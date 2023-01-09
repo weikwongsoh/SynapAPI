@@ -1,0 +1,647 @@
+
+---
+openapi: "3.0.0"
+info:  # (MANDATORY)
+    title: "SYNAP WEB API"
+    version: "0.0.1"  # major.minor.patch
+    description: "WEB API for SYNAP"
+    contact:
+        name: "Cranium Ventures Pte Ltd"
+        url:  "https://www.craniumventures.com"
+        email: "info@craniumventures.com"
+servers:
+    -
+        url: "https://sandbox01.craniumventures.com/synap/dev"
+        description: "Sandbox Environment"
+components:
+    schemas:
+        UserContactRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    recordStatus:
+                        type: "string"
+                    class:
+                        type: "number"
+                        description: "the contact class"
+                    identifier:
+                        type: "string"
+                        description: "a system generated key which can be used to retrieve this contact record"
+                    maskedAddress:
+                        type: "string"
+                        description: "the contact address masked for security purposes; an application must only display the masked address even if a plain text address is present in the response"
+                    address:
+                        type: "string"
+                        description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address which has been parsed by the system"
+                    originalAddress:
+                        type: "string"
+                        description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address string as entered by the user when the record was created or updated"
+                    flags:
+                        type: "object"
+                        properties:
+                            verified:
+                                type: "boolean"
+                                description: "the record has been verified"
+                            primary:
+                                type: "boolean"
+                                description: "this is a primary address"
+                            default:
+                                type: "boolean"
+                                description: "this is a default address"
+                            phone:
+                                type: "boolean"
+                                description: "this is a phone type record"
+                            messageCapable:
+                                type: "boolean"
+                                description: "this type of address is capable of receiving notification messages"
+                            url:
+                                type: "boolean"
+                                description: "this is a social media address record"
+                            notification:
+                                type: "boolean"
+                                description: "this record can receive account notification messages from the system"
+                            recovery:
+                                type: "boolean"
+                                description: "this record can be used for password and account recovery operations"
+        ResponseResult:
+            type: "object"
+            properties:
+                code:
+                    type: "string"
+                    description: "success or error code"
+                    example: "ErrorCode"
+                reason:
+                    type: "string"
+                    description: "reason for error occur"
+                    example: "ErrorReason"
+            required:
+                - code
+    parameters:
+        SessionToken:
+            name: "sessionToken"
+            in: "header"
+            description: "Synap's session token"
+            required: true
+            schema:
+                type: "string"
+                example: "SessionToken"
+    requestBodies:
+        GetAccessRightsRequestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            user:
+                                type: "object"
+                                properties:
+                                    name:
+                                        type: "string"
+                            accessRightObject:
+                                type: "object"
+                                properties:
+                                    name:
+                                        type: "string"
+                                        description: "name of the object which the rights are processed"
+                                    action:
+                                        type: "string"
+                                        description: "one or more actions; the set of actions is a comma or space separated list of words"
+    responses:
+        ResultOnlyResponse:
+            description: "Receive only result object on response"
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            result:
+                                $ref: "#/components/schemas/ResponseResult"
+        GetAccessRightsResponse:
+            description: "Returned list of user's access rights"
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            result:
+                                $ref: "#/components/schemas/ResponseResult"
+                            accessRights:
+                                type: "array"
+                                items:
+                                    type: "object"
+                                    properties:
+                                        accessRightObject:
+                                            type: "object"
+                                            properties:
+                                                name:
+                                                    type: "string"
+                                        accessRightActions:
+                                            type: "object"
+                                            description: "list of defined actions of an object"
+    securitySchemes:
+        synapSessionToken:
+            type: "apiKey"
+            description: "Synap's session token is required for all commands except 'Login'"
+            name: x-synap-sessionToken
+            in: header
+security:
+    -
+        synapSessionToken: []
+paths:
+    /Echo:
+        summary: "Ping the server"
+        post:
+            operationId: "Echo"
+            tags:
+                -  "System"
+            summary: "Echo back request body"
+            security: []
+            requestBody:
+                description: "content to be echoed back"
+                content:
+                    application/json:
+                        schema:
+                            anyOf:
+                                - type: "array"
+                                - type: "boolean"
+                                - type: "number"
+                                - type: "object"
+                                - type: "string"
+            responses:
+                200:
+                    description: "Echo back request body"
+                    content:
+                        application/json:
+                            schema:
+                                anyOf:
+                                    - type: "array"
+                                    - type: "boolean"
+                                    - type: "number"
+                                    - type: "object"
+                                    - type: "string"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/Logout:
+        summary: "User logout or sign out"
+        post:
+            tags:
+                -  "Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/Login:
+        summary: "User login or sign in"
+        post:
+            security: []
+            tags:
+                -  "Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                            minLength: 1
+                                        password:
+                                            type: "string"
+                                            minLength: 1
+            responses:
+                200:
+                    description: "Returned a session token and related data"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    sessionToken:
+                                        type: "string"
+                                        minLength: 1
+                                    user:
+                                        type: "object"
+                                        properties:
+                                            inactivityTimeout:
+                                                type: "number"
+                                            name:
+                                                type: "string"
+                                            preferName:
+                                                type: "string"
+                                            lastLogin:
+                                                type: "string"
+                                                format: "date-time"
+                                    password:
+                                        type: "object"
+                                        properties:
+                                            minimumLength:
+                                                type: "number"
+                                            validationChecks:
+                                                type: "object"
+                                                properties:
+                                                    minimumLengthCheck:
+                                                        type: "boolean"
+                                                        description: "Validate against password.minimumLength"
+                                                    alphaCheck:
+                                                        type: "boolean"
+                                                        description: "Must contain at least one alphabet"
+                                                    upperCaseCheck:
+                                                        type: "boolean"
+                                                        description: "Must contain at least one upper case letter"
+                                                    lowerCaseCheck:
+                                                        type: "boolean"
+                                                        description: "Must contain at least one lower case letter"
+                                                    digitCheck:
+                                                        type: "boolean"
+                                                        description: "Must contain at least one digit"
+                                                    specialCharacterCheck:
+                                                        type: "boolean"
+                                                        description: "Must contain at least one special char (not an alphabet, not a digit)"
+                                                    usernameStrippedCheck:
+                                                        type: "boolean"
+                                                        description: "The password cannot contain the user name (in this case the user name and password are stripped of all non-alphabet as well as email suffix before a match is attempted)"
+                                                    usernameCheck:
+                                                        type: "boolean"
+                                                        description: "The password cannot contain the user name (in this the user name is not stripped of non-alphabet and the email suffix)"
+                                    organization:
+                                        type: "object"
+                                        properties:
+                                            name:
+                                                type: "string"
+                                            fullname:
+                                                type: "string"
+                                                description: "organization name to be used for display"
+                                    userContacts:
+                                        type: "object"
+                                        properties:
+                                            mobile:
+                                                $ref: "#/components/schemas/UserContactRecords"
+                                            email:
+                                                $ref: "#/components/schemas/UserContactRecords"
+                                            landline:
+                                                $ref: "#/components/schemas/UserContactRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/ContactShortList:
+        summary: "Retrieve list of econtact for an user"
+        post:
+            security: []
+            tags:
+                -  "Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                            minLength: 1
+            responses:
+                200:
+                    description: "Returned a list of user's econtact"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    userContacts:
+                                        type: "object"
+                                        properties:
+                                            mobile:
+                                                $ref: "#/components/schemas/UserContactRecords"
+                                            email:
+                                                $ref: "#/components/schemas/UserContactRecords"
+                                            landline:
+                                                $ref: "#/components/schemas/UserContactRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/ChangePassword:
+        summary: "Change user's existing password"
+        post:
+            security: []
+            tags:
+                -  "Password"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                            minLength: 1
+                                        password:
+                                            type: "string"
+                                            minLength: 1
+                                        newPassword:
+                                            type: "string"
+                                            minLength: 1
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/RequestToResetPassword:
+        summary: "Request to reset user's existing password"
+        post:
+            security: []
+            tags:
+                -  "Password"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                            minLength: 1
+                                location:
+                                    type: "object"
+                                    properties:
+                                        ipAddress:
+                                            type: "string"
+                                        currentTimestamp:
+                                            type: "string"
+                                            format: "date-time"
+                                application:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                userContact:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+            responses:
+                200:
+                    description: "Returned an URL for user to reset password"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    password:
+                                        type: "object"
+                                        properties:
+                                            resetURL:
+                                                type: "string"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/VerifyResetPasswordToken:
+        summary: "Verify security token for reset password"
+        post:
+            security: []
+            tags:
+                -  "Password"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                password:
+                                    type: "object"
+                                    properties:
+                                        resetToken:
+                                            type: "string"
+                                            minLength: 1
+                                    required:
+                                        - resetToken
+                            required:
+                                - password
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/ResetPassword:
+        summary: "Reset user's reset password"
+        post:
+            security: []
+            tags:
+                -  "Password"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        newPassword:
+                                            type: "string"
+                                            minLength: 1
+                                    required:
+                                        - newPassword
+                                password:
+                                    type: "object"
+                                    properties:
+                                        resetToken:
+                                            type: "string"
+                                            minLength: 1
+                                    required:
+                                        - resetToken
+                                location:
+                                    type: "object"
+                                    properties:
+                                        ipAddress:
+                                            type: "string"
+                                            minLength: 1
+                                    required:
+                                        - ipAddress
+                            required:
+                                - user
+                                - password
+                                - location
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/CheckAccessRights:
+        summary: "Check user's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                accessRight:
+                                    type: "object"
+                                    properties:
+                                        expression:
+                                            type: "string"
+                                            description: "arbitrary rights expression"
+                                            example: "%user(joe) and transact(reversal)"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUserAccessRights:
+        summary: "Get list of user's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                $ref: "#/components/requestBodies/GetAccessRightsRequestBody"
+            responses:
+                200:
+                    $ref: "#/components/responses/GetAccessRightsResponse"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetTeamAccessRights:
+        summary: "Get list of team's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                $ref: "#/components/requestBodies/GetAccessRightsRequestBody"
+            responses:
+                200:
+                    $ref: "#/components/responses/GetAccessRightsResponse"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetOrganizationAccessRights:
+        summary: "Get list of organization's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                $ref: "#/components/requestBodies/GetAccessRightsRequestBody"
+            responses:
+                200:
+                    $ref: "#/components/responses/GetAccessRightsResponse"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUser:
+        summary: "Get user's details"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+            responses:
+                200:
+                    description: "Returned list of user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    users:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                user:
+                                                    type: "object"
+                                                    properties:
+                                                        rowId:
+                                                            type: "number"
+                                                        recordStatus:
+                                                            type: "string"
+                                                        recordDateTime:
+                                                            type: "string"
+                                                            format: "date-time"
+                                                        createDateTime:
+                                                            type: "string"
+                                                            format: "date-time"
+                                                        name:
+                                                            type: "string"
+                                                        identifier:
+                                                            type: "string"
+                                                        externalIdentifier:
+                                                            type: "string"
+                                                        groupIdentifier:
+                                                            type: "string"
+                                                        policyIdentifier:
+                                                            type: "string"
+                                                        organizationIdentifier:
+                                                            type: "string"
+                                                        multiFactorIdentifier:
+                                                            type: "string"
+                                                        multiFactorName:
+                                                            type: "string"
+                                                        email:
+                                                            type: "string"
+                                                            format: "email"
+                                                        mobileNumber:
+                                                            type: "string"
+                                                        lastFailedAuthenticateDateTime:
+                                                            type: "string"
+                                                            format: "date-time"
+                                                        lastLoginLocation:
+                                                            type: "string"
+                                                        lastFailedLoginLocation:
+                                                            type: "string"
+                                                        lockoutPeriod:
+                                                            type: "string"
+                                                        failedAuthenticateAttemptCount:
+                                                            type: "number"
+                                                        sessionExceededPolicy:
+                                                            type: "number"
+                                                        loginShell:
+                                                            type: "string"
+                                                        loginShellArguments:
+                                                            type: "string"
+                                                        serverLoginScriptPath:
+                                                            type: "string"
+                                                        homeDirectory:
+                                                            type: "string"
+                                                        notificationOptInMap:
+                                                            type: "string"
+                                                        restricted:
+                                                            type: "string"
+                                                        preferName:
+                                                            type: "string"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
