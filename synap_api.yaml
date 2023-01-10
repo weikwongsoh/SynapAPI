@@ -97,6 +97,20 @@ components:
                     example: "ErrorReason"
             required:
                 - code
+        AccessRightObjectNameOnRequest:
+            type: "object"
+            properties:
+                name:
+                    type: "string"
+                    description: "name of the object which the rights are processed"
+                    example: "frog"
+        AccessRightActions:
+            type: "object"
+            description: "one or more actions"
+            properties:
+                <replace_with_action_name>:
+                    type: "boolean"
+                    description: "name of an action; values are ignored during retrieval however 'true' would mean an action to be granted and 'false' would mean an action to be revoked"
     parameters:
         SessionToken:
             name: "sessionToken"
@@ -107,7 +121,7 @@ components:
                 type: "string"
                 example: "SessionToken"
     requestBodies:
-        GetAccessRightsRequestBody:
+        UserAccessRightsRequestBody:
             required: true
             content:
                 application/json:
@@ -120,19 +134,41 @@ components:
                                     name:
                                         type: "string"
                             accessRightObject:
+                                $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                            accessRightActions:
+                                $ref: "#/components/schemas/AccessRightActions"
+        TeamAccessRightsRequestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            team:
                                 type: "object"
                                 properties:
                                     name:
                                         type: "string"
-                                        description: "name of the object which the rights are processed"
-                                        example: "frog"
+                            accessRightObject:
+                                $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
                             accessRightActions:
+                                $ref: "#/components/schemas/AccessRightActions"
+        OrganizationAccessRightsRequestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            organization:
                                 type: "object"
-                                description: "one or more actions"
                                 properties:
-                                    <replace_with_action_name>:
-                                        type: "boolean"
-                                        description: "name of an action; values are ignored during validation however 'true' would mean accessRightAction to be granted and 'false' would mean accessRightAction to be revoked"
+                                    name:
+                                        type: "string"
+                            accessRightObject:
+                                $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                            accessRightActions:
+                                $ref: "#/components/schemas/AccessRightActions"
     responses:
         ResultOnlyResponse:
             description: "Receive only result object on response"
@@ -163,11 +199,7 @@ components:
                                                 name:
                                                     type: "string"
                                         accessRightActions:
-                                            type: "object"
-                                            description: "list of defined actions of an object"
-                                            properties:
-                                                <replace_with_action_name>:
-                                                    type: "boolean"
+                                            $ref: "#/components/schemas/AccessRightActions"
     securitySchemes:
         synapSessionToken:
             type: "apiKey"
@@ -548,7 +580,7 @@ paths:
             tags:
                 -  "AccessRights"
             requestBody:
-                $ref: "#/components/requestBodies/GetAccessRightsRequestBody"
+                $ref: "#/components/requestBodies/UserAccessRightsRequestBody"
             responses:
                 200:
                     $ref: "#/components/responses/GetAccessRightsResponse"
@@ -560,7 +592,7 @@ paths:
             tags:
                 -  "AccessRights"
             requestBody:
-                $ref: "#/components/requestBodies/GetAccessRightsRequestBody"
+                $ref: "#/components/requestBodies/TeamAccessRightsRequestBody"
             responses:
                 200:
                     $ref: "#/components/responses/GetAccessRightsResponse"
@@ -572,10 +604,70 @@ paths:
             tags:
                 -  "AccessRights"
             requestBody:
-                $ref: "#/components/requestBodies/GetAccessRightsRequestBody"
+                $ref: "#/components/requestBodies/OrganizationAccessRightsRequestBody"
             responses:
                 200:
                     $ref: "#/components/responses/GetAccessRightsResponse"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GrantUserAccessRights:
+        summary: "Grant user's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                $ref: "#/components/requestBodies/UserAccessRightsRequestBody"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GrantTeamAccessRights:
+        summary: "Grant team's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                $ref: "#/components/requestBodies/TeamAccessRightsRequestBody"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GrantOrganizationAccessRights:
+        summary: "Grant organization's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                $ref: "#/components/requestBodies/OrganizationAccessRightsRequestBody"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/RevokeUserAccessRights:
+        summary: "Revoke user's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                $ref: "#/components/requestBodies/UserAccessRightsRequestBody"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/RevokeTeamAccessRights:
+        summary: "Revoke team's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                $ref: "#/components/requestBodies/TeamAccessRightsRequestBody"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/RevokeOrganizationAccessRights:
+        summary: "Revoke organization's access rights"
+        post:
+            tags:
+                -  "AccessRights"
+            requestBody:
+                $ref: "#/components/requestBodies/OrganizationAccessRightsRequestBody"
+            responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetUser:
