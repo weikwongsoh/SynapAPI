@@ -15,13 +15,25 @@ servers:
         description: "Sandbox Environment"
 components:
     schemas:
+        RecordStatus:
+            type: "string"
+            description: "status of the record"
+            enum:
+                - active
+                - inactive
+                - suspensed
+                - pendingApproval
+                - disabled
+                - locked
+                - removed
+                - noPassword
         UserContactRecords:
             type: "array"
             items:
                 type: "object"
                 properties:
                     recordStatus:
-                        type: "string"
+                        $ref: "#/components/schemas/RecordStatus"
                     class:
                         type: "number"
                         description: "the contact class"
@@ -71,6 +83,14 @@ components:
                     type: "string"
                     description: "success or error code"
                     example: "ErrorCode"
+                    enum:
+                        - Success
+                        - Fail
+                        - InvalidSessionToken
+                        - InvalidRequestValues
+                        - ServerTimeout
+                        - SystemError
+                        - InvalidProvider
                 reason:
                     type: "string"
                     description: "reason for error occur"
@@ -105,9 +125,14 @@ components:
                                     name:
                                         type: "string"
                                         description: "name of the object which the rights are processed"
-                                    action:
-                                        type: "string"
-                                        description: "one or more actions; the set of actions is a comma or space separated list of words"
+                                        example: "frog"
+                            accessRightActions:
+                                type: "object"
+                                description: "one or more actions"
+                                properties:
+                                    <replace_with_action_name>:
+                                        type: "boolean"
+                                        description: "name of an action; values are ignored during validation however 'true' would mean accessRightAction to be granted and 'false' would mean accessRightAction to be revoked"
     responses:
         ResultOnlyResponse:
             description: "Receive only result object on response"
@@ -140,6 +165,9 @@ components:
                                         accessRightActions:
                                             type: "object"
                                             description: "list of defined actions of an object"
+                                            properties:
+                                                <replace_with_action_name>:
+                                                    type: "boolean"
     securitySchemes:
         synapSessionToken:
             type: "apiKey"
@@ -487,7 +515,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
-    /command/CheckAccessRights:
+    /command/CheckUserAccessRights:
         summary: "Check user's access rights"
         post:
             tags:
@@ -588,7 +616,7 @@ paths:
                                                         rowId:
                                                             type: "number"
                                                         recordStatus:
-                                                            type: "string"
+                                                            $ref: "#/components/schemas/RecordStatus"
                                                         recordDateTime:
                                                             type: "string"
                                                             format: "date-time"
