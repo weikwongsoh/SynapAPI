@@ -838,3 +838,114 @@ paths:
                                         $ref: "#/components/schemas/UserRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewUser:
+        summary: "Create a new user's record"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                policy:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                            description: "default team of an user"
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        preferName:
+                                            type: "string"
+                                        inactivityTimeout:
+                                            type: "integer"
+                                            format: "int32"
+                                        maximumSessions:
+                                            type: "integer"
+                                            format: "int32"
+                                        newPassword:
+                                            type: "string"
+                                        oneTimePassword:
+                                            type: "string"
+                                        firstTimePassword:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateUser:
+        summary: "Update an existing user's record"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                policy:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                            description: "default team of an user"
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        preferName:
+                                            type: "string"
+                                        inactivityTimeout:
+                                            type: "integer"
+                                            format: "int32"
+                                        maximumSessions:
+                                            type: "integer"
+                                            format: "int32"
+                                        recordStatus:
+                                            $ref: "#/components/schemas/RecordStatus"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteUser:
+        summary: "Delete an existing user's record"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
