@@ -15,6 +15,41 @@ servers:
         description: "Sandbox Environment"
 components:
     schemas:
+        CursorRecordCountOnRequest:
+            type: "object"
+            properties:
+                recordCount:
+                    type: "number"
+                    description: "number of records to be retrieved"
+        CursorOnRequest:
+            type: "object"
+            properties:
+                identifier:
+                    type: "string"
+                recordOffset:
+                    type: "number"
+                    description: "offset of the record to retrieve"
+                recordCount:
+                    type: "number"
+                    description: "number of records to be retrieved for this command"
+            required:
+                - identifier
+                - recordOffset
+        CursorOnResponse:
+            type: "object"
+            properties:
+                identifier:
+                    type: "string"
+                    description: "identifier used to uniquely identify a cursor created by the system"
+                totalRecords:
+                    type: "number"
+                    description: "total number of records a cursor holds"
+        CursorRecordIdentifierOnResponse:
+            type: "object"
+            properties:
+                recordIdentifier:
+                    type: "string"
+                    description: "record's identifier of a given cursor's context"
         RecordStatus:
             type: "string"
             description: "status of the record"
@@ -76,6 +111,76 @@ components:
                             recovery:
                                 type: "boolean"
                                 description: "this record can be used for password and account recovery operations"
+        UserRecord:
+            type: "object"
+            properties:
+                rowId:
+                    type: "number"
+                recordStatus:
+                    $ref: "#/components/schemas/RecordStatus"
+                recordDateTime:
+                    type: "string"
+                    format: "date-time"
+                createDateTime:
+                    type: "string"
+                    format: "date-time"
+                name:
+                    type: "string"
+                identifier:
+                    type: "string"
+                externalIdentifier:
+                    type: "string"
+                groupIdentifier:
+                    type: "string"
+                policyIdentifier:
+                    type: "string"
+                organizationIdentifier:
+                    type: "string"
+                multiFactorIdentifier:
+                    type: "string"
+                multiFactorName:
+                    type: "string"
+                email:
+                    type: "string"
+                    format: "email"
+                mobileNumber:
+                    type: "string"
+                lastFailedAuthenticateDateTime:
+                    type: "string"
+                    format: "date-time"
+                lastLoginLocation:
+                    type: "string"
+                lastFailedLoginLocation:
+                    type: "string"
+                lockoutPeriod:
+                    type: "string"
+                failedAuthenticateAttemptCount:
+                    type: "number"
+                sessionExceededPolicy:
+                    type: "number"
+                loginShell:
+                    type: "string"
+                loginShellArguments:
+                    type: "string"
+                serverLoginScriptPath:
+                    type: "string"
+                homeDirectory:
+                    type: "string"
+                notificationOptInMap:
+                    type: "string"
+                restricted:
+                    type: "string"
+                preferName:
+                    type: "string"
+        UserRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    cursor:
+                        $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
+                    user:
+                        $ref: "#/components/schemas/UserRecord"
         ResponseResult:
             type: "object"
             properties:
@@ -687,6 +792,38 @@ paths:
                                     properties:
                                         name:
                                             type: "string"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    users:
+                                        $ref: "#/components/schemas/UserRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchUser:
+        summary: "Fetch more user's details with cursor"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
             responses:
                 200:
                     description: "Returned list of user records"
@@ -698,70 +835,6 @@ paths:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
                                     users:
-                                        type: "array"
-                                        items:
-                                            type: "object"
-                                            properties:
-                                                user:
-                                                    type: "object"
-                                                    properties:
-                                                        rowId:
-                                                            type: "number"
-                                                        recordStatus:
-                                                            $ref: "#/components/schemas/RecordStatus"
-                                                        recordDateTime:
-                                                            type: "string"
-                                                            format: "date-time"
-                                                        createDateTime:
-                                                            type: "string"
-                                                            format: "date-time"
-                                                        name:
-                                                            type: "string"
-                                                        identifier:
-                                                            type: "string"
-                                                        externalIdentifier:
-                                                            type: "string"
-                                                        groupIdentifier:
-                                                            type: "string"
-                                                        policyIdentifier:
-                                                            type: "string"
-                                                        organizationIdentifier:
-                                                            type: "string"
-                                                        multiFactorIdentifier:
-                                                            type: "string"
-                                                        multiFactorName:
-                                                            type: "string"
-                                                        email:
-                                                            type: "string"
-                                                            format: "email"
-                                                        mobileNumber:
-                                                            type: "string"
-                                                        lastFailedAuthenticateDateTime:
-                                                            type: "string"
-                                                            format: "date-time"
-                                                        lastLoginLocation:
-                                                            type: "string"
-                                                        lastFailedLoginLocation:
-                                                            type: "string"
-                                                        lockoutPeriod:
-                                                            type: "string"
-                                                        failedAuthenticateAttemptCount:
-                                                            type: "number"
-                                                        sessionExceededPolicy:
-                                                            type: "number"
-                                                        loginShell:
-                                                            type: "string"
-                                                        loginShellArguments:
-                                                            type: "string"
-                                                        serverLoginScriptPath:
-                                                            type: "string"
-                                                        homeDirectory:
-                                                            type: "string"
-                                                        notificationOptInMap:
-                                                            type: "string"
-                                                        restricted:
-                                                            type: "string"
-                                                        preferName:
-                                                            type: "string"
+                                        $ref: "#/components/schemas/UserRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
