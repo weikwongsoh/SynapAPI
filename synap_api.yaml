@@ -276,6 +276,10 @@ components:
                                 type: "string"
                             issuerInstitution:
                                 type: "string"
+                            countryCode:
+                                type: "string"
+                            currencyCode:
+                                type: "string"
                     refund:
                         type: "object"
                         properties:
@@ -300,6 +304,10 @@ components:
                             categoryCode:
                                 type: "string"
                             deviceIdentifier:
+                                type: "string"
+                            countryCode:
+                                type: "string"
+                            nameAndLocation:
                                 type: "string"
     parameters:
         SessionToken:
