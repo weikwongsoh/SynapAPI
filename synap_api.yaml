@@ -216,6 +216,91 @@ components:
                 <replace_with_action_name>:
                     type: "boolean"
                     description: "name of an action; values are ignored during retrieval however 'true' would mean an action to be granted and 'false' would mean an action to be revoked"
+        PaymentRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    payment:
+                        type: "object"
+                        properties:
+                            recordDateTime:
+                                type: "string"
+                                format: "date-time"
+                            applicationIdentifier:
+                                type: "string"
+                            messageTypeIdentifier:
+                                type: "string"
+                            processingCode:
+                                type: "string"
+                            traceNumber:
+                                type: "string"
+                            transmissionDateTime:
+                                type: "string"
+                                format: "date-time"
+                            status:
+                                type: "string"
+                            acquirerInstitution:
+                                type: "string"
+                            switchSequence:
+                                type: "string"
+                            amount:
+                                type: "number"
+                            localTime:
+                                type: "string"
+                            localDate:
+                                type: "string"
+                                format: "date-time"
+                            retrievalReferenceNumber:
+                                type: "string"
+                            currencyCode:
+                                type: "string"
+                    settlement:
+                        type: "object"
+                        properties:
+                            date:
+                                type: "string"
+                                format: "date-time"
+                            amount:
+                                type: "number"
+                            rate:
+                                type: "number"
+                            currencyCode:
+                                type: "string"
+                    instrument:
+                        type: "object"
+                        properties:
+                            maskedNumber:
+                                type: "string"
+                            encryptedNumber:
+                                type: "string"
+                            issuerInstitution:
+                                type: "string"
+                    refund:
+                        type: "object"
+                        properties:
+                            amount:
+                                type: "number"
+                            date:
+                                type: "string"
+                                format: "date-time"
+                    adjustment:
+                        type: "object"
+                        properties:
+                            amount:
+                                type: "number"
+                            date:
+                                type: "string"
+                                format: "date-time"
+                    merchant:
+                        type: "object"
+                        properties:
+                            identifier:
+                                type: "string"
+                            categoryCode:
+                                type: "string"
+                            deviceIdentifier:
+                                type: "string"
     parameters:
         SessionToken:
             name: "sessionToken"
@@ -449,6 +534,11 @@ paths:
                                             fullname:
                                                 type: "string"
                                                 description: "organization name to be used for display"
+                                    merchant:
+                                        type: "object"
+                                        properties:
+                                            identifier:
+                                                type: "string"
                                     userContacts:
                                         type: "object"
                                         properties:
@@ -947,5 +1037,68 @@ paths:
                                         name:
                                             type: "string"
             responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetPayment:
+        summary: "Get list of payments"
+        post:
+            tags:
+                -  "Payment"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                merchant:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of payment records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    payments:
+                                        $ref: "#/components/schemas/PaymentRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchPayment:
+        summary: "Fetch more payment records with cursor"
+        post:
+            tags:
+                -  "Payment"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of payment records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    payments:
+                                        $ref: "#/components/schemas/PaymentRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
