@@ -1064,6 +1064,43 @@ paths:
                                     properties:
                                         identifier:
                                             type: "string"
+                                filterBy:
+                                    type: "object"
+                                    properties:
+                                        localDate:
+                                            type: "object"
+                                            properties:
+                                                operator:
+                                                    type: "string"
+                                                    enum:
+                                                        - "between"
+                                                        - "="
+                                                        - ">"
+                                                        - "<"
+                                                        - ">="
+                                                        - "<="
+                                                        - "<>"
+                                                value:
+                                                    type: "string"
+                                                    format: "date"
+                                                endValue:
+                                                    type: "string"
+                                                    format: "date"
+                                        status:
+                                            type: "object"
+                                            properties:
+                                                operator:
+                                                    type: "string"
+                                                    enum:
+                                                        - "in"
+                                                values:
+                                                    type: "array"
+                                                    items:
+                                                        type: "string"
+                                                        enum:
+                                                            - "succeeded"
+                                                            - "failed"
+                                                            - "refunded"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
             responses:
