@@ -1147,3 +1147,30 @@ paths:
                                         $ref: "#/components/schemas/PaymentRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/RefundPayment:
+        summary: "Refund of a payment"
+        post:
+            tags:
+                -  "Payment"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        switchSequence:
+                                            type: "string"
+                                refund:
+                                    type: "object"
+                                    properties:
+                                        amount:
+                                            type: "number"
+                                        reason:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
