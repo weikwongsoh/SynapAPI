@@ -18,9 +18,14 @@ components:
         CursorRecordCountOnRequest:
             type: "object"
             properties:
+                recordOffset:
+                    type: "number"
+                    description: "offset of record to retrieve from"
                 recordCount:
                     type: "number"
                     description: "number of records to be retrieved"
+            required:
+                - recordOffset
         CursorOnRequest:
             type: "object"
             properties:
@@ -1163,6 +1168,35 @@ paths:
                                     type: "object"
                                     properties:
                                         switchSequence:
+                                            type: "string"
+                                refund:
+                                    type: "object"
+                                    properties:
+                                        amount:
+                                            type: "number"
+                                        reason:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewPaymentLink:
+        summary: "Create a new payment link"
+        post:
+            tags:
+                -  "Payment"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        amount:
+                                            type: "number"
+                                        purpose:
                                             type: "string"
                                 refund:
                                     type: "object"
