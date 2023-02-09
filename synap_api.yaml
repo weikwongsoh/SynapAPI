@@ -285,6 +285,8 @@ components:
                                 type: "string"
                             currencyCode:
                                 type: "string"
+                            expiry:
+                                type: "string"
                     refund:
                         type: "object"
                         properties:
@@ -313,6 +315,11 @@ components:
                             countryCode:
                                 type: "string"
                             nameAndLocation:
+                                type: "string"
+                    customer:
+                        type: "object"
+                        properties:
+                            name:
                                 type: "string"
     parameters:
         SessionToken:
@@ -1148,6 +1155,39 @@ paths:
                                 properties:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
+                                    payments:
+                                        $ref: "#/components/schemas/PaymentRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetPaymentWithSwitchSequence:
+        summary: "Get payment"
+        post:
+            tags:
+                -  "Payment"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        switchSequence:
+                                            type: "string"
+            responses:
+                200:
+                    description: "Returned list of payment records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
                                     payments:
                                         $ref: "#/components/schemas/PaymentRecords"
                 default:
