@@ -221,6 +221,32 @@ components:
                 <replace_with_action_name>:
                     type: "boolean"
                     description: "name of an action; values are ignored during retrieval however 'true' would mean an action to be granted and 'false' would mean an action to be revoked"
+        CountryRecord:
+            type: "object"
+            properties:
+                name:
+                    type: "string"
+                isoAlpha2Code:
+                    type: "string"
+                isoAlpha3Code:
+                    type: "string"
+                isoNumericCode:
+                    type: "number"
+        CurrencyRecord:
+            type: "object"
+            properties:
+                name:
+                    type: "string"
+                isoAlphaCode:
+                    type: "string"
+                isoNumericCode:
+                    type: "number"
+                symbol:
+                    type: "string"
+                minorUnits:
+                    type: "number"
+                isPrefix:
+                    type: "boolean"
         PaymentRecords:
             type: "array"
             items:
@@ -1096,20 +1122,51 @@ paths:
                                             type: "object"
                                             properties:
                                                 currency:
-                                                    type: "object"
-                                                    properties:
-                                                        isoAlphaCode:
-                                                            type: "string"
-                                                        isoNumericCode:
-                                                            type: "number"
-                                                        name:
-                                                            type: "string"
-                                                        symbol:
-                                                            type: "string"
-                                                        minorUnits:
-                                                            type: "number"
-                                                        isPrefix:
-                                                            type: "boolean"
+                                                    $ref: "#/components/schemas/CurrencyRecord"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetCountry:
+        summary: "Get list of countries"
+        post:
+            security: []
+            tags:
+                -  "Countries & Currencies"
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                country:
+                                    type: "object"
+                                    properties:
+                                        isoAlpha2Code:
+                                            type: "string"
+                                        isoAlpha3Code:
+                                            type: "string"
+                                        isoNumericCode:
+                                            type: "number"
+            responses:
+                200:
+                    description: "Returned list of country records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    currencies:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                country:
+                                                    $ref: "#/components/schemas/CountryRecord"
+                                                currency:
+                                                    $ref: "#/components/schemas/CurrencyRecord"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetPayment:
