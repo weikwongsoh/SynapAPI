@@ -1059,6 +1059,59 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetCurrency:
+        summary: "Get list of currencies"
+        post:
+            tags:
+                -  "Countries & Currencies"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                currency:
+                                    type: "object"
+                                    properties:
+                                        isoAlphaCode:
+                                            type: "string"
+                                        isoNumericCode:
+                                            type: "number"
+            responses:
+                200:
+                    description: "Returned list of currency records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    currencies:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                currency:
+                                                    type: "object"
+                                                    properties:
+                                                        isoAlphaCode:
+                                                            type: "string"
+                                                        isoNumericCode:
+                                                            type: "number"
+                                                        name:
+                                                            type: "string"
+                                                        symbol:
+                                                            type: "string"
+                                                        minorUnits:
+                                                            type: "number"
+                                                        isPrefix:
+                                                            type: "boolean"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetPayment:
         summary: "Get list of payments"
         post:
