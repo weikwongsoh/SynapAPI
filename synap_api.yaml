@@ -1434,9 +1434,6 @@ paths:
                                             description: "Shopper's ISO numeric country code"
                                             type: "number"
                                             example: 840
-                                required:
-                                    - merchant
-                                    - payment
             responses:
                 default:
                     description: "Receive only result object on response"
