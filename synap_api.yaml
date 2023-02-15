@@ -1455,5 +1455,9 @@ paths:
                                                 paymentMethod:
                                                     type: "object"
                                                     properties:
-                                                        identifier:
+                                                        name:
+                                                            description: "name of the payment method to be presented on screen"
+                                                            type: "string"
+                                                        type:
+                                                            description: "unique payment method code to be included in 'Pay' command"
                                                             type: "string"
