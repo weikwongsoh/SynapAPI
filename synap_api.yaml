@@ -1405,7 +1405,7 @@ paths:
                                     type: "object"
                                     properties:
                                         amount:
-                                            description: "The payment's value in minor units"
+                                            description: "The payment's value"
                                             type: "number"
                                             example: 1.23
                                         currencyCode:
@@ -1421,6 +1421,7 @@ paths:
                                                 - "android"
                                     required:
                                         - amount
+                                        - currencyCode
                                         - channel
                                 customer:
                                     type: "object"
