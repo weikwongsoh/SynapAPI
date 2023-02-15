@@ -1370,15 +1370,84 @@ paths:
             responses:
                 default:
                     description: "Receive only result object on response"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    paymentLink:
+                                        type: "object"
+                                        properties:
+                                            identifier:
+                                                type: "string"
+    /command/GetPaymentMethod:
+        summary: "Get list of payment method"
+        post:
+            tags:
+                -  "Payment"
+            requestBody:
+                required: true
                 content:
                     application/json:
                         schema:
                             type: "object"
                             properties:
-                                result:
-                                    $ref: "#/components/schemas/ResponseResult"
-                                paymentLink:
+                                merchant:
                                     type: "object"
                                     properties:
                                         identifier:
                                             type: "string"
+                                    required:
+                                        - identifier
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        amount:
+                                            type: "number"
+                                            example: "1.23"
+                                        channel:
+                                            description: "The platform of the shopper's device"
+                                            type: "string"
+                                            enum:
+                                                - "web"
+                                                - "ios"
+                                                - "android"
+                                    required:
+                                        - amount
+                                        - channel
+                                customer:
+                                    type: "object"
+                                    properties:
+                                        locale:
+                                            description: "Shopper's preferred language and country code"
+                                            type: "string"
+                                            example: "en-US"
+                                        countryCode:
+                                            description: "Shopper's ISO numeric country code"
+                                            type: "string"
+                                            example: "840"
+                                required:
+                                    - merchant
+                                    - payment
+            responses:
+                default:
+                    description: "Receive only result object on response"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    paymentMethods:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                paymentMethod:
+                                                    type: "object"
+                                                    properties:
+                                                        identifier:
+                                                            type: "string"
