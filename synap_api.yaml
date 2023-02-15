@@ -1405,8 +1405,13 @@ paths:
                                     type: "object"
                                     properties:
                                         amount:
+                                            description: "The payment's value in minor units"
                                             type: "number"
-                                            example: "1.23"
+                                            example: 1.23
+                                        currencyCode:
+                                            description: "The payment's currency in ISO numeric code"
+                                            type: "number"
+                                            example: 840
                                         channel:
                                             description: "The platform of the shopper's device"
                                             type: "string"
@@ -1426,8 +1431,8 @@ paths:
                                             example: "en-US"
                                         countryCode:
                                             description: "Shopper's ISO numeric country code"
-                                            type: "string"
-                                            example: "840"
+                                            type: "number"
+                                            example: 840
                                 required:
                                     - merchant
                                     - payment
