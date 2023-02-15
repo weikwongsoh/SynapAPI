@@ -1350,13 +1350,35 @@ paths:
                                             type: "number"
                                         purpose:
                                             type: "string"
-                                refund:
+                                        description:
+                                            type: "string"
+                                        recurring:
+                                            type: "boolean"
+                                options:
                                     type: "object"
                                     properties:
-                                        amount:
-                                            type: "number"
-                                        reason:
-                                            type: "string"
+                                        collectTaxAutomatically:
+                                            type: "boolean"
+                                        allowPromotionCodes:
+                                            type: "boolean"
+                                        savePaymentDetails:
+                                            type: "boolean"
+                                        requirePhoneNumber:
+                                            type: "boolean"
+                                        requireAddress:
+                                            type: "boolean"
             responses:
                 default:
-                    $ref: "#/components/responses/ResultOnlyResponse"
+                    description: "Receive only result object on response"
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                result:
+                                    $ref: "#/components/schemas/ResponseResult"
+                                paymentLink:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
