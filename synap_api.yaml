@@ -1458,3 +1458,106 @@ paths:
                                                         type:
                                                             description: "unique payment method code to be included in 'Pay' command"
                                                             type: "string"
+    /command/Pay:
+        summary: "Pay with payment instrument"
+        post:
+            tags:
+                -  "Payment"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                merchant:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        amount:
+                                            description: "The payment's value"
+                                            type: "number"
+                                            example: 1.23
+                                        currencyCode:
+                                            description: "The payment's currency in ISO numeric code"
+                                            type: "number"
+                                            example: 840
+                                        referenceNumber:
+                                            description: "merchant's unique reference number for this payment"
+                                            type: "string"
+                                    required:
+                                        - amount
+                                        - currencyCode
+                                        - channel
+                                paymentMethod:
+                                    type: "object"
+                                    properties:
+                                        type:
+                                            description: "unique payment method code from 'GetPaymentMethod' response"
+                                            type: "string"
+                                device:
+                                    type: "object"
+                                    properties:
+                                        type:
+                                            description: "The platform of the shopper's device"
+                                            type: "string"
+                                            enum:
+                                                - "web"
+                                                - "ios"
+                                                - "android"
+                                    required:
+                                        - type
+                                instrument:
+                                    type: "object"
+                                    properties:
+                                        type:
+                                            type: "string"
+                                            enum:
+                                                - "card"
+                                        number:
+                                            type: "string"
+                                            
+                                customer:
+                                    type: "object"
+                                    properties:
+                                        locale:
+                                            description: "Shopper's preferred language and country code"
+                                            type: "string"
+                                            example: "en-US"
+                                        countryCode:
+                                            description: "Shopper's ISO numeric country code"
+                                            type: "number"
+                                            example: 840
+                                returnURL:
+                                    description: "URL where the shopper will be taken back to after payment processing"
+                                    type: "string"
+            responses:
+                default:
+                    description: "Receive only result object on response"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    action:
+                                        type: "object"
+                                        properties:
+                                            type:
+                                                type: "string"
+                                                enum
+                                                    - "redirect"
+                                            url:
+                                                type: "object"
+                                                properties:
+                                                    address:
+                                                        type: "string"
+                                                    method:
+                                                        type: "string"
