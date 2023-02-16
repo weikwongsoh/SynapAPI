@@ -1475,6 +1475,7 @@ paths:
                                     properties:
                                         identifier:
                                             type: "string"
+                                            minLength: 1
                                     required:
                                         - identifier
                                 payment:
@@ -1483,10 +1484,13 @@ paths:
                                         amount:
                                             description: "The payment's value"
                                             type: "number"
+                                            minimum: 0
                                             example: 1.23
                                         currencyCode:
                                             description: "The payment's currency in ISO numeric code"
-                                            type: "number"
+                                            type: "integer"
+                                            format: "int32"
+                                            minimum: 0
                                             example: 840
                                         referenceNumber:
                                             description: "merchant's unique reference number for this payment"
@@ -1522,17 +1526,36 @@ paths:
                                                 - "card"
                                         number:
                                             type: "string"
+                                        cardVerificationValue:
+                                            type: "number"
+                                        expiryDate:
+                                            description: "expiry date shall be presented as 'YYMM'"
+                                            type: "integer"
+                                            format: "int32"
+                                            minimum: 0
                                             
                                 customer:
                                     type: "object"
                                     properties:
+                                        identifier:
+                                            description: "System assigned identifier for the shopper"
+                                            type: "string"
+                                        email:
+                                            description: "Shopper's email address to be used for identifying the shopper record"
+                                            type: "string"
+                                            format: "email"
+                                        mobileNumber:
+                                            description: "Shopper's mobile number to be used for identifying the shopper record"
+                                            type: "string"
                                         locale:
                                             description: "Shopper's preferred language and country code"
                                             type: "string"
                                             example: "en-US"
                                         countryCode:
                                             description: "Shopper's ISO numeric country code"
-                                            type: "number"
+                                            type: "integer"
+                                            format: "int32"
+                                            minimum: 0
                                             example: 840
                                 returnURL:
                                     description: "URL where the shopper will be taken back to after payment processing"
@@ -1552,7 +1575,7 @@ paths:
                                         properties:
                                             type:
                                                 type: "string"
-                                                enum
+                                                enum:
                                                     - "redirect"
                                             url:
                                                 type: "object"
