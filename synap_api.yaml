@@ -1498,7 +1498,6 @@ paths:
                                     required:
                                         - amount
                                         - currencyCode
-                                        - channel
                                 paymentMethod:
                                     type: "object"
                                     properties:
