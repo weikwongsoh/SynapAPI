@@ -1173,7 +1173,7 @@ paths:
         summary: "Get list of payments"
         post:
             tags:
-                -  "Payment"
+                -  "Payment History"
             requestBody:
                 required: true
                 content:
@@ -1247,7 +1247,7 @@ paths:
         summary: "Fetch more payment records with cursor"
         post:
             tags:
-                -  "Payment"
+                -  "Payment History"
             requestBody:
                 required: true
                 content:
@@ -1275,7 +1275,7 @@ paths:
         summary: "Get payment"
         post:
             tags:
-                -  "Payment"
+                -  "Payment History"
             requestBody:
                 required: true
                 content:
@@ -1304,11 +1304,11 @@ paths:
                                         $ref: "#/components/schemas/PaymentRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
-    /command/RefundPayment:
-        summary: "Refund of a payment"
+    /command/GetPaymentToken:
+        summary: "Get payment token"
         post:
             tags:
-                -  "Payment"
+                -  "Payment Token [TODO]"
             requestBody:
                 required: true
                 content:
@@ -1316,26 +1316,66 @@ paths:
                         schema:
                             type: "object"
                             properties:
-                                payment:
+                                merchant:
                                     type: "object"
                                     properties:
-                                        switchSequence:
+                                        identifier:
                                             type: "string"
-                                refund:
+                                    required:
+                                        - identifier
+                                paymentToken:
                                     type: "object"
                                     properties:
-                                        amount:
-                                            type: "number"
-                                        reason:
+                                        identifier:
                                             type: "string"
             responses:
                 default:
-                    $ref: "#/components/responses/ResultOnlyResponse"
-    /command/NewPaymentLink:
-        summary: "Create a new payment link"
+                    description: "Receive result object and payment tokens on response"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    paymentTokens:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                paymentToken:
+                                                    type: "object"
+                                                    properties:
+                                                        recordStatus:
+                                                            $ref: "#/components/schemas/RecordStatus"
+                                                        identifier:
+                                                            type: "string"
+                                                        amount:
+                                                            type: "number"
+                                                        name:
+                                                            type: "string"
+                                                        description:
+                                                            type: "string"
+                                                        collectTaxAutomatically:
+                                                            type: "boolean"
+                                                        allowPromotionCodes:
+                                                            type: "boolean"
+                                                        savePaymentDetails:
+                                                            type: "boolean"
+                                                        requirePhoneNumber:
+                                                            type: "boolean"
+                                                        requireAddress:
+                                                            type: "boolean"
+                                                url:
+                                                    type: "object"
+                                                    properties:
+                                                        address:
+                                                            type: "string"
+    /command/NewPaymentToken:
+        summary: "Create a new payment token"
         post:
             tags:
-                -  "Payment"
+                -  "Payment Token [TODO]"
             requestBody:
                 required: true
                 content:
@@ -1343,20 +1383,22 @@ paths:
                         schema:
                             type: "object"
                             properties:
-                                payment:
+                                merchant:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                                paymentToken:
                                     type: "object"
                                     properties:
                                         amount:
                                             type: "number"
-                                        purpose:
+                                        name:
                                             type: "string"
                                         description:
                                             type: "string"
-                                        recurring:
-                                            type: "boolean"
-                                options:
-                                    type: "object"
-                                    properties:
                                         collectTaxAutomatically:
                                             type: "boolean"
                                         allowPromotionCodes:
@@ -1369,7 +1411,7 @@ paths:
                                             type: "boolean"
             responses:
                 default:
-                    description: "Receive only result object on response"
+                    description: "Receive result object and payment token on response"
                     content:
                         application/json:
                             schema:
@@ -1377,16 +1419,83 @@ paths:
                                 properties:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
-                                    paymentLink:
+                                    paymentToken:
                                         type: "object"
                                         properties:
                                             identifier:
                                                 type: "string"
+                                    url:
+                                        type: "object"
+                                        properties:
+                                            address:
+                                                type: "string"
+    /command/UpdatePaymentToken:
+        summary: "Update a new payment token"
+        post:
+            tags:
+                -  "Payment Token [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                paymentToken:
+                                    type: "object"
+                                    properties:
+                                        recordStatus:
+                                            $ref: "#/components/schemas/RecordStatus"
+                                        identifier:
+                                            type: "string"
+                                        amount:
+                                            type: "number"
+                                        name:
+                                            type: "string"
+                                        description:
+                                            type: "string"
+                                        collectTaxAutomatically:
+                                            type: "boolean"
+                                        allowPromotionCodes:
+                                            type: "boolean"
+                                        savePaymentDetails:
+                                            type: "boolean"
+                                        requirePhoneNumber:
+                                            type: "boolean"
+                                        requireAddress:
+                                            type: "boolean"
+                                    required:
+                                        - identifier
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeletePaymentToken:
+        summary: "Delete an existing payment token"
+        post:
+            tags:
+                -  "Payment Token [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                paymentToken:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetPaymentMethod:
         summary: "Get list of payment method"
         post:
             tags:
-                -  "Payment"
+                -  "Payment Method [TODO]"
             requestBody:
                 required: true
                 content:
@@ -1434,9 +1543,11 @@ paths:
                                             description: "Shopper's ISO numeric country code"
                                             type: "number"
                                             example: 840
+                            required:
+                                - merchant
             responses:
                 default:
-                    description: "Receive only result object on response"
+                    description: "Receive result object and/or payment methods on response"
                     content:
                         application/json:
                             schema:
@@ -1459,7 +1570,7 @@ paths:
                                                             description: "unique payment method code to be included in 'Pay' command"
                                                             type: "string"
     /command/Pay:
-        summary: "Pay with payment instrument"
+        summary: "Make a payment or hold funds and capture separately later"
         post:
             tags:
                 -  "Payment"
@@ -1493,8 +1604,17 @@ paths:
                                             minimum: 0
                                             example: 840
                                         referenceNumber:
-                                            description: "merchant's unique reference number for this payment"
+                                            description: "Merchant's unique reference number for this payment"
                                             type: "string"
+                                        purposeOfPayment:
+                                            description: "The summary of the payment"
+                                            type: "string"
+                                        description:
+                                            description: "More details about the payment"
+                                            type: "string"
+                                        holdFunds:
+                                            description: "Authorize a payment now and capture funds separately"
+                                            type: "boolean"
                                     required:
                                         - amount
                                         - currencyCode
@@ -1526,13 +1646,19 @@ paths:
                                         number:
                                             type: "string"
                                         cardVerificationValue:
-                                            type: "number"
+                                            type: "integer"
+                                            format: "int32"
+                                            minimum: 1
+                                            maximum: 9999
                                         expiryDate:
                                             description: "expiry date shall be presented as 'YYMM'"
                                             type: "integer"
                                             format: "int32"
-                                            minimum: 0
-                                            
+                                            minimum: 1
+                                            maximum: 9999
+                                        savePaymentDetails:
+                                            description: "to save this payment instrument details onto customer profile"
+                                            type: "boolean"
                                 customer:
                                     type: "object"
                                     properties:
@@ -1556,12 +1682,30 @@ paths:
                                             format: "int32"
                                             minimum: 0
                                             example: 840
+                                billingAddress:
+                                    type: "object"
+                                    properties:
+                                        payerName:
+                                            description: "The name of the payer or name primted on card"
+                                            type: "string"
+                                        countryName:
+                                            description: "Country's name"
+                                            type: "string"
+                                        address:
+                                            description: "The address"
+                                            type: "string"
+                                        city:
+                                            type: "string"
+                                        stateProvince:
+                                            type: "string"
+                                        postalCode:
+                                            type: "string"
                                 returnURL:
                                     description: "URL where the shopper will be taken back to after payment processing"
                                     type: "string"
             responses:
                 default:
-                    description: "Receive only result object on response"
+                    description: "Receive payment's result object and/or action on response"
                     content:
                         application/json:
                             schema:
@@ -1583,3 +1727,85 @@ paths:
                                                         type: "string"
                                                     method:
                                                         type: "string"
+    /command/CapturePayment:
+        summary: "Capture payment that hold separately"
+        post:
+            tags:
+                -  "Payment [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        switchSequence:
+                                            type: "string"
+                                        amount:
+                                            description: "The payment's value"
+                                            type: "number"
+                                            minimum: 0
+                                            example: 1.23
+                                    required:
+                                        - switchSequence
+                                        - amount
+            responses:
+                default:
+                    description: "Receive capture's result object on response"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+    /command/RefundPayment:
+        summary: "Refund of a payment"
+        post:
+            tags:
+                -  "Payment [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        switchSequence:
+                                            type: "string"
+                                refund:
+                                    type: "object"
+                                    properties:
+                                        amount:
+                                            type: "number"
+                                        reason:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DestroyCursor:
+        summary: "Destroy an existing cursor"
+        post:
+            tags:
+                -  "Cursor"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
