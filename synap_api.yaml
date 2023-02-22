@@ -1452,6 +1452,9 @@ paths:
                                             - amount
                                             - currencyCode
                                             - amountIsFlexible
+                            required:
+                                - merchant
+                                - paymentToken
             responses:
                 default:
                     description: "Receive result object and payment token on response"
@@ -1464,7 +1467,7 @@ paths:
                                         $ref: "#/components/schemas/ResponseResult"
                                     paymentToken:
                                         allOf:
-                                            - $ref: "#/components/schemas/PaymentTokenRecord"
+                                            - $ref: "#/components/schemas/ObjectIdentifier"
                                             - required:
                                                 - identifier
                                     url:
