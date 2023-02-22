@@ -470,6 +470,140 @@ components:
                                 $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
                             accessRightActions:
                                 $ref: "#/components/schemas/AccessRightActions"
+        PaymentRequestBody:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            merchant:
+                                type: "object"
+                                properties:
+                                    identifier:
+                                        type: "string"
+                                        minLength: 1
+                                required:
+                                    - identifier
+                            payment:
+                                type: "object"
+                                properties:
+                                    amount:
+                                        description: "The payment's value"
+                                        type: "number"
+                                        minimum: 0
+                                        example: 1.23
+                                    currencyCode:
+                                        description: "The payment's currency in ISO numeric code"
+                                        type: "integer"
+                                        format: "int32"
+                                        minimum: 0
+                                        example: 840
+                                    referenceNumber:
+                                        description: "Merchant's unique reference number for this payment"
+                                        type: "string"
+                                    purposeOfPayment:
+                                        description: "The summary of the payment"
+                                        type: "string"
+                                    description:
+                                        description: "More details about the payment"
+                                        type: "string"
+                                required:
+                                    - amount
+                                    - currencyCode
+                            paymentToken:
+                                type: "object"
+                                properties:
+                                    identifier:
+                                        type: "string"
+                            paymentMethod:
+                                type: "object"
+                                properties:
+                                    type:
+                                        description: "unique payment method code from 'GetPaymentMethod' response"
+                                        type: "string"
+                            device:
+                                type: "object"
+                                properties:
+                                    type:
+                                        description: "The platform of the shopper's device"
+                                        type: "string"
+                                        enum:
+                                            - "web"
+                                            - "ios"
+                                            - "android"
+                                required:
+                                    - type
+                            paymentInstrument:
+                                type: "object"
+                                properties:
+                                    type:
+                                        type: "string"
+                                        enum:
+                                            - "card"
+                                    number:
+                                        type: "string"
+                                    cardVerificationValue:
+                                        type: "integer"
+                                        format: "int32"
+                                        minimum: 1
+                                        maximum: 9999
+                                    expiryDate:
+                                        description: "expiry date shall be presented as 'YYMM'"
+                                        type: "integer"
+                                        format: "int32"
+                                        minimum: 1
+                                        maximum: 9999
+                                    savePaymentDetails:
+                                        description: "to save this payment instrument details onto customer profile"
+                                        type: "boolean"
+                            customer:
+                                type: "object"
+                                properties:
+                                    identifier:
+                                        description: "System assigned identifier for the shopper"
+                                        type: "string"
+                                    email:
+                                        description: "Shopper's email addresses to be used for identifying the shopper record"
+                                        type: "array"
+                                        items:
+                                            $ref: "#/components/schemas/ContactAddressObject"
+                                    mobile:
+                                        description: "Shopper's mobile number to be used for identifying the shopper record"
+                                        type: "array"
+                                        items:
+                                            $ref: "#/components/schemas/ContactAddressObject"
+                                    locale:
+                                        description: "Shopper's preferred language and country code"
+                                        type: "string"
+                                        example: "en-US"
+                                    countryCode:
+                                        description: "Shopper's ISO numeric country code"
+                                        type: "integer"
+                                        format: "int32"
+                                        minimum: 0
+                                        example: 840
+                            billingAddress:
+                                type: "object"
+                                properties:
+                                    payerName:
+                                        description: "The name of the payer or name primted on card"
+                                        type: "string"
+                                    countryName:
+                                        description: "Country's name"
+                                        type: "string"
+                                    address:
+                                        description: "The address"
+                                        type: "string"
+                                    city:
+                                        type: "string"
+                                    stateProvince:
+                                        type: "string"
+                                    postalCode:
+                                        type: "string"
+                            returnURL:
+                                description: "URL where the shopper will be taken back to after payment processing"
+                                type: "string"
     responses:
         ResultOnlyResponse:
             description: "Receive only result object on response"
@@ -501,6 +635,36 @@ components:
                                                     type: "string"
                                         accessRightActions:
                                             $ref: "#/components/schemas/AccessRightActions"
+        PaymentResponse:
+            description: "Receive payment's result object and/or action on response"
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            result:
+                                $ref: "#/components/schemas/ResponseResult"
+                            payment:
+                                type: "object"
+                                properties:
+                                    switchSequence:
+                                        type: "string"
+                            action:
+                                type: "object"
+                                properties:
+                                    type:
+                                        type: "string"
+                                        enum:
+                                            - "redirect"
+                                    url:
+                                        type: "object"
+                                        properties:
+                                            address:
+                                                type: "string"
+                                            method:
+                                                type: "string"
+                        required:
+                            - result
     securitySchemes:
         synapSessionToken:
             type: "apiKey"
@@ -1611,330 +1775,20 @@ paths:
             tags:
                 -  "Payment"
             requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            type: "object"
-                            properties:
-                                merchant:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            type: "string"
-                                            minLength: 1
-                                    required:
-                                        - identifier
-                                payment:
-                                    type: "object"
-                                    properties:
-                                        amount:
-                                            description: "The payment's value"
-                                            type: "number"
-                                            minimum: 0
-                                            example: 1.23
-                                        currencyCode:
-                                            description: "The payment's currency in ISO numeric code"
-                                            type: "integer"
-                                            format: "int32"
-                                            minimum: 0
-                                            example: 840
-                                        referenceNumber:
-                                            description: "Merchant's unique reference number for this payment"
-                                            type: "string"
-                                        purposeOfPayment:
-                                            description: "The summary of the payment"
-                                            type: "string"
-                                        description:
-                                            description: "More details about the payment"
-                                            type: "string"
-                                    required:
-                                        - amount
-                                        - currencyCode
-                                paymentToken:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            type: "string"
-                                paymentMethod:
-                                    type: "object"
-                                    properties:
-                                        type:
-                                            description: "unique payment method code from 'GetPaymentMethod' response"
-                                            type: "string"
-                                device:
-                                    type: "object"
-                                    properties:
-                                        type:
-                                            description: "The platform of the shopper's device"
-                                            type: "string"
-                                            enum:
-                                                - "web"
-                                                - "ios"
-                                                - "android"
-                                    required:
-                                        - type
-                                paymentInstrument:
-                                    type: "object"
-                                    properties:
-                                        type:
-                                            type: "string"
-                                            enum:
-                                                - "card"
-                                        number:
-                                            type: "string"
-                                        cardVerificationValue:
-                                            type: "integer"
-                                            format: "int32"
-                                            minimum: 1
-                                            maximum: 9999
-                                        expiryDate:
-                                            description: "expiry date shall be presented as 'YYMM'"
-                                            type: "integer"
-                                            format: "int32"
-                                            minimum: 1
-                                            maximum: 9999
-                                        savePaymentDetails:
-                                            description: "to save this payment instrument details onto customer profile"
-                                            type: "boolean"
-                                customer:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            description: "System assigned identifier for the shopper"
-                                            type: "string"
-                                        email:
-                                            description: "Shopper's email address to be used for identifying the shopper record"
-                                            type: "string"
-                                            format: "email"
-                                        mobileNumber:
-                                            description: "Shopper's mobile number to be used for identifying the shopper record"
-                                            type: "string"
-                                        locale:
-                                            description: "Shopper's preferred language and country code"
-                                            type: "string"
-                                            example: "en-US"
-                                        countryCode:
-                                            description: "Shopper's ISO numeric country code"
-                                            type: "integer"
-                                            format: "int32"
-                                            minimum: 0
-                                            example: 840
-                                billingAddress:
-                                    type: "object"
-                                    properties:
-                                        payerName:
-                                            description: "The name of the payer or name primted on card"
-                                            type: "string"
-                                        countryName:
-                                            description: "Country's name"
-                                            type: "string"
-                                        address:
-                                            description: "The address"
-                                            type: "string"
-                                        city:
-                                            type: "string"
-                                        stateProvince:
-                                            type: "string"
-                                        postalCode:
-                                            type: "string"
-                                returnURL:
-                                    description: "URL where the shopper will be taken back to after payment processing"
-                                    type: "string"
+                $ref: "#/components/requestBodies/PaymentRequestBody"
             responses:
                 default:
-                    description: "Receive payment's result object and/or action on response"
-                    content:
-                        application/json:
-                            schema:
-                                type: "object"
-                                properties:
-                                    result:
-                                        $ref: "#/components/schemas/ResponseResult"
-                                    payment:
-                                        type: "object"
-                                        properties:
-                                            switchSequence:
-                                                type: "string"
-                                    action:
-                                        type: "object"
-                                        properties:
-                                            type:
-                                                type: "string"
-                                                enum:
-                                                    - "redirect"
-                                            url:
-                                                type: "object"
-                                                properties:
-                                                    address:
-                                                        type: "string"
-                                                    method:
-                                                        type: "string"
-                                required:
-                                    - result
+                    $ref: "#/components/responses/PaymentResponse"
     /command/AuthorizePayment:
         summary: "Initiate a payment authorization to withhold the funds to be captured later"
         post:
             tags:
-                -  "Payment"
+                -  "Payment [TODO]"
             requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            type: "object"
-                            properties:
-                                merchant:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            type: "string"
-                                            minLength: 1
-                                    required:
-                                        - identifier
-                                payment:
-                                    type: "object"
-                                    properties:
-                                        amount:
-                                            description: "The payment's value"
-                                            type: "number"
-                                            minimum: 0
-                                            example: 1.23
-                                        currencyCode:
-                                            description: "The payment's currency in ISO numeric code"
-                                            type: "integer"
-                                            format: "int32"
-                                            minimum: 0
-                                            example: 840
-                                        referenceNumber:
-                                            description: "Merchant's unique reference number for this payment"
-                                            type: "string"
-                                        purposeOfPayment:
-                                            description: "The summary of the payment"
-                                            type: "string"
-                                        description:
-                                            description: "More details about the payment"
-                                            type: "string"
-                                    required:
-                                        - amount
-                                        - currencyCode
-                                paymentToken:
-                                paymentMethod:
-                                    type: "object"
-                                    properties:
-                                        type:
-                                            description: "unique payment method code from 'GetPaymentMethod' response"
-                                            type: "string"
-                                device:
-                                    type: "object"
-                                    properties:
-                                        type:
-                                            description: "The platform of the shopper's device"
-                                            type: "string"
-                                            enum:
-                                                - "web"
-                                                - "ios"
-                                                - "android"
-                                    required:
-                                        - type
-                                paymentInstrument:
-                                    type: "object"
-                                    properties:
-                                        type:
-                                            type: "string"
-                                            enum:
-                                                - "card"
-                                        number:
-                                            type: "string"
-                                        cardVerificationValue:
-                                            type: "integer"
-                                            format: "int32"
-                                            minimum: 1
-                                            maximum: 9999
-                                        expiryDate:
-                                            description: "expiry date shall be presented as 'YYMM'"
-                                            type: "integer"
-                                            format: "int32"
-                                            minimum: 1
-                                            maximum: 9999
-                                        savePaymentDetails:
-                                            description: "to save this payment instrument details onto customer profile"
-                                            type: "boolean"
-                                customer:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            description: "System assigned identifier for the shopper"
-                                            type: "string"
-                                        email:
-                                            description: "Shopper's email address to be used for identifying the shopper record"
-                                            type: "string"
-                                            format: "email"
-                                        mobileNumber:
-                                            description: "Shopper's mobile number to be used for identifying the shopper record"
-                                            type: "string"
-                                        locale:
-                                            description: "Shopper's preferred language and country code"
-                                            type: "string"
-                                            example: "en-US"
-                                        countryCode:
-                                            description: "Shopper's ISO numeric country code"
-                                            type: "integer"
-                                            format: "int32"
-                                            minimum: 0
-                                            example: 840
-                                billingAddress:
-                                    type: "object"
-                                    properties:
-                                        payerName:
-                                            description: "The name of the payer or name primted on card"
-                                            type: "string"
-                                        countryName:
-                                            description: "Country's name"
-                                            type: "string"
-                                        address:
-                                            description: "The address"
-                                            type: "string"
-                                        city:
-                                            type: "string"
-                                        stateProvince:
-                                            type: "string"
-                                        postalCode:
-                                            type: "string"
-                                returnURL:
-                                    description: "URL where the shopper will be taken back to after payment processing"
-                                    type: "string"
+                $ref: "#/components/requestBodies/PaymentRequestBody"
             responses:
                 default:
-                    description: "Receive payment's result object and/or action on response"
-                    content:
-                        application/json:
-                            schema:
-                                type: "object"
-                                properties:
-                                    result:
-                                        $ref: "#/components/schemas/ResponseResult"
-                                    payment:
-                                        type: "object"
-                                        properties:
-                                            switchSequence:
-                                                type: "string"
-                                    action:
-                                        type: "object"
-                                        properties:
-                                            type:
-                                                type: "string"
-                                                enum:
-                                                    - "redirect"
-                                            url:
-                                                type: "object"
-                                                properties:
-                                                    address:
-                                                        type: "string"
-                                                    method:
-                                                        type: "string"
-                                required:
-                                    - result
+                    $ref: "#/components/responses/PaymentResponse"
     /command/CapturePayment:
         summary: "Capture payment that hold separately"
         post:
