@@ -313,7 +313,7 @@ components:
                                 description: "The settlement's currency in ISO numeric code"
                                 type: "integer"
                                 format: "int32"
-                    instrument:
+                    paymentInstrument:
                         type: "object"
                         properties:
                             maskedNumber:
@@ -1665,7 +1665,7 @@ paths:
                                                 - "android"
                                     required:
                                         - type
-                                instrument:
+                                paymentInstrument:
                                     type: "object"
                                     properties:
                                         type:
