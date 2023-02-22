@@ -67,6 +67,17 @@ components:
                 - locked
                 - removed
                 - noPassword
+        ObjectRecordStatus:
+            type: "object"
+            properties:
+                recordStatus:
+                    $ref: "#/components/schemas/RecordStatus"
+        ObjectIdentifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "unique identity of an object in a given scope"
+                    type: "string"
         UserContactRecords:
             type: "array"
             items:
@@ -285,7 +296,9 @@ components:
                             retrievalReferenceNumber:
                                 type: "string"
                             currencyCode:
-                                type: "string"
+                                description: "The payment's currency in ISO numeric code"
+                                type: "integer"
+                                format: "int32"
                     settlement:
                         type: "object"
                         properties:
@@ -297,7 +310,9 @@ components:
                             rate:
                                 type: "number"
                             currencyCode:
-                                type: "string"
+                                description: "The settlement's currency in ISO numeric code"
+                                type: "integer"
+                                format: "int32"
                     instrument:
                         type: "object"
                         properties:
@@ -310,7 +325,9 @@ components:
                             countryCode:
                                 type: "string"
                             currencyCode:
-                                type: "string"
+                                description: "The payment instrument's currency in ISO numeric code"
+                                type: "integer"
+                                format: "int32"
                             expiry:
                                 type: "string"
                     refund:
@@ -347,6 +364,47 @@ components:
                         properties:
                             name:
                                 type: "string"
+        PaymentTokenRecord:
+            type: "object"
+            properties:
+                amount:
+                    type: "number"
+                minimumAmount:
+                    type: "number"
+                maximumAmount:
+                    type: "number"
+                currencyCode:
+                    description: "The amount's currency in ISO numeric code"
+                    type: "integer"
+                    format: "int32"
+                name:
+                    description: "The purpose/usage of the payment token"
+                    type: "string"
+                description:
+                    type: "string"
+                image:
+                    description: "Base64 encoded string of an image"
+                    type: "string"
+                    format: "byte"
+                amountIsFlexible:
+                    description: "Indicator if shopper/customer is allowed to change amount"
+                    type: "boolean"
+                collectTaxAutomatically:
+                    type: "boolean"
+                allowPromotionCodes:
+                    type: "boolean"
+                savePaymentDetails:
+                    type: "boolean"
+                requireCustomerPhoneNumber:
+                    type: "boolean"
+                requireCustomerAddress:
+                    type: "boolean"
+                payButtonText:
+                    type: "string"
+                    enum:
+                        - "Pay"
+                        - "Donate"
+                        - "Book"
     parameters:
         SessionToken:
             name: "sessionToken"
@@ -1314,20 +1372,25 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: "object"
-                            properties:
-                                merchant:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            type: "string"
-                                    required:
-                                        - identifier
-                                paymentToken:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            type: "string"
+                            oneOf:
+                              - type: "object"
+                                properties:
+                                    merchant:
+                                        type: "object"
+                                        properties:
+                                            identifier:
+                                                type: "string"
+                                        required:
+                                            - identifier
+                              - type: "object"
+                                properties:
+                                    paymentToken:
+                                        type: "object"
+                                        properties:
+                                            identifier:
+                                                type: "string"
+                                        required:
+                                            - identifier
             responses:
                 default:
                     description: "Receive result object and payment tokens on response"
@@ -1344,33 +1407,24 @@ paths:
                                             type: "object"
                                             properties:
                                                 paymentToken:
-                                                    type: "object"
-                                                    properties:
-                                                        recordStatus:
-                                                            $ref: "#/components/schemas/RecordStatus"
-                                                        identifier:
-                                                            type: "string"
-                                                        amount:
-                                                            type: "number"
-                                                        name:
-                                                            type: "string"
-                                                        description:
-                                                            type: "string"
-                                                        collectTaxAutomatically:
-                                                            type: "boolean"
-                                                        allowPromotionCodes:
-                                                            type: "boolean"
-                                                        savePaymentDetails:
-                                                            type: "boolean"
-                                                        requirePhoneNumber:
-                                                            type: "boolean"
-                                                        requireAddress:
-                                                            type: "boolean"
+                                                    allOf:
+                                                        - $ref: "#/components/schemas/ObjectRecordStatus"
+                                                        - $ref: "#/components/schemas/ObjectIdentifier"
+                                                        - $ref: "#/components/schemas/PaymentTokenRecord"
+                                                        - required:
+                                                            - recordStatus
+                                                            - identifier
+                                                            - name
+                                                            - amount
+                                                            - currencyCode
+                                                            - amountIsFlexible
                                                 url:
                                                     type: "object"
                                                     properties:
                                                         address:
                                                             type: "string"
+                                                    required:
+                                                        - address
     /command/NewPaymentToken:
         summary: "Create a new payment token"
         post:
@@ -1391,24 +1445,13 @@ paths:
                                     required:
                                         - identifier
                                 paymentToken:
-                                    type: "object"
-                                    properties:
-                                        amount:
-                                            type: "number"
-                                        name:
-                                            type: "string"
-                                        description:
-                                            type: "string"
-                                        collectTaxAutomatically:
-                                            type: "boolean"
-                                        allowPromotionCodes:
-                                            type: "boolean"
-                                        savePaymentDetails:
-                                            type: "boolean"
-                                        requirePhoneNumber:
-                                            type: "boolean"
-                                        requireAddress:
-                                            type: "boolean"
+                                    allOf:
+                                        - $ref: "#/components/schemas/PaymentTokenRecord"
+                                        - required:
+                                            - name
+                                            - amount
+                                            - currencyCode
+                                            - amountIsFlexible
             responses:
                 default:
                     description: "Receive result object and payment token on response"
@@ -1420,15 +1463,17 @@ paths:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
                                     paymentToken:
-                                        type: "object"
-                                        properties:
-                                            identifier:
-                                                type: "string"
+                                        allOf:
+                                            - $ref: "#/components/schemas/PaymentTokenRecord"
+                                            - required:
+                                                - identifier
                                     url:
                                         type: "object"
                                         properties:
                                             address:
                                                 type: "string"
+                                        required:
+                                            - address
     /command/UpdatePaymentToken:
         summary: "Update a new payment token"
         post:
@@ -1442,30 +1487,12 @@ paths:
                             type: "object"
                             properties:
                                 paymentToken:
-                                    type: "object"
-                                    properties:
-                                        recordStatus:
-                                            $ref: "#/components/schemas/RecordStatus"
-                                        identifier:
-                                            type: "string"
-                                        amount:
-                                            type: "number"
-                                        name:
-                                            type: "string"
-                                        description:
-                                            type: "string"
-                                        collectTaxAutomatically:
-                                            type: "boolean"
-                                        allowPromotionCodes:
-                                            type: "boolean"
-                                        savePaymentDetails:
-                                            type: "boolean"
-                                        requirePhoneNumber:
-                                            type: "boolean"
-                                        requireAddress:
-                                            type: "boolean"
-                                    required:
-                                        - identifier
+                                    allOf:
+                                        - $ref: "#/components/schemas/ObjectRecordStatus"
+                                        - $ref: "#/components/schemas/ObjectIdentifier"
+                                        - $ref: "#/components/schemas/PaymentTokenRecord"
+                                        - required:
+                                            - identifier
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -1482,12 +1509,10 @@ paths:
                             type: "object"
                             properties:
                                 paymentToken:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            type: "string"
-                                    required:
-                                        - identifier
+                                    allOf:
+                                        - $ref: "#/components/schemas/ObjectIdentifier"
+                                        - required:
+                                            - identifier
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -1519,7 +1544,8 @@ paths:
                                             example: 1.23
                                         currencyCode:
                                             description: "The payment's currency in ISO numeric code"
-                                            type: "number"
+                                            type: "integer"
+                                            format: "int32"
                                             example: 840
                                         channel:
                                             description: "The platform of the shopper's device"
@@ -1727,6 +1753,8 @@ paths:
                                                         type: "string"
                                                     method:
                                                         type: "string"
+                                required:
+                                    - result
     /command/CapturePayment:
         summary: "Capture payment that hold separately"
         post:
