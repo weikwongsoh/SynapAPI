@@ -163,7 +163,7 @@ components:
                     type: "string"
                 multiFactorName:
                     type: "string"
-                email:
+                emailAddress:
                     type: "string"
                     format: "email"
                 mobileNumber:
@@ -1874,14 +1874,20 @@ paths:
                                         sendTo:
                                             type: "object"
                                             properties:
-                                                email:
+                                                emails:
                                                     type: "array"
                                                     items:
-                                                        $ref: "#/components/schemas/ContactAddressObject"
-                                                mobile:
+                                                        type: "object"
+                                                        properties:
+                                                            email:
+                                                                $ref: "#/components/schemas/ContactAddressObject"
+                                                mobiles:
                                                     type: "array"
                                                     items:
-                                                        $ref: "#/components/schemas/ContactAddressObject"
+                                                        type: "object"
+                                                        properties:
+                                                            mobile:
+                                                                $ref: "#/components/schemas/ContactAddressObject"
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
