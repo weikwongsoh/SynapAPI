@@ -396,7 +396,11 @@ components:
                 amountIsFlexible:
                     description: "Indicator if shopper/customer is allowed to change amount"
                     type: "boolean"
+                taxCategoryCode:
+                    type: "string"
                 collectTaxAutomatically:
+                    type: "boolean"
+                includeTaxInPrice:
                     type: "boolean"
                 allowPromotionCodes:
                     type: "boolean"
