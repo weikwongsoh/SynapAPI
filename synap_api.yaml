@@ -418,6 +418,30 @@ components:
                         - "Pay"
                         - "Donate"
                         - "Book"
+        PaymentTokenRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    paymentToken:
+                        allOf:
+                            - $ref: "#/components/schemas/RecordStatusObject"
+                            - $ref: "#/components/schemas/IdentifierObject"
+                            - $ref: "#/components/schemas/PaymentTokenRecord"
+                            - required:
+                                - recordStatus
+                                - identifier
+                                - name
+                                - amount
+                                - currencyCode
+                                - amountIsFlexible
+                    url:
+                        type: "object"
+                        properties:
+                            address:
+                                type: "string"
+                        required:
+                            - address
     parameters:
         SessionToken:
             name: "sessionToken"
@@ -1601,30 +1625,46 @@ paths:
                                 properties:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
                                     paymentTokens:
-                                        type: "array"
-                                        items:
-                                            type: "object"
-                                            properties:
-                                                paymentToken:
-                                                    allOf:
-                                                        - $ref: "#/components/schemas/RecordStatusObject"
-                                                        - $ref: "#/components/schemas/IdentifierObject"
-                                                        - $ref: "#/components/schemas/PaymentTokenRecord"
-                                                        - required:
-                                                            - recordStatus
-                                                            - identifier
-                                                            - name
-                                                            - amount
-                                                            - currencyCode
-                                                            - amountIsFlexible
-                                                url:
-                                                    type: "object"
-                                                    properties:
-                                                        address:
-                                                            type: "string"
-                                                    required:
-                                                        - address
+                                        $ref: "#/components/schemas/PaymentTokenRecords"
+                                required:
+                                    - result
+                                    - paymentTokens
+    /command/FetchPaymentToken:
+        summary: "Fetch more payment tokens with cursor"
+        post:
+            tags:
+                -  "Payment Token [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+                            required:
+                                - cursor
+            responses:
+                200:
+                    description: "Returned list of user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    paymentTokens:
+                                        $ref: "#/components/schemas/PaymentTokenRecords"
+                                required:
+                                    - result
+                                    - paymentTokens
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/NewPaymentToken:
         summary: "Create a new payment token"
         post:
