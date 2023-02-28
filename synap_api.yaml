@@ -404,7 +404,9 @@ components:
                     type: "boolean"
                 requireCustomerPhoneNumber:
                     type: "boolean"
-                requireCustomerAddress:
+                requireCustomerBillingAddress:
+                    type: "boolean"
+                requireCustomerShippingAddress:
                     type: "boolean"
                 payButtonText:
                     type: "string"
