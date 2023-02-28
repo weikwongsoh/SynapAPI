@@ -495,7 +495,12 @@ components:
                                 type: "object"
                                 properties:
                                     amount:
-                                        description: "The payment's value"
+                                        description: "The payment's value including tax amount"
+                                        type: "number"
+                                        minimum: 0
+                                        example: 1.23
+                                    taxAmount:
+                                        description: "The payment's tax value"
                                         type: "number"
                                         minimum: 0
                                         example: 1.23
@@ -590,6 +595,24 @@ components:
                                         minimum: 0
                                         example: 840
                             billingAddress:
+                                type: "object"
+                                properties:
+                                    payerName:
+                                        description: "The name of the payer or name primted on card"
+                                        type: "string"
+                                    countryName:
+                                        description: "Country's name"
+                                        type: "string"
+                                    address:
+                                        description: "The address"
+                                        type: "string"
+                                    city:
+                                        type: "string"
+                                    stateProvince:
+                                        type: "string"
+                                    postalCode:
+                                        type: "string"
+                            shippingAddress:
                                 type: "object"
                                 properties:
                                     payerName:
