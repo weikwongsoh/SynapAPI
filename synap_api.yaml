@@ -294,6 +294,13 @@ components:
             minimum: 0
             maximum: 999
             example: 840
+        CurrencyCode:
+            description: "The currency in ISO numeric code"
+            type: "integer"
+            format: "int32"
+            minimum: 0
+            maximum: 999
+            example: 840
         PaymentRecords:
             type: "array"
             items:
