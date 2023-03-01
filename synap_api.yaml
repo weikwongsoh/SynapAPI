@@ -56,8 +56,8 @@ components:
                     type: "string"
                     description: "record's identifier of a given cursor's context"
         RecordStatus:
+            description: "The current status/state of a record"
             type: "string"
-            description: "status of the record"
             enum:
                 - active
                 - inactive
@@ -67,6 +67,7 @@ components:
                 - locked
                 - removed
                 - noPassword
+            example: "active"
         RecordStatusObject:
             type: "object"
             properties:
@@ -77,6 +78,24 @@ components:
             properties:
                 identifier:
                     description: "unique identity of an object in a given scope"
+                    type: "string"
+                    minLength: 1
+                    example: "identifier_of_an_object"
+        PostalAddress:
+            type: "object"
+            properties:
+                countryCode:
+                    description: "ISO numeric country code"
+                    type: "integer"
+                    format: "int32"
+                address:
+                    description: "unit#, building name, street name"
+                    type: "string"
+                city:
+                    type: "string"
+                stateProvince:
+                    type: "string"
+                postalCode:
                     type: "string"
         ContactAddress:
             description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address which has been parsed by the system"
@@ -265,6 +284,13 @@ components:
                     type: "number"
                 isPrefix:
                     type: "boolean"
+        CountryCode:
+            description: "ISO numeric country code"
+            type: "integer"
+            format: "int32"
+            minimum: 0
+            maximum: 999
+            example: 840
         PaymentRecords:
             type: "array"
             items:
@@ -375,20 +401,34 @@ components:
             type: "object"
             properties:
                 amount:
+                    description: "The payment amount to be collected"
                     type: "number"
+                    minimum: 0
+                    example: 10
                 minimumAmount:
+                    description: "The manimum amount needed"
                     type: "number"
+                    minimum: 0
+                    exclusiveMinimum: true
+                    example: 1
                 maximumAmount:
+                    description: "The maximum amount allowed"
                     type: "number"
+                    minimum: 0
+                    exclusiveMinimum: true
+                    example: 100
                 currencyCode:
-                    description: "The amount's currency in ISO numeric code"
-                    type: "integer"
-                    format: "int32"
+                    description: "The amount's currency code"
+                    $ref: "#/components/schemas/CountryCode"
                 name:
                     description: "The purpose/usage of the payment token"
                     type: "string"
+                    minLength: 1
+                    example: "Donate For Children"
                 description:
                     type: "string"
+                    minLength: 1
+                    example: "Help us protect children around the world"
                 image:
                     description: "Base64 encoded string of an image"
                     type: "string"
@@ -396,28 +436,53 @@ components:
                 amountIsFlexible:
                     description: "Indicator if shopper/customer is allowed to change amount"
                     type: "boolean"
+                    example: true
                 taxCategoryCode:
+                    description: "Indicator if shopper/customer is allowed to change amount"
                     type: "string"
+                    minLength: 1
+                    example: "taxCategoryCode01"
                 collectTaxAutomatically:
+                    description: "Indicator if tax is calculated and collected automatically"
                     type: "boolean"
+                    example: true
                 includeTaxInPrice:
+                    description: "Indicator if tax should be included in pricing"
                     type: "boolean"
+                    example: true
                 allowPromotionCodes:
+                    description: "Indicator if shopper/customer is allowed to enter promotion codes"
                     type: "boolean"
+                    example: true
                 savePaymentDetails:
+                    description: "Indicator if payment details shall be saved"
                     type: "boolean"
+                    example: true
                 requireCustomerPhoneNumber:
+                    description: "Indicator if shopper/customer is required to enter phone number"
                     type: "boolean"
+                    example: true
                 requireCustomerBillingAddress:
+                    description: "Indicator if shopper/customer is required to enter billing address"
                     type: "boolean"
+                    example: true
                 requireCustomerShippingAddress:
+                    description: "Indicator if shopper/customer is required to enter shipping address"
                     type: "boolean"
+                    example: true
                 payButtonText:
+                    description: "Text to be presented on the 'PAY' button"
                     type: "string"
                     enum:
-                        - "Pay"
-                        - "Donate"
-                        - "Book"
+                        - "PAY"
+                        - "DONATE"
+                        - "BOOK"
+            required:
+                - amount
+                - currencyCode
+                - name
+                - description
+                - payButtonText
         PaymentTokenRecords:
             type: "array"
             items:
@@ -439,9 +504,15 @@ components:
                         type: "object"
                         properties:
                             address:
+                                description: "Full URL path with end point to initiate the payment process"
                                 type: "string"
+                                format: "uri"
+                                example: "https://pay.example.com/paymentToken/payment_token_identifier"
                         required:
                             - address
+                required:
+                    - paymentToken
+                    - url
     parameters:
         SessionToken:
             name: "sessionToken"
@@ -519,7 +590,7 @@ components:
                                 type: "object"
                                 properties:
                                     amount:
-                                        description: "The payment's value including tax amount"
+                                        description: "The total payment's value including tax"
                                         type: "number"
                                         minimum: 0
                                         example: 1.23
@@ -533,16 +604,20 @@ components:
                                         type: "integer"
                                         format: "int32"
                                         minimum: 0
+                                        maximum: 999
                                         example: 840
-                                    referenceNumber:
-                                        description: "Merchant's unique reference number for this payment"
+                                    merchantReferenceNumber:
+                                        description: "An unique identifier allows merchant to track payment"
                                         type: "string"
+                                        example: "merchant_reference_number"
                                     purposeOfPayment:
                                         description: "The summary of the payment"
                                         type: "string"
+                                        example: "Donate For Child"
                                     description:
                                         description: "More details about the payment"
                                         type: "string"
+                                        example: "Help us protect children around the world"
                                 required:
                                     - amount
                                     - currencyCode
@@ -550,13 +625,18 @@ components:
                                 type: "object"
                                 properties:
                                     identifier:
+                                        description: "The payment token identifier"
                                         type: "string"
+                                        example: "payment_token_identifier"
+                                required:
+                                    - identifier
                             paymentMethod:
                                 type: "object"
                                 properties:
                                     type:
                                         description: "unique payment method code from 'GetPaymentMethod' response"
                                         type: "string"
+                                        example: "card"
                             device:
                                 type: "object"
                                 properties:
@@ -567,6 +647,7 @@ components:
                                             - "web"
                                             - "ios"
                                             - "android"
+                                        example: "web"
                                 required:
                                     - type
                             paymentInstrument:
@@ -576,28 +657,51 @@ components:
                                         type: "string"
                                         enum:
                                             - "card"
+                                        example: "card"
                                     number:
                                         type: "string"
+                                        example: "card_number"
                                     cardVerificationValue:
                                         type: "integer"
                                         format: "int32"
                                         minimum: 1
                                         maximum: 9999
+                                        example: 123
                                     expiryDate:
                                         description: "expiry date shall be presented as 'YYMM'"
                                         type: "integer"
                                         format: "int32"
                                         minimum: 1
                                         maximum: 9999
+                                        example: 1234
+                                    ownerName:
+                                        description: "name printed on plastic card or owner's name"
+                                        type: "string"
+                                        example: "John Smith"
+                                    issuingCountryCode:
+                                        description: "The payment instrument issuing's ISO numeric country code"
+                                        type: "integer"
+                                        format: "int32"
+                                        minimum: 0
+                                        maximum: 999
+                                        example: 840
                                     savePaymentDetails:
                                         description: "to save this payment instrument details onto customer profile"
                                         type: "boolean"
+                                        example: true
+                                required:
+                                    - type
+                                    - number
+                                    - ownerName
+                                    - issuingCountryCode
                             customer:
                                 type: "object"
                                 properties:
                                     identifier:
                                         description: "System assigned identifier for the shopper"
                                         type: "string"
+                                        minLength: 1
+                                        example: "customer_identifier"
                                     email:
                                         description: "Shopper's email addresses to be used for identifying the shopper record"
                                         type: "array"
@@ -617,46 +721,17 @@ components:
                                         type: "integer"
                                         format: "int32"
                                         minimum: 0
+                                        maximum: 999
                                         example: 840
                             billingAddress:
-                                type: "object"
-                                properties:
-                                    payerName:
-                                        description: "The name of the payer or name primted on card"
-                                        type: "string"
-                                    countryName:
-                                        description: "Country's name"
-                                        type: "string"
-                                    address:
-                                        description: "The address"
-                                        type: "string"
-                                    city:
-                                        type: "string"
-                                    stateProvince:
-                                        type: "string"
-                                    postalCode:
-                                        type: "string"
+                                $ref: "#/components/schemas/PostalAddress"
                             shippingAddress:
-                                type: "object"
-                                properties:
-                                    payerName:
-                                        description: "The name of the payer or name primted on card"
-                                        type: "string"
-                                    countryName:
-                                        description: "Country's name"
-                                        type: "string"
-                                    address:
-                                        description: "The address"
-                                        type: "string"
-                                    city:
-                                        type: "string"
-                                    stateProvince:
-                                        type: "string"
-                                    postalCode:
-                                        type: "string"
+                                $ref: "#/components/schemas/PostalAddress"
                             returnURL:
                                 description: "URL where the shopper will be taken back to after payment processing"
                                 type: "string"
+                                format: "uri"
+                                example: "https://payment.merchant.com/result/merchant_reference_number"
     responses:
         ResultOnlyResponse:
             description: "Receive only result object on response"
