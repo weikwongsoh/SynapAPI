@@ -2078,6 +2078,8 @@ paths:
                                     properties:
                                         identifier:
                                             type: "string"
+                                    required:
+                                        - identifier
                                 payment:
                                     type: "object"
                                     properties:
@@ -2085,8 +2087,16 @@ paths:
                                             type: "number"
                                         currencyCode:
                                             $ref: "#/components/schemas/CurrencyCode"
+                                    required:
+                                        - amount
+                                        - currencyCode
                                 billingAddress:
                                     $ref: "#/components/schemas/PostalAddress"
+                                shippingAddress:
+                                    $ref: "#/components/schemas/PostalAddress"
+                            required:
+                                - taxCategory
+                                - payment
             responses:
                 200:
                     description: "Returned the calculated tax amount"
