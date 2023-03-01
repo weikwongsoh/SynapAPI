@@ -49,6 +49,9 @@ components:
                 totalRecords:
                     type: "number"
                     description: "total number of records a cursor holds"
+            required:
+                - identifier
+                - totalRecords
         CursorRecordIdentifierOnResponse:
             type: "object"
             properties:
@@ -1584,6 +1587,8 @@ paths:
                                                             - "refunded"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - merchant
             responses:
                 200:
                     description: "Returned list of payment records"
@@ -1598,6 +1603,9 @@ paths:
                                         $ref: "#/components/schemas/CursorOnResponse"
                                     payments:
                                         $ref: "#/components/schemas/PaymentRecords"
+                                required:
+                                    - result
+                                    - payments
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/FetchPayment:
@@ -1614,6 +1622,8 @@ paths:
                             properties:
                                 cursor:
                                     $ref: "#/components/schemas/CursorOnRequest"
+                            required:
+                                - cursor
             responses:
                 200:
                     description: "Returned list of payment records"
@@ -1626,6 +1636,9 @@ paths:
                                         $ref: "#/components/schemas/ResponseResult"
                                     payments:
                                         $ref: "#/components/schemas/PaymentRecords"
+                                required:
+                                    - result
+                                    - payments
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetPaymentWithSwitchSequence:
@@ -1681,6 +1694,10 @@ paths:
                                                 type: "string"
                                         required:
                                             - identifier
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                                required:
+                                    - merchant
                               - type: "object"
                                 properties:
                                     paymentToken:
@@ -1690,6 +1707,8 @@ paths:
                                                 type: "string"
                                         required:
                                             - identifier
+                                required:
+                                    - paymentToken
             responses:
                 default:
                     description: "Receive result object and payment tokens on response"
@@ -2033,6 +2052,60 @@ paths:
                                                             mobile:
                                                                 $ref: "#/components/schemas/ContactAddressObject"
             responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/CalculateTaxAmount:
+        summary: "Calculate the tax amount of a given tax category code"
+        post:
+            tags:
+                -  "Tax [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                taxCategory:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        amount:
+                                            type: "number"
+                                        currencyCode:
+                                            $ref: "#/components/schemas/CurrencyCode"
+                                billingAddress:
+                                    $ref: "#/components/schemas/PostalAddress"
+            responses:
+                200:
+                    description: "Returned the calculated tax amount"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    payment:
+                                        type: "object"
+                                        properties:
+                                            amount:
+                                                type: "number"
+                                            taxAmount:
+                                                type: "number"
+                                            currencyCode:
+                                                $ref: "#/components/schemas/CurrencyCode"
+                                        required:
+                                            - amount
+                                            - taxAmount
+                                            - currencyCode
+                                required:
+                                    - result
+                                    - payment
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/DestroyCursor:
