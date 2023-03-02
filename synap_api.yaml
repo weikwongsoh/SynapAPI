@@ -1949,16 +1949,6 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/PaymentResponse"
-    /command/AuthorizePayment:
-        summary: "Initiate a payment authorization to withhold the funds to be captured later"
-        post:
-            tags:
-                -  "Payment [TODO]"
-            requestBody:
-                $ref: "#/components/requestBodies/PaymentRequestBody"
-            responses:
-                default:
-                    $ref: "#/components/responses/PaymentResponse"
     /command/CapturePayment:
         summary: "Capture payment that hold separately"
         post:
