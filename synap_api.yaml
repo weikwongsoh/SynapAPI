@@ -653,6 +653,8 @@ components:
                             device:
                                 type: "object"
                                 properties:
+                                    identifier:
+                                        type: "string"
                                     type:
                                         description: "The platform of the shopper's device"
                                         type: "string"
