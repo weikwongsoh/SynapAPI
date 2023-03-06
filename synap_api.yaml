@@ -656,7 +656,7 @@ components:
                                 properties:
                                     identifier:
                                         type: "string"
-                                        example: "07045338"
+                                        example: "06045338"
                                     type:
                                         description: "The platform of the shopper's device"
                                         type: "string"
