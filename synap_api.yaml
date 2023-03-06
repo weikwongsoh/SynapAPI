@@ -628,6 +628,9 @@ components:
                                         description: "More details about the payment"
                                         type: "string"
                                         example: "Help us protect children around the world"
+                                    captureFundLater:
+                                        description: "Reserve funds now and will be charged at later time"
+                                        type: "boolean"
                                 required:
                                     - amount
                                     - currencyCode
@@ -670,7 +673,7 @@ components:
                                         example: "card"
                                     number:
                                         type: "string"
-                                        example: "card_number"
+                                        example: "5522300012953018"
                                     cardVerificationValue:
                                         type: "integer"
                                         format: "int32"
@@ -712,12 +715,12 @@ components:
                                         type: "string"
                                         minLength: 1
                                         example: "customer_identifier"
-                                    email:
+                                    emails:
                                         description: "Shopper's email addresses to be used for identifying the shopper record"
                                         type: "array"
                                         items:
                                             $ref: "#/components/schemas/ContactAddressObject"
-                                    mobile:
+                                    mobiles:
                                         description: "Shopper's mobile number to be used for identifying the shopper record"
                                         type: "array"
                                         items:
@@ -734,9 +737,39 @@ components:
                                         maximum: 999
                                         example: 840
                             billingAddress:
-                                $ref: "#/components/schemas/PostalAddress"
+                                allOf:
+                                    - type: "object"
+                                      properties:
+                                        email:
+                                            allOf:
+                                                - description: "The recipient's email for notification delivery"
+                                                - $ref: "#/components/schemas/ContactAddress"
+                                                - example: "john.smith@example.com"
+                                        mobile:
+                                            allOf:
+                                                - description: "The recipient's mobile number for contact if needed during delivery"
+                                                - $ref: "#/components/schemas/ContactAddress"
+                                                - example: "+1 (555) 555-1234"
+                                    - $ref: "#/components/schemas/PostalAddress"
                             shippingAddress:
-                                $ref: "#/components/schemas/PostalAddress"
+                                allOf:
+                                    - type: "object"
+                                      properties:
+                                        name:
+                                            description: "The recipient's name of whom goods and services will be delievered to"
+                                            type: "string"
+                                            example: "John Smith"
+                                        email:
+                                            allOf:
+                                                - description: "The recipient's email for notification delivery"
+                                                - $ref: "#/components/schemas/ContactAddress"
+                                                - example: "john.smith@example.com"
+                                        mobile:
+                                            allOf:
+                                                - description: "The recipient's mobile number for contact if needed during delivery"
+                                                - $ref: "#/components/schemas/ContactAddress"
+                                                - example: "+1 (555) 555-1234"
+                                    - $ref: "#/components/schemas/PostalAddress"
                             returnURL:
                                 description: "URL where the shopper will be taken back to after payment processing"
                                 type: "string"
