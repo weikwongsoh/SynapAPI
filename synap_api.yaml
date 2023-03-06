@@ -594,6 +594,7 @@ components:
                                     identifier:
                                         type: "string"
                                         minLength: 1
+                                        example: "110000000000053"
                                 required:
                                     - identifier
                             payment:
@@ -655,6 +656,7 @@ components:
                                 properties:
                                     identifier:
                                         type: "string"
+                                        example: "007045338"
                                     type:
                                         description: "The platform of the shopper's device"
                                         type: "string"
