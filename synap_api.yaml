@@ -19,36 +19,42 @@ components:
             type: "object"
             properties:
                 recordOffset:
-                    type: "number"
-                    description: "offset of record to retrieve from"
-                recordCount:
-                    type: "number"
-                    description: "number of records to be retrieved"
-            required:
-                - recordOffset
-        CursorOnRequest:
-            type: "object"
-            properties:
-                identifier:
-                    type: "string"
-                recordOffset:
-                    type: "number"
                     description: "offset of the record to retrieve"
+                    type: "integer"
+                    format: "int32"
+                    minimum: 0
+                    example: 0
                 recordCount:
-                    type: "number"
-                    description: "number of records to be retrieved for this command"
+                    description: "number of records to be retrieved"
+                    type: "integer"
+                    format: "int32"
+                    minimum: 1
+                    example: 1
             required:
-                - identifier
                 - recordOffset
+        CursorIdentifier:
+            description: "identifier used to uniquely identify a cursor created by the system"
+            type: "string"
+            minLength: 1
+            example: "<cursor_identifier>"
+        CursorOnRequest:
+            allOf:
+                - type: "object"
+                  properties:
+                    identifier:
+                        $ref: "#/components/schemas/CursorIdentifier"
+                  required:
+                    - identifier
+                - $ref: "#/components/schemas/CursorRecordCountOnRequest"
         CursorOnResponse:
             type: "object"
             properties:
                 identifier:
-                    type: "string"
-                    description: "identifier used to uniquely identify a cursor created by the system"
+                        $ref: "#/components/schemas/CursorIdentifier"
                 totalRecords:
-                    type: "number"
                     description: "total number of records a cursor holds"
+                    type: "number"
+                    example: 10
             required:
                 - identifier
                 - totalRecords
@@ -56,8 +62,8 @@ components:
             type: "object"
             properties:
                 recordIdentifier:
-                    type: "string"
                     description: "record's identifier of a given cursor's context"
+                    type: "string"
         RecordStatus:
             description: "The current status/state of a record"
             type: "string"
@@ -76,14 +82,22 @@ components:
             properties:
                 recordStatus:
                     $ref: "#/components/schemas/RecordStatus"
-        IdentifierObject:
+        EntityIdentifier:
+            description: "unique identity of an entity in a given scope"
+            type: "string"
+            minLength: 1
+            example: "<identifier_of_an_entity>"
+        EntityIdentifierObject:
             type: "object"
             properties:
                 identifier:
-                    description: "unique identity of an object in a given scope"
-                    type: "string"
-                    minLength: 1
-                    example: "identifier_of_an_object"
+                    $ref: "#/components/schemas/EntityIdentifier"
+            required:
+                - identifier
+        BusinessPersonName:
+            description: "The name of a person or business"
+            type: "string"
+            example: "John Smith"
         PostalAddress:
             type: "object"
             properties:
@@ -108,6 +122,15 @@ components:
             properties:
                 address:
                     $ref: "#/components/schemas/ContactAddress"
+        Email:
+            description: "The plain text email address"
+            type: "string"
+            format: "email"
+            example: "john.smith@example.com"
+        Phone:
+            description: "The plain text of formatted phone number"
+            type: "string"
+            example: "+1 (555) 555-1234"
         UserContactRecords:
             type: "array"
             items:
@@ -492,6 +515,7 @@ components:
                 - currencyCode
                 - name
                 - description
+                - amountIsFlexible
                 - payButtonText
         PaymentTokenRecords:
             type: "array"
@@ -500,16 +524,16 @@ components:
                 properties:
                     paymentToken:
                         allOf:
-                            - $ref: "#/components/schemas/RecordStatusObject"
-                            - $ref: "#/components/schemas/IdentifierObject"
-                            - $ref: "#/components/schemas/PaymentTokenRecord"
-                            - required:
+                            - type: "object"
+                              properties:
+                                recordStatus:
+                                    $ref: "#/components/schemas/RecordStatus"
+                                identifier:
+                                    $ref: "#/components/schemas/EntityIdentifier"
+                              required:
                                 - recordStatus
                                 - identifier
-                                - name
-                                - amount
-                                - currencyCode
-                                - amountIsFlexible
+                            - $ref: "#/components/schemas/PaymentTokenRecord"
                     url:
                         type: "object"
                         properties:
@@ -523,15 +547,114 @@ components:
                 required:
                     - paymentToken
                     - url
+        BillingAddress:
+            allOf:
+                - type: "object"
+                  properties:
+                    name:
+                        $ref: "#/components/schemas/BusinessPersonName"
+                    email:
+                        $ref: "#/components/schemas/Email"
+                    ccEmail:
+                        $ref: "#/components/schemas/Email"
+                    phone:
+                        $ref: "#/components/schemas/Phone"
+                - $ref: "#/components/schemas/PostalAddress"
+        ShippingAddress:
+            allOf:
+                - type: "object"
+                  properties:
+                    name:
+                        $ref: "#/components/schemas/BusinessPersonName"
+                    phone:
+                        $ref: "#/components/schemas/Phone"
+                - $ref: "#/components/schemas/PostalAddress"
+        Locale:
+            description: "One's preferred language and country code"
+            type: "string"
+            example: "en-US"
+        TaxRecord:
+            type: "object"
+            properties:
+                countryCode:
+                    $ref: "#/components/schemas/CountryCode"
+                type:
+                    description: "The type of taxation of a territory of jurisdiction"
+                    type: "string"
+                    example: "VAT"
+                identityNumber:
+                    description: "The identity number of taxation for a business"
+                    type: "string"
+                    example: "<tax_id_number>"
+            required:
+                - countryCode
+                - type
+                - identityNumber
+        CustomerRecord:
+            type: "object"
+            properties:
+                name:
+                    $ref: "#/components/schemas/BusinessPersonName"
+                email:
+                    $ref: "#/components/schemas/Email"
+                description:
+                    description: "A brief desctiptive text about the customer"
+                    type: "string"
+                    minLength: 1
+                    example: "Help us protect children around the world"
+                currencyCode:
+                    $ref: "#/components/schemas/CountryCode"
+                image:
+                    description: "Base64 encoded string of an image"
+                    type: "string"
+                    format: "byte"
+                locale:
+                    $ref: "#/components/schemas/Locale"
+                timeZone:
+                    type: "string"
+                    example: "+08:00"
+                invoicePrefix:
+                    description: "The prefix of customer invoice number"
+                    type: "string"
+                    minLength: 1
+                    maxLength: 8
+                    example: "SALE_INV"
+                nextInvoiceSequence:
+                    description: "The number of next customer invoice"
+                    type: "number"
+                    minimum: 1
+                    maximum: 99999
+                    example: 1
+                taxStatus:
+                    type: "string"
+                    enum:
+                        - "taxable"
+                        - "exempt"
+                        - "reverseCharge"
+                metadata:
+                    type: "string"
+            required:
+                - identifier
+                - name
+                - email
+        CustomerRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    customer:
+                        allOf:
+                            - $ref: "#/components/schemas/EntityIdentifierObject"
+                            - $ref: "#/components/schemas/CustomerRecord"
     parameters:
         SessionToken:
-            name: "sessionToken"
+            name: "x-synap-SessionToken"
             in: "header"
             description: "Synap's session token"
             required: true
             schema:
                 type: "string"
-                example: "SessionToken"
+                example: "<session_token>"
     requestBodies:
         UserAccessRightsRequestBody:
             required: true
@@ -843,8 +966,8 @@ components:
     securitySchemes:
         synapSessionToken:
             type: "apiKey"
-            description: "Synap's session token is required for all commands except 'Login'"
-            name: x-synap-sessionToken
+            description: "Synap's session token is required for all commands except few specific purpose commands"
+            name: x-synap-SessionToken
             in: header
 security:
     -
@@ -1788,7 +1911,7 @@ paths:
                                 - cursor
             responses:
                 200:
-                    description: "Returned list of user records"
+                    description: "Returned list of payment tokens"
                     content:
                         application/json:
                             schema:
@@ -1834,7 +1957,7 @@ paths:
                                 - merchant
                                 - paymentToken
             responses:
-                default:
+                200:
                     description: "Receive result object and payment token on response"
                     content:
                         application/json:
@@ -1844,10 +1967,7 @@ paths:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
                                     paymentToken:
-                                        allOf:
-                                            - $ref: "#/components/schemas/IdentifierObject"
-                                            - required:
-                                                - identifier
+                                        $ref: "#/components/schemas/EntityIdentifierObject"
                                     url:
                                         type: "object"
                                         properties:
@@ -1855,8 +1975,14 @@ paths:
                                                 type: "string"
                                         required:
                                             - address
+                                required:
+                                    - result
+                                    - paymentToken
+                                    - url
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/UpdatePaymentToken:
-        summary: "Update a new payment token"
+        summary: "Update a payment token"
         post:
             tags:
                 -  "Payment Token [TODO]"
@@ -1870,10 +1996,8 @@ paths:
                                 paymentToken:
                                     allOf:
                                         - $ref: "#/components/schemas/RecordStatusObject"
-                                        - $ref: "#/components/schemas/IdentifierObject"
+                                        - $ref: "#/components/schemas/EntityIdentifierObject"
                                         - $ref: "#/components/schemas/PaymentTokenRecord"
-                                        - required:
-                                            - identifier
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -1890,10 +2014,7 @@ paths:
                             type: "object"
                             properties:
                                 paymentToken:
-                                    allOf:
-                                        - $ref: "#/components/schemas/IdentifierObject"
-                                        - required:
-                                            - identifier
+                                    $ref: "#/components/schemas/EntityIdentifierObject"
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -2152,6 +2273,188 @@ paths:
                                     - payment
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetCustomer:
+        summary: "Get list of customers"
+        post:
+            tags:
+                -  "Customer [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            oneOf:
+                              - type: "object"
+                                properties:
+                                    merchant:
+                                        type: "object"
+                                        properties:
+                                            identifier:
+                                                $ref: "#/components/schemas/EntityIdentifier"
+                                        required:
+                                            - identifier
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                                required:
+                                    - merchant
+                              - type: "object"
+                                properties:
+                                    customer:
+                                        type: "object"
+                                        properties:
+                                            identifier:
+                                                $ref: "#/components/schemas/EntityIdentifier"
+                                        required:
+                                            - identifier
+                                required:
+                                    - customer
+            responses:
+                200:
+                    description: "Returned list of customer records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    customers:
+                                        $ref: "#/components/schemas/CustomerRecords"
+                                required:
+                                    - result
+                                    - customers
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchCustomer:
+        summary: "Fetch more customer records with cursor"
+        post:
+            tags:
+                -  "Customer [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+                            required:
+                                - cursor
+            responses:
+                200:
+                    description: "Returned list of customer records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    customers:
+                                        $ref: "#/components/schemas/CustomerRecords"
+                                required:
+                                    - result
+                                    - customers
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewCustomer:
+        summary: "Create a new customer"
+        post:
+            tags:
+                -  "Customer [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                merchant:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                                customer:
+                                    $ref: "#/components/schemas/CustomerRecord"
+                                billingAddress:
+                                    $ref: "#/components/schemas/BillingAddress"
+                                shippingAddress:
+                                    $ref: "#/components/schemas/ShippingAddress"
+                                taxes:
+                                    type: "array"
+                                    items:
+                                        type: "object"
+                                        properties:
+                                            tax:
+                                                $ref: "#/components/schemas/TaxRecord"
+                                        required:
+                                            - tax
+                            required:
+                                - merchant
+                                - customer
+                                - billingAddress
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateCustomer:
+        summary: "Update a customer record"
+        post:
+            tags:
+                -  "Customer [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                customer:
+                                    allOf:
+                                        - $ref: "#/components/schemas/RecordStatusObject"
+                                        - $ref: "#/components/schemas/EntityIdentifierObject"
+                                        - $ref: "#/components/schemas/CustomerRecord"
+                                billingAddress:
+                                    $ref: "#/components/schemas/BillingAddress"
+                                shippingAddress:
+                                    $ref: "#/components/schemas/ShippingAddress"
+                                taxes:
+                                    type: "array"
+                                    items:
+                                        type: "object"
+                                        properties:
+                                            tax:
+                                                $ref: "#/components/schemas/TaxRecord"
+                                        required:
+                                            - tax
+                            required:
+                                - customer
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteCustomer:
+        summary: "Delete an existing customer record"
+        post:
+            tags:
+                -  "Customer [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                customer:
+                                    $ref: "#/components/schemas/EntityIdentifierObject"
+                            required:
+                                - customer
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/DestroyCursor:
         summary: "Destroy an existing cursor"
         post:
@@ -2169,6 +2472,10 @@ paths:
                                     properties:
                                         identifier:
                                             type: "string"
+                                    required:
+                                        - identifier
+                            required:
+                                - cursor
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
