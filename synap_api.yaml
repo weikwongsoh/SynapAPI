@@ -65,33 +65,29 @@ components:
                     description: "record's identifier of a given cursor's context"
                     type: "string"
         RecordStatus:
-            description: "The current status/state of a record"
-            type: "string"
-            enum:
-                - active
-                - inactive
-                - suspensed
-                - pendingApproval
-                - disabled
-                - locked
-                - removed
-                - noPassword
-            example: "active"
-        RecordStatusObject:
             type: "object"
             properties:
                 recordStatus:
-                    $ref: "#/components/schemas/RecordStatus"
+                    description: "The current status/state of a record"
+                    type: "string"
+                    enum:
+                        - active
+                        - inactive
+                        - suspensed
+                        - pendingApproval
+                        - disabled
+                        - locked
+                        - removed
+                        - noPassword
+                    example: "active"
         EntityIdentifier:
-            description: "unique identity of an entity in a given scope"
-            type: "string"
-            minLength: 1
-            example: "<identifier_of_an_entity>"
-        EntityIdentifierObject:
             type: "object"
             properties:
                 identifier:
-                    $ref: "#/components/schemas/EntityIdentifier"
+                    description: "unique identity of an entity in a given scope"
+                    type: "string"
+                    minLength: 1
+                    example: "<identifier_of_an_entity>"
             required:
                 - identifier
         MerchantIdentifier:
@@ -105,9 +101,12 @@ components:
             required:
                 - identifier
         BusinessPersonName:
-            description: "The name of a person or business"
-            type: "string"
-            example: "John Smith"
+            type: "object"
+            properties:
+                name:
+                    description: "The name of a person or business"
+                    type: "string"
+                    example: "John Smith"
         MailingAddress:
             type: "object"
             properties:
@@ -145,131 +144,145 @@ components:
                     minLength: 1
                     example: "123456"
         ContactAddress:
-            description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address which has been parsed by the system"
-            type: "string"
-        ContactAddressObject:
             type: "object"
             properties:
                 address:
-                    $ref: "#/components/schemas/ContactAddress"
-        Email:
+                    description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address which has been parsed by the system"
+                    type: "string"
+        EmailAddressAttribute:
             description: "The plain text email address"
             type: "string"
             format: "email"
             example: "john.smith@example.com"
-        Phone:
+        EmailAddress:
+            type: "object"
+            properties:
+                emailAddress:
+                    $ref: "#/components/schemas/EmailAddressAttribute"
+        CCEmailAddress:
+            type: "object"
+            properties:
+                ccEmailAddress:
+                    $ref: "#/components/schemas/EmailAddressAttribute"
+        PhoneNumberAttribute:
             description: "The plain text of formatted phone number"
             type: "string"
             example: "+1 (555) 555-1234"
+        PhoneNumber:
+            type: "object"
+            properties:
+                phoneNumber:
+                    $ref: "#/components/schemas/PhoneNumberAttribute"
+        MobileNumber:
+            type: "object"
+            properties:
+                mobileNumber:
+                    $ref: "#/components/schemas/PhoneNumberAttribute"
         UserContactRecords:
             type: "array"
             items:
-                type: "object"
-                properties:
-                    recordStatus:
-                        $ref: "#/components/schemas/RecordStatus"
-                    class:
+                allOf:
+                    - $ref: "#/components/schemas/RecordStatus"
+                    - $ref: "#/components/schemas/ContactAddress"
+                    - type: "object"
+                      properties:
+                        class:
+                            type: "number"
+                            description: "the contact class"
+                        identifier:
+                            type: "string"
+                            description: "a system generated key which can be used to retrieve this contact record"
+                        maskedAddress:
+                            type: "string"
+                            description: "the contact address masked for security purposes; an application must only display the masked address even if a plain text address is present in the response"
+                        originalAddress:
+                            type: "string"
+                            description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address string as entered by the user when the record was created or updated"
+                        flags:
+                            type: "object"
+                            properties:
+                                verified:
+                                    type: "boolean"
+                                    description: "the record has been verified"
+                                primary:
+                                    type: "boolean"
+                                    description: "this is a primary address"
+                                default:
+                                    type: "boolean"
+                                    description: "this is a default address"
+                                phone:
+                                    type: "boolean"
+                                    description: "this is a phone type record"
+                                messageCapable:
+                                    type: "boolean"
+                                    description: "this type of address is capable of receiving notification messages"
+                                url:
+                                    type: "boolean"
+                                    description: "this is a social media address record"
+                                notification:
+                                    type: "boolean"
+                                    description: "this record can receive account notification messages from the system"
+                                recovery:
+                                    type: "boolean"
+                                    description: "this record can be used for password and account recovery operations"
+        UserRecord:
+            allOf:
+                - $ref: "#/components/schemas/RecordStatus"
+                - $ref: "#/components/schemas/EmailAddress"
+                - $ref: "#/components/schemas/MobileNumber"
+                - type: "object"
+                  properties:
+                    rowId:
                         type: "number"
-                        description: "the contact class"
+                    recordDateTime:
+                        type: "string"
+                        format: "date-time"
+                    createDateTime:
+                        type: "string"
+                        format: "date-time"
+                    name:
+                        type: "string"
                     identifier:
                         type: "string"
-                        description: "a system generated key which can be used to retrieve this contact record"
-                    maskedAddress:
+                    externalIdentifier:
                         type: "string"
-                        description: "the contact address masked for security purposes; an application must only display the masked address even if a plain text address is present in the response"
-                    address:
-                        $ref: "#/components/schemas/ContactAddress"
-                    originalAddress:
+                    groupIdentifier:
                         type: "string"
-                        description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address string as entered by the user when the record was created or updated"
-                    flags:
-                        type: "object"
-                        properties:
-                            verified:
-                                type: "boolean"
-                                description: "the record has been verified"
-                            primary:
-                                type: "boolean"
-                                description: "this is a primary address"
-                            default:
-                                type: "boolean"
-                                description: "this is a default address"
-                            phone:
-                                type: "boolean"
-                                description: "this is a phone type record"
-                            messageCapable:
-                                type: "boolean"
-                                description: "this type of address is capable of receiving notification messages"
-                            url:
-                                type: "boolean"
-                                description: "this is a social media address record"
-                            notification:
-                                type: "boolean"
-                                description: "this record can receive account notification messages from the system"
-                            recovery:
-                                type: "boolean"
-                                description: "this record can be used for password and account recovery operations"
-        UserRecord:
-            type: "object"
-            properties:
-                rowId:
-                    type: "number"
-                recordStatus:
-                    $ref: "#/components/schemas/RecordStatus"
-                recordDateTime:
-                    type: "string"
-                    format: "date-time"
-                createDateTime:
-                    type: "string"
-                    format: "date-time"
-                name:
-                    type: "string"
-                identifier:
-                    type: "string"
-                externalIdentifier:
-                    type: "string"
-                groupIdentifier:
-                    type: "string"
-                policyIdentifier:
-                    type: "string"
-                organizationIdentifier:
-                    type: "string"
-                multiFactorIdentifier:
-                    type: "string"
-                multiFactorName:
-                    type: "string"
-                emailAddress:
-                    type: "string"
-                    format: "email"
-                mobileNumber:
-                    type: "string"
-                lastFailedAuthenticateDateTime:
-                    type: "string"
-                    format: "date-time"
-                lastLoginLocation:
-                    type: "string"
-                lastFailedLoginLocation:
-                    type: "string"
-                lockoutPeriod:
-                    type: "string"
-                failedAuthenticateAttemptCount:
-                    type: "number"
-                sessionExceededPolicy:
-                    type: "number"
-                loginShell:
-                    type: "string"
-                loginShellArguments:
-                    type: "string"
-                serverLoginScriptPath:
-                    type: "string"
-                homeDirectory:
-                    type: "string"
-                notificationOptInMap:
-                    type: "string"
-                restricted:
-                    type: "string"
-                preferName:
-                    type: "string"
+                    policyIdentifier:
+                        type: "string"
+                    organizationIdentifier:
+                        type: "string"
+                    multiFactorIdentifier:
+                        type: "string"
+                    multiFactorName:
+                        type: "string"
+                    lastFailedAuthenticateDateTime:
+                        type: "string"
+                        format: "date-time"
+                    lastLoginLocation:
+                        type: "string"
+                    lastFailedLoginLocation:
+                        type: "string"
+                    lockoutPeriod:
+                        type: "string"
+                    failedAuthenticateAttemptCount:
+                        type: "number"
+                    sessionExceededPolicy:
+                        type: "number"
+                    loginShell:
+                        type: "string"
+                    loginShellArguments:
+                        type: "string"
+                    serverLoginScriptPath:
+                        type: "string"
+                    homeDirectory:
+                        type: "string"
+                    notificationOptInMap:
+                        type: "string"
+                    restricted:
+                        type: "string"
+                    preferName:
+                        type: "string"
         UserRecords:
             type: "array"
             items:
@@ -547,16 +560,16 @@ components:
                 properties:
                     paymentToken:
                         allOf:
-                            - type: "object"
-                              properties:
-                                recordStatus:
-                                    $ref: "#/components/schemas/RecordStatus"
-                                identifier:
-                                    $ref: "#/components/schemas/EntityIdentifier"
-                              required:
+                            - $ref: "#/components/schemas/RecordStatus"
+                            - $ref: "#/components/schemas/EntityIdentifier"
+                            - $ref: "#/components/schemas/PaymentTokenRecord"
+                            - required:
                                 - recordStatus
                                 - identifier
-                            - $ref: "#/components/schemas/PaymentTokenRecord"
+                                - name
+                                - description
+                                - amount
+                                - amountIsFlexible
                     url:
                         type: "object"
                         properties:
@@ -572,25 +585,15 @@ components:
                     - url
         BillingAddress:
             allOf:
-                - type: "object"
-                  properties:
-                    name:
-                        $ref: "#/components/schemas/BusinessPersonName"
-                    email:
-                        $ref: "#/components/schemas/Email"
-                    ccEmail:
-                        $ref: "#/components/schemas/Email"
-                    phone:
-                        $ref: "#/components/schemas/Phone"
+                - $ref: "#/components/schemas/BusinessPersonName"
+                - $ref: "#/components/schemas/EmailAddress"
+                - $ref: "#/components/schemas/CCEmailAddress"
+                - $ref: "#/components/schemas/PhoneNumber"
                 - $ref: "#/components/schemas/MailingAddress"
         ShippingAddress:
             allOf:
-                - type: "object"
-                  properties:
-                    name:
-                        $ref: "#/components/schemas/BusinessPersonName"
-                    phone:
-                        $ref: "#/components/schemas/Phone"
+                - $ref: "#/components/schemas/BusinessPersonName"
+                - $ref: "#/components/schemas/PhoneNumber"
                 - $ref: "#/components/schemas/MailingAddress"
         Locale:
             description: "One's preferred language and country code"
@@ -614,48 +617,47 @@ components:
                 - type
                 - identityNumber
         CustomerRecord:
-            type: "object"
-            properties:
-                name:
-                    $ref: "#/components/schemas/BusinessPersonName"
-                email:
-                    $ref: "#/components/schemas/Email"
-                description:
-                    description: "A brief desctiptive text about the customer"
-                    type: "string"
-                    minLength: 1
-                    example: "Help us protect children around the world"
-                currencyCode:
-                    $ref: "#/components/schemas/CountryCode"
-                image:
-                    description: "Base64 encoded string of an image"
-                    type: "string"
-                    format: "byte"
-                locale:
-                    $ref: "#/components/schemas/Locale"
-                timeZone:
-                    type: "string"
-                    example: "+08:00"
-                invoicePrefix:
-                    description: "The prefix of customer invoice number"
-                    type: "string"
-                    minLength: 1
-                    maxLength: 8
-                    example: "SALE_INV"
-                nextInvoiceSequence:
-                    description: "The number of next customer invoice"
-                    type: "number"
-                    minimum: 1
-                    maximum: 99999
-                    example: 1
-                taxStatus:
-                    type: "string"
-                    enum:
-                        - "taxable"
-                        - "exempt"
-                        - "reverseCharge"
-                metadata:
-                    type: "string"
+            allOf:
+                - $ref: "#/components/schemas/BusinessPersonName"
+                - $ref: "#/components/schemas/EmailAddress"
+                - type: "object"
+                  properties:
+                    description:
+                        description: "A brief desctiptive text about the customer"
+                        type: "string"
+                        minLength: 1
+                        example: "Help us protect children around the world"
+                    currencyCode:
+                        $ref: "#/components/schemas/CountryCode"
+                    image:
+                        description: "Base64 encoded string of an image"
+                        type: "string"
+                        format: "byte"
+                    locale:
+                        $ref: "#/components/schemas/Locale"
+                    timeZone:
+                        type: "string"
+                        example: "+08:00"
+                    invoicePrefix:
+                        description: "The prefix of customer invoice number"
+                        type: "string"
+                        minLength: 1
+                        maxLength: 8
+                        example: "SALE_INV"
+                    nextInvoiceSequence:
+                        description: "The number of next customer invoice"
+                        type: "number"
+                        minimum: 1
+                        maximum: 99999
+                        example: 1
+                    taxStatus:
+                        type: "string"
+                        enum:
+                            - "taxable"
+                            - "exempt"
+                            - "reverseCharge"
+                    metadata:
+                        type: "string"
         CustomerRecords:
             type: "array"
             items:
@@ -663,7 +665,7 @@ components:
                 properties:
                     customer:
                         allOf:
-                            - $ref: "#/components/schemas/EntityIdentifierObject"
+                            - $ref: "#/components/schemas/EntityIdentifier"
                             - $ref: "#/components/schemas/CustomerRecord"
     parameters:
         SessionToken:
@@ -848,7 +850,7 @@ components:
                                     - issuingCountryCode
                             customer:
                                 allOf:
-                                    - $ref: "#/components/schemas/EntityIdentifierObject"
+                                    - $ref: "#/components/schemas/EntityIdentifier"
                                     - $ref: "#/components/schemas/CustomerRecord"
                             billingAddress:
                                 $ref: "#/components/schemas/BillingAddress"
@@ -1072,11 +1074,11 @@ paths:
                                     userContacts:
                                         type: "object"
                                         properties:
-                                            mobile:
+                                            mobiles:
                                                 $ref: "#/components/schemas/UserContactRecords"
-                                            email:
+                                            emails:
                                                 $ref: "#/components/schemas/UserContactRecords"
-                                            landline:
+                                            landlines:
                                                 $ref: "#/components/schemas/UserContactRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -1112,11 +1114,11 @@ paths:
                                     userContacts:
                                         type: "object"
                                         properties:
-                                            mobile:
+                                            mobiles:
                                                 $ref: "#/components/schemas/UserContactRecords"
-                                            email:
+                                            emails:
                                                 $ref: "#/components/schemas/UserContactRecords"
-                                            landline:
+                                            landlines:
                                                 $ref: "#/components/schemas/UserContactRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -1532,20 +1534,20 @@ paths:
                                             type: "string"
                                             description: "default team of an user"
                                 user:
-                                    type: "object"
-                                    properties:
-                                        name:
-                                            type: "string"
-                                        preferName:
-                                            type: "string"
-                                        inactivityTimeout:
-                                            type: "integer"
-                                            format: "int32"
-                                        maximumSessions:
-                                            type: "integer"
-                                            format: "int32"
-                                        recordStatus:
-                                            $ref: "#/components/schemas/RecordStatus"
+                                    allOf:
+                                        - $ref: "#/components/schemas/RecordStatus"
+                                        - type: "object"
+                                          properties:
+                                            name:
+                                                type: "string"
+                                            preferName:
+                                                type: "string"
+                                            inactivityTimeout:
+                                                type: "integer"
+                                                format: "int32"
+                                            maximumSessions:
+                                                type: "integer"
+                                                format: "int32"
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -1674,10 +1676,9 @@ paths:
                             type: "object"
                             properties:
                                 merchant:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            type: "string"
+                                    $ref: "#/components/schemas/MerchantIdentifier"
+                                customer:
+                                    $ref: "#/components/schemas/EntityIdentifier"
                                 searchText:
                                     type: "string"
                                 searchFilters:
@@ -1828,7 +1829,7 @@ paths:
                               - type: "object"
                                 properties:
                                     paymentToken:
-                                        $ref: "#/components/schemas/EntityIdentifierObject"
+                                        $ref: "#/components/schemas/EntityIdentifier"
                                 required:
                                     - paymentToken
             responses:
@@ -1921,7 +1922,7 @@ paths:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
                                     paymentToken:
-                                        $ref: "#/components/schemas/EntityIdentifierObject"
+                                        $ref: "#/components/schemas/EntityIdentifier"
                                     url:
                                         type: "object"
                                         properties:
@@ -1949,8 +1950,8 @@ paths:
                             properties:
                                 paymentToken:
                                     allOf:
-                                        - $ref: "#/components/schemas/RecordStatusObject"
-                                        - $ref: "#/components/schemas/EntityIdentifierObject"
+                                        - $ref: "#/components/schemas/RecordStatus"
+                                        - $ref: "#/components/schemas/EntityIdentifier"
                                         - $ref: "#/components/schemas/PaymentTokenRecord"
                             required:
                                 - paymentToken
@@ -1970,7 +1971,7 @@ paths:
                             type: "object"
                             properties:
                                 paymentToken:
-                                    $ref: "#/components/schemas/EntityIdentifierObject"
+                                    $ref: "#/components/schemas/EntityIdentifier"
                             required:
                                 - paymentToken
             responses:
@@ -2151,14 +2152,14 @@ paths:
                                                         type: "object"
                                                         properties:
                                                             email:
-                                                                $ref: "#/components/schemas/ContactAddressObject"
+                                                                $ref: "#/components/schemas/ContactAddress"
                                                 mobiles:
                                                     type: "array"
                                                     items:
                                                         type: "object"
                                                         properties:
                                                             mobile:
-                                                                $ref: "#/components/schemas/ContactAddressObject"
+                                                                $ref: "#/components/schemas/ContactAddress"
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -2248,7 +2249,7 @@ paths:
                               - type: "object"
                                 properties:
                                     customer:
-                                        $ref: "#/components/schemas/EntityIdentifierObject"
+                                        $ref: "#/components/schemas/EntityIdentifier"
                                 required:
                                     - customer
             responses:
@@ -2371,8 +2372,8 @@ paths:
                             properties:
                                 customer:
                                     allOf:
-                                        - $ref: "#/components/schemas/RecordStatusObject"
-                                        - $ref: "#/components/schemas/EntityIdentifierObject"
+                                        - $ref: "#/components/schemas/RecordStatus"
+                                        - $ref: "#/components/schemas/EntityIdentifier"
                                         - $ref: "#/components/schemas/CustomerRecord"
                                 billingAddress:
                                     $ref: "#/components/schemas/BillingAddress"
@@ -2406,7 +2407,7 @@ paths:
                             type: "object"
                             properties:
                                 customer:
-                                    $ref: "#/components/schemas/EntityIdentifierObject"
+                                    $ref: "#/components/schemas/EntityIdentifier"
                             required:
                                 - customer
             responses:
