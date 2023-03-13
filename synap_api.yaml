@@ -292,6 +292,34 @@ components:
                         $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
                     user:
                         $ref: "#/components/schemas/UserRecord"
+        UserProfile:
+            type: "object"
+            properties:
+                createDateTime:
+                    type: "string"
+                    format: "date-time"
+                nationalRegistrationIdentityCard:
+                    type: "string"
+                gender:
+                    type: "string"
+                nationality:
+                    type: "string"
+                race:
+                    type: "string"
+                birthdate:
+                    type: "date"
+                salutationPrefix:
+                    type: "string"
+                salutationSuffix:
+                    type: "string"
+                firstName:
+                    type: "string"
+                middleName:
+                    type: "string"
+                lastName:
+                    type: "string"
+                otherName:
+                    type: "string"
         TeamRecord:
             allOf:
                 - $ref: "#/components/schemas/RecordStatus"
@@ -1618,6 +1646,81 @@ paths:
                                     properties:
                                         name:
                                             type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUserProfile:
+        summary: "Get user's profile"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+            responses:
+                200:
+                    description: "Returned list of user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    userProfile:
+                                        $ref: "#/components/schemas/UserProfile"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewUserProfile:
+        summary: "Create a new user profile's record"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                userProfile:
+                                    $ref: "#/components/schemas/UserProfile"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateUserProfile:
+        summary: "Update an existing user profile's record"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                userProfile:
+                                    $ref: "#/components/schemas/UserProfile"
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
