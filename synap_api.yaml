@@ -292,6 +292,56 @@ components:
                         $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
                     user:
                         $ref: "#/components/schemas/UserRecord"
+        TeamRecord:
+            allOf:
+                - $ref: "#/components/schemas/RecordStatus"
+                - $ref: "#/components/schemas/EmailAddress"
+                - $ref: "#/components/schemas/MobileNumber"
+                - type: "object"
+                  properties:
+                    rowId:
+                        type: "number"
+                    recordDateTime:
+                        type: "string"
+                        format: "date-time"
+                    createDateTime:
+                        type: "string"
+                        format: "date-time"
+                    name:
+                        type: "string"
+                    identifier:
+                        type: "string"
+                    restricted:
+                        type: "string"
+        TeamRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    cursor:
+                        $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
+                    teams:
+                        $ref: "#/components/schemas/TeamRecord"
+        TeamUserRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    team:
+                        type: "object"
+                        properties:
+                            name:
+                                type: "string"
+                    users:
+                        type: "array"
+                        items:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
         ResponseResult:
             type: "object"
             properties:
@@ -1563,6 +1613,275 @@ paths:
                         schema:
                             type: "object"
                             properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetTeam:
+        summary: "Get team's details"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of team records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    teams:
+                                        $ref: "#/components/schemas/TeamRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchTeam:
+        summary: "Fetch more team's details with cursor"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    teams:
+                                        $ref: "#/components/schemas/TeamRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewTeam:
+        summary: "Create a new team's record"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        restricted:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateTeam:
+        summary: "Update an existing team's record"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    allOf:
+                                        - type: "object"
+                                          properties:
+                                            name:
+                                                type: "string"
+                                        - $ref: "#/components/schemas/RecordStatus"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteTeam:
+        summary: "Delete an existing team's record"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        migrateToTeam:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetTeamUser:
+        summary: "Get list of team users"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of team records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    teams:
+                                        $ref: "#/components/schemas/TeamUserRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchTeamUser:
+        summary: "Fetch more team users with cursor"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    teams:
+                                        $ref: "#/components/schemas/TeamUserRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewTeamUser:
+        summary: "Create a new team's record"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateTeamUser:
+        summary: "Update an existing team user's record"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                user:
+                                    allOf:
+                                        - type: "object"
+                                          properties:
+                                            name:
+                                                type: "string"
+                                        - $ref: "#/components/schemas/RecordStatus"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteTeamUser:
+        summary: "Delete an existing team user's record"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
                                 user:
                                     type: "object"
                                     properties:
