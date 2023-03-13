@@ -80,6 +80,20 @@ components:
                         - removed
                         - noPassword
                     example: "active"
+        CreateDateTime:
+            type: "object"
+            properties:
+                createDateTime:
+                    description: "date & time of create record"
+                    type: "string"
+                    format: "date-time"
+        RecordDateTime:
+            type: "object"
+            properties:
+                recordDateTime:
+                    description: "date & time of update record"
+                    type: "string"
+                    format: "date-time"
         EntityIdentifier:
             type: "object"
             properties:
@@ -107,6 +121,17 @@ components:
                     description: "The name of a person or business"
                     type: "string"
                     example: "John Smith"
+        MailingAddressType:
+            type: "object"
+            properties:
+                type:
+                    description: "the type of mailing address"
+                    type: "string"
+                    enum:
+                        - "default"
+                        - "correspondence"
+                        - "billing"
+                        - "shipping"
         MailingAddress:
             type: "object"
             properties:
@@ -133,8 +158,8 @@ components:
                     type: "string"
                     minLength: 1
                     example: "Middle City"
-                stateProvince:
-                    description: "state or province of mailing address"
+                provinceState:
+                    description: "province or state of mailing address"
                     type: "string"
                     minLength: 1
                     example: "Big State"
@@ -230,16 +255,12 @@ components:
                 - $ref: "#/components/schemas/RecordStatus"
                 - $ref: "#/components/schemas/EmailAddress"
                 - $ref: "#/components/schemas/MobileNumber"
+                - $ref: "#/components/schemas/CreateDateTime"
+                - $ref: "#/components/schemas/RecordDateTime"
                 - type: "object"
                   properties:
                     rowId:
                         type: "number"
-                    recordDateTime:
-                        type: "string"
-                        format: "date-time"
-                    createDateTime:
-                        type: "string"
-                        format: "date-time"
                     name:
                         type: "string"
                     identifier:
@@ -293,48 +314,44 @@ components:
                     user:
                         $ref: "#/components/schemas/UserRecord"
         UserProfile:
-            type: "object"
-            properties:
-                createDateTime:
-                    type: "string"
-                    format: "date-time"
-                nationalRegistrationIdentityCard:
-                    type: "string"
-                gender:
-                    type: "string"
-                nationality:
-                    type: "string"
-                race:
-                    type: "string"
-                birthdate:
-                    type: "date"
-                salutationPrefix:
-                    type: "string"
-                salutationSuffix:
-                    type: "string"
-                firstName:
-                    type: "string"
-                middleName:
-                    type: "string"
-                lastName:
-                    type: "string"
-                otherName:
-                    type: "string"
+            allOf:
+                - $ref: "#/components/schemas/CreateDateTime"
+                - type: "object"
+                  properties:
+                    nationalRegistrationIdentityCard:
+                        type: "string"
+                    gender:
+                        type: "string"
+                    nationality:
+                        type: "string"
+                    race:
+                        type: "string"
+                    birthdate:
+                        type: "string"
+                        format: "date"
+                    salutationPrefix:
+                        type: "string"
+                    salutationSuffix:
+                        type: "string"
+                    firstName:
+                        type: "string"
+                    middleName:
+                        type: "string"
+                    lastName:
+                        type: "string"
+                    otherName:
+                        type: "string"
         TeamRecord:
             allOf:
                 - $ref: "#/components/schemas/RecordStatus"
                 - $ref: "#/components/schemas/EmailAddress"
                 - $ref: "#/components/schemas/MobileNumber"
+                - $ref: "#/components/schemas/CreateDateTime"
+                - $ref: "#/components/schemas/RecordDateTime"
                 - type: "object"
                   properties:
                     rowId:
                         type: "number"
-                    recordDateTime:
-                        type: "string"
-                        format: "date-time"
-                    createDateTime:
-                        type: "string"
-                        format: "date-time"
                     name:
                         type: "string"
                     identifier:
@@ -1724,6 +1741,50 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUserMailingAddress:
+        summary: "Get user's address"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    mailingAddresses:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                mailingAddress:
+                                                    allOf:
+                                                        - $ref: "#/components/schemas/RecordStatus"
+                                                        - $ref: "#/components/schemas/CreateDateTime"
+                                                        - $ref: "#/components/schemas/MailingAddressType"
+                                                        - $ref: "#/components/schemas/MailingAddress"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetTeam:
         summary: "Get team's details"
         post:
@@ -2753,7 +2814,7 @@ paths:
                                             - countryCode
                                             - addressLine1
                                             - city
-                                            - stateProvince
+                                            - provinceState
                                             - postalCode
                                 shippingAddress:
                                     allOf:
@@ -2762,7 +2823,7 @@ paths:
                                             - countryCode
                                             - addressLine1
                                             - city
-                                            - stateProvince
+                                            - provinceState
                                             - postalCode
                                 taxes:
                                     type: "array"
