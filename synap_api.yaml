@@ -481,6 +481,141 @@ components:
                 <replace_with_action_name>:
                     type: "boolean"
                     description: "name of an action; values are ignored during retrieval however 'true' would mean an action to be granted and 'false' would mean an action to be revoked"
+        ValidationChecks:
+            type: "object"
+            properties:
+                minimumLengthCheck:
+                    type: "boolean"
+                    description: "Validate against password.minimumLength"
+                alphaCheck:
+                    type: "boolean"
+                    description: "Must contain at least one alphabet"
+                upperCaseCheck:
+                    type: "boolean"
+                    description: "Must contain at least one upper case letter"
+                lowerCaseCheck:
+                    type: "boolean"
+                    description: "Must contain at least one lower case letter"
+                digitCheck:
+                    type: "boolean"
+                    description: "Must contain at least one digit"
+                specialCharacterCheck:
+                    type: "boolean"
+                    description: "Must contain at least one special char (not an alphabet, not a digit)"
+                usernameStrippedCheck:
+                    type: "boolean"
+                    description: "The password cannot contain the user name (in this case the user name and password are stripped of all non-alphabet as well as email suffix before a match is attempted)"
+                usernameCheck:
+                    type: "boolean"
+                    description: "The password cannot contain the user name (in this the user name is not stripped of non-alphabet and the email suffix)"
+        PasswordPolicyName:
+            type: "object"
+            properties:
+                name:
+                    description: "The name assigned to this policy"
+                    type: "string"
+            required:
+                - name
+        PasswordPolicy:
+            allOf:
+                - $ref: "#/components/schemas/PasswordPolicyName"
+                - type: "object"
+                  properties:
+                    name:
+                        description: "The name assigned to this policy"
+                        type: "string"
+                    minimumStrength:
+                        description: "The minimum strength, as determinted by entropy, which a password must have"
+                        type: "integer"
+                        format: "int32"
+                    minimumLength:
+                        description: "The minimum length a password must have. A value of zero implies no minimum required"
+                        type: "integer"
+                        format: "int32"
+                    historySize:
+                        description: "The number of past passwords in the password history file. This indicates how many past passwords are checked when a user attempts to change their password. A value of zero means never check against old password."
+                        type: "integer"
+                        format: "int32"
+                    maximumLife:
+                        description: "The number of days after which the user must change their password. A value of zero means the user is never required to change their password."
+                        type: "integer"
+                        format: "int32"
+                    maximumFailedAttempts:
+                        description: "The maximum consecutive times a password authentication fails after which the user is locked out. A value of zero means to never lock the record."
+                        type: "integer"
+                        format: "int32"
+                    lockoutPeriod:
+                        description: "The number of seconds to lockout an account after 'maximumFailedAttempts' consecutive password failures. If this field is zero, then the record is locked until an administrator unlocks the record."
+                        type: "integer"
+                        format: "int32"
+                    resetLife:
+                        description: "The number of seconds a temporary password is valid."
+                        type: "integer"
+                        format: "int32"
+                    validationChecks:
+                        $ref: "#/components/schemas/ValidationChecks"
+                    hashAlgorithm:
+                        description: "The value determines which hashing algorithm will be used to hash the plaintext password."
+                        type: "string"
+                        enum:
+                            - "pbkdf2"
+                            - "digest"
+                            - "bcrypt"
+                            - "scrypt"
+                            - "encrypt"
+                            - "random"
+                    hashDigest:
+                        description: "The message digest to use with the hash algorithm"
+                        type: "string"
+                        enum:
+                            - "md5"
+                            - "sha1"
+                            - "sha224"
+                            - "sha256"
+                            - "sha512"
+                            - "ripemd160"
+                            - "whirlpool"
+                            - "random"
+                    hashEncoding:
+                        description: "How the final hash is encoded in the database"
+                        type: "string"
+                        enum:
+                            - "ascii"
+                            - "crypt"
+                            - "binary"
+                    hashSaltSize:
+                        description: "The size of the salt, in bytes, value to apply to password. Some algorithms fix this value or apply a minimum to size of salt. The system will automatically modify this value if required."
+                        type: "integer"
+                        format: "int32"
+                    hashKeySize:
+                        description: "The size of the key to pass to the PBKDF2 function."
+                        type: "integer"
+                        format: "int32"
+                    hashRounds:
+                        description: "The number of rounds (iterations) to apply the hash algorithm (default is 131,072). Note that some algorithms require a specific number of rounds or set a minimum or maximum on the allowed rounds. Depending on the choice of algorithm, the system will automatically adjust the rounds. The overall minimum number of rounds is 1000."
+                        type: "integer"
+                        format: "int32"
+                    restricted:
+                        description: "The name of the organization to which this policy is restricted."
+                        type: "string"
+        PasswordPolicyRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    cursor:
+                        $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
+                    passwordPolicy:
+                        allOf:
+                            - $ref: "#/components/schemas/RecordStatus"
+                            - $ref: "#/components/schemas/RecordDateTime"
+                            - $ref: "#/components/schemas/PasswordPolicy"
+                            - type: "object"
+                              properties:
+                                rowId:
+                                    type: "number"
+                                identifier:
+                                    type: "string"
         CountryRecord:
             type: "object"
             properties:
@@ -1180,38 +1315,13 @@ paths:
                                             lastLogin:
                                                 type: "string"
                                                 format: "date-time"
-                                    password:
+                                    passwordPolicy:
                                         type: "object"
                                         properties:
                                             minimumLength:
                                                 type: "number"
                                             validationChecks:
-                                                type: "object"
-                                                properties:
-                                                    minimumLengthCheck:
-                                                        type: "boolean"
-                                                        description: "Validate against password.minimumLength"
-                                                    alphaCheck:
-                                                        type: "boolean"
-                                                        description: "Must contain at least one alphabet"
-                                                    upperCaseCheck:
-                                                        type: "boolean"
-                                                        description: "Must contain at least one upper case letter"
-                                                    lowerCaseCheck:
-                                                        type: "boolean"
-                                                        description: "Must contain at least one lower case letter"
-                                                    digitCheck:
-                                                        type: "boolean"
-                                                        description: "Must contain at least one digit"
-                                                    specialCharacterCheck:
-                                                        type: "boolean"
-                                                        description: "Must contain at least one special char (not an alphabet, not a digit)"
-                                                    usernameStrippedCheck:
-                                                        type: "boolean"
-                                                        description: "The password cannot contain the user name (in this case the user name and password are stripped of all non-alphabet as well as email suffix before a match is attempted)"
-                                                    usernameCheck:
-                                                        type: "boolean"
-                                                        description: "The password cannot contain the user name (in this the user name is not stripped of non-alphabet and the email suffix)"
+                                                $ref: "#/components/schemas/ValidationChecks"
                                     organization:
                                         type: "object"
                                         properties:
@@ -2084,7 +2194,7 @@ paths:
                                             type: "string"
                                         class:
                                             type: "string"
-                                    - required:
+                                    required:
                                         - identifier
                                 flags:
                                     $ref: "#/components/schemas/UserContactFlags"
@@ -2118,7 +2228,7 @@ paths:
                                     properties:
                                         identifier:
                                             type: "string"
-                                    - required:
+                                    required:
                                         - identifier
                                 flags:
                                     $ref: "#/components/schemas/UserContactFlags"
@@ -2152,7 +2262,7 @@ paths:
                                     properties:
                                         identifier:
                                             type: "string"
-                                    - required:
+                                    required:
                                         - identifier
                                 flags:
                                     $ref: "#/components/schemas/UserContactFlags"
@@ -2428,6 +2538,120 @@ paths:
                                     properties:
                                         name:
                                             type: "string"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetPasswordPolicy:
+        summary: "Get password policy's details"
+        post:
+            tags:
+                -  "Password Policy"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                passwordPolicy:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of team records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    passwordPolicies:
+                                        $ref: "#/components/schemas/PasswordPolicyRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchPasswordPolicy:
+        summary: "Fetch more password policy with cursor"
+        post:
+            tags:
+                -  "Team"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    passwordPolicies:
+                                        $ref: "#/components/schemas/PasswordPolicyRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewPasswordPolicy:
+        summary: "Create a new password policy's record"
+        post:
+            tags:
+                -  "Password Policy"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                passwordPolicy:
+                                    $ref: "#/components/schemas/PasswordPolicy"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdatePasswordPolicy:
+        summary: "Update an existing password policy's record"
+        post:
+            tags:
+                -  "Password Policy"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                passwordPolicy:
+                                    $ref: "#/components/schemas/PasswordPolicy"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeletePasswordPolicy:
+        summary: "Delete an existing password policy's record"
+        post:
+            tags:
+                -  "Password Policy"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                passwordPolicy:
+                                    $ref: "#/components/schemas/PasswordPolicyName"
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
