@@ -128,7 +128,6 @@ components:
                     description: "the type of mailing address"
                     type: "string"
                     enum:
-                        - "default"
                         - "correspondence"
                         - "billing"
                         - "shipping"
