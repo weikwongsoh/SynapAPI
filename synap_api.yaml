@@ -131,6 +131,8 @@ components:
                         - "correspondence"
                         - "billing"
                         - "shipping"
+            required:
+                - type
         MailingAddress:
             type: "object"
             properties:
@@ -1757,8 +1759,13 @@ paths:
                                     properties:
                                         name:
                                             type: "string"
-                                cursor:
-                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                                    required:
+                                        - name
+                                mailingAddress:
+                                    $ref: "#/components/schemas/MailingAddressType"
+                            required:
+                                - user
+                                - mailingAddress
             responses:
                 200:
                     description: "Returned list of user records"
@@ -1769,8 +1776,6 @@ paths:
                                 properties:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
-                                    cursor:
-                                        $ref: "#/components/schemas/CursorOnResponse"
                                     mailingAddresses:
                                         type: "array"
                                         items:
@@ -1782,6 +1787,96 @@ paths:
                                                         - $ref: "#/components/schemas/CreateDateTime"
                                                         - $ref: "#/components/schemas/MailingAddressType"
                                                         - $ref: "#/components/schemas/MailingAddress"
+                                            required:
+                                                - mailingAddress
+                                required:
+                                    - result
+                                    - mailingAddresses
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewUserMailingAddress:
+        summary: "Create a new user's mailing address"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                mailingAddress:
+                                    allOf:
+                                        - $ref: "#/components/schemas/MailingAddressType"
+                                        - $ref: "#/components/schemas/MailingAddress"
+                            required:
+                                - user
+                                - mailingAddress
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateUserMailingAddress:
+        summary: "Update an existing user's mailing address"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                mailingAddress:
+                                    allOf:
+                                        - $ref: "#/components/schemas/MailingAddressType"
+                                        - $ref: "#/components/schemas/MailingAddress"
+                            required:
+                                - user
+                                - mailingAddress
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteUserMailingAddress:
+        summary: "Delete an existing user's mailing address"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                mailingAddress:
+                                    $ref: "#/components/schemas/MailingAddressType"
+                            required:
+                                - user
+                                - mailingAddress
+            responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetTeam:
