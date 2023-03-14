@@ -204,53 +204,111 @@ components:
             properties:
                 mobileNumber:
                     $ref: "#/components/schemas/PhoneNumberAttribute"
+        UserContactType:
+            type: "object"
+            properties:
+                type:
+                    description: "The type of a contact"
+                    type: "string"
+                    enum:
+                        - "email"
+                        - "mobile"
+                        - "landline"
+                        - "url"
+        UserContact:
+            allOf:
+                - $ref: "#/components/schemas/RecordStatus"
+                - $ref: "#/components/schemas/ContactAddress"
+                - type: "object"
+                  properties:
+                    class:
+                        type: "number"
+                        description: "the contact class"
+                    identifier:
+                        type: "string"
+                        description: "a system generated key which can be used to retrieve this contact record"
+                    maskedAddress:
+                        type: "string"
+                        description: "the contact address masked for security purposes; an application must only display the masked address even if a plain text address is present in the response"
+                    originalAddress:
+                        type: "string"
+                        description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address string as entered by the user when the record was created or updated"
+                    flags:
+                        $ref: "#/components/schemas/UserContactFlags"
+        UserContactFlags:
+            type: "object"
+            properties:
+                verified:
+                    type: "boolean"
+                    description: "the record has been verified"
+                primary:
+                    type: "boolean"
+                    description: "this is a primary address"
+                default:
+                    type: "boolean"
+                    description: "this is a default address"
+                phone:
+                    type: "boolean"
+                    description: "this is a phone type record"
+                messageCapable:
+                    type: "boolean"
+                    description: "this type of address is capable of receiving notification messages"
+                url:
+                    type: "boolean"
+                    description: "this is a social media address record"
+                notification:
+                    type: "boolean"
+                    description: "this record can receive account notification messages from the system"
+                recovery:
+                    type: "boolean"
+                    description: "this record can be used for password and account recovery operations"
         UserContactRecords:
             type: "array"
             items:
-                allOf:
-                    - $ref: "#/components/schemas/RecordStatus"
-                    - $ref: "#/components/schemas/ContactAddress"
-                    - type: "object"
-                      properties:
-                        class:
-                            type: "number"
-                            description: "the contact class"
-                        identifier:
-                            type: "string"
-                            description: "a system generated key which can be used to retrieve this contact record"
-                        maskedAddress:
-                            type: "string"
-                            description: "the contact address masked for security purposes; an application must only display the masked address even if a plain text address is present in the response"
-                        originalAddress:
-                            type: "string"
-                            description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address string as entered by the user when the record was created or updated"
-                        flags:
-                            type: "object"
-                            properties:
-                                verified:
-                                    type: "boolean"
-                                    description: "the record has been verified"
-                                primary:
-                                    type: "boolean"
-                                    description: "this is a primary address"
-                                default:
-                                    type: "boolean"
-                                    description: "this is a default address"
-                                phone:
-                                    type: "boolean"
-                                    description: "this is a phone type record"
-                                messageCapable:
-                                    type: "boolean"
-                                    description: "this type of address is capable of receiving notification messages"
-                                url:
-                                    type: "boolean"
-                                    description: "this is a social media address record"
-                                notification:
-                                    type: "boolean"
-                                    description: "this record can receive account notification messages from the system"
-                                recovery:
-                                    type: "boolean"
-                                    description: "this record can be used for password and account recovery operations"
+                type: "object"
+                properties:
+                    user:
+                        type: "object"
+                        properties:
+                            name:
+                                type: "string"
+                        required:
+                            - name
+                    mobiles:
+                        $ref: "#/components/schemas/UserMobileContactRecords"
+                    emails:
+                        $ref: "#/components/schemas/UserEmailContactRecords"
+                    landlines:
+                        $ref: "#/components/schemas/UserLandlineContactRecords"
+                required:
+                    - user
+        UserMobileContactRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    mobile:
+                        $ref: "#/components/schemas/UserContact"
+                required:
+                    - mobile
+        UserEmailContactRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    email:
+                        $ref: "#/components/schemas/UserContact"
+                required:
+                    - email
+        UserLandlineContactRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    landline:
+                        $ref: "#/components/schemas/UserContact"
+                required:
+                    - landline
         UserRecord:
             allOf:
                 - $ref: "#/components/schemas/RecordStatus"
@@ -1167,19 +1225,16 @@ paths:
                                         properties:
                                             identifier:
                                                 type: "string"
-                                    userContacts:
-                                        type: "object"
-                                        properties:
-                                            mobiles:
-                                                $ref: "#/components/schemas/UserContactRecords"
-                                            emails:
-                                                $ref: "#/components/schemas/UserContactRecords"
-                                            landlines:
-                                                $ref: "#/components/schemas/UserContactRecords"
+                                    mobiles:
+                                        $ref: "#/components/schemas/UserMobileContactRecords"
+                                    emails:
+                                        $ref: "#/components/schemas/UserEmailContactRecords"
+                                    landlines:
+                                        $ref: "#/components/schemas/UserLandlineContactRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/ContactShortList:
-        summary: "Retrieve list of econtact for an user"
+        summary: "Retrieve list of contact for an user"
         post:
             security: []
             tags:
@@ -1197,9 +1252,13 @@ paths:
                                         name:
                                             type: "string"
                                             minLength: 1
+                                    required:
+                                        - name
+                            required:
+                                - user
             responses:
                 200:
-                    description: "Returned a list of user's econtact"
+                    description: "Returned a list of user's contact"
                     content:
                         application/json:
                             schema:
@@ -1207,15 +1266,14 @@ paths:
                                 properties:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
-                                    userContacts:
-                                        type: "object"
-                                        properties:
-                                            mobiles:
-                                                $ref: "#/components/schemas/UserContactRecords"
-                                            emails:
-                                                $ref: "#/components/schemas/UserContactRecords"
-                                            landlines:
-                                                $ref: "#/components/schemas/UserContactRecords"
+                                    mobiles:
+                                        $ref: "#/components/schemas/UserMobileContactRecords"
+                                    emails:
+                                        $ref: "#/components/schemas/UserEmailContactRecords"
+                                    landlines:
+                                        $ref: "#/components/schemas/UserLandlineContactRecords"
+                                required:
+                                    - result
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/ChangePassword:
@@ -1876,6 +1934,231 @@ paths:
                             required:
                                 - user
                                 - mailingAddress
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUserContact:
+        summary: "Get user's contact"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                contact:
+                                    allOf:
+                                        - $ref: "#/components/schemas/UserContactType"
+                                        - type: "object"
+                                          properties:
+                                            identifier:
+                                                type: "string"
+                                        - required:
+                                            - type
+                            required:
+                                - user
+            responses:
+                200:
+                    description: "Returned list of user contact records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    users:
+                                        $ref: "#/components/schemas/UserContactRecords"
+                                required:
+                                    - result
+                                    - users
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchUserContact:
+        summary: "Fetch more user's contacts with cursor"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user contact records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    users:
+                                        $ref: "#/components/schemas/UserContactRecords"
+                                required:
+                                    - result
+                                    - users
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewUserContact:
+        summary: "Create a new contact's record"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                contact:
+                                    allOf:
+                                        - $ref: "#/components/schemas/UserContactType"
+                                        - $ref: "#/components/schemas/ContactAddress"
+                                        - type: "object"
+                                          properties:
+                                            class:
+                                                type: "string"
+                                        - required:
+                                            - type
+                                            - address
+                                flags:
+                                    $ref: "#/components/schemas/UserContactFlags"
+                            required:
+                                - user
+                                - contact
+                                - flags
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateUserContact:
+        summary: "Update an existing contact's record"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                contact:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                        address:
+                                            type: "string"
+                                        class:
+                                            type: "string"
+                                    - required:
+                                        - identifier
+                                flags:
+                                    $ref: "#/components/schemas/UserContactFlags"
+                            required:
+                                - user
+                                - contact
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteUserContact:
+        summary: "Delete an existing contact's record"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                contact:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    - required:
+                                        - identifier
+                                flags:
+                                    $ref: "#/components/schemas/UserContactFlags"
+                            required:
+                                - user
+                                - contact
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/VerifyUserContact:
+        summary: "Verify an existing contact's record"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                contact:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    - required:
+                                        - identifier
+                                flags:
+                                    $ref: "#/components/schemas/UserContactFlags"
+                            required:
+                                - user
+                                - contact
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
