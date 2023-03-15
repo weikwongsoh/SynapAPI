@@ -481,6 +481,32 @@ components:
                 <replace_with_action_name>:
                     type: "boolean"
                     description: "name of an action; values are ignored during retrieval however 'true' would mean an action to be granted and 'false' would mean an action to be revoked"
+        AccessRightObjectRecord:
+            allOf:
+                - $ref: "#/components/schemas/RecordStatus"
+                - $ref: "#/components/schemas/CreateDateTime"
+                - $ref: "#/components/schemas/RecordDateTime"
+                - type: "object"
+                  properties:
+                    rowId:
+                        type: "number"
+                    name:
+                        type: "string"
+                    identifier:
+                        type: "string"
+                    class:
+                        type: "string"
+                    restricted:
+                        type: "string"
+        AccessRightObjectRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    cursor:
+                        $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
+                    accessRightObject:
+                        $ref: "#/components/schemas/AccessRightObjectRecord"
         ValidationChecks:
             type: "object"
             properties:
@@ -1542,7 +1568,7 @@ paths:
         summary: "Check user's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 required: true
                 content:
@@ -1569,7 +1595,7 @@ paths:
         summary: "Get list of user's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/UserAccessRightsRequestBody"
             responses:
@@ -1581,7 +1607,7 @@ paths:
         summary: "Get list of team's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/TeamAccessRightsRequestBody"
             responses:
@@ -1593,7 +1619,7 @@ paths:
         summary: "Get list of organization's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/OrganizationAccessRightsRequestBody"
             responses:
@@ -1605,7 +1631,7 @@ paths:
         summary: "Grant user's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/UserAccessRightsRequestBody"
             responses:
@@ -1615,7 +1641,7 @@ paths:
         summary: "Grant team's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/TeamAccessRightsRequestBody"
             responses:
@@ -1625,7 +1651,7 @@ paths:
         summary: "Grant organization's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/OrganizationAccessRightsRequestBody"
             responses:
@@ -1635,7 +1661,7 @@ paths:
         summary: "Revoke user's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/UserAccessRightsRequestBody"
             responses:
@@ -1645,7 +1671,7 @@ paths:
         summary: "Revoke team's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/TeamAccessRightsRequestBody"
             responses:
@@ -1655,7 +1681,7 @@ paths:
         summary: "Revoke organization's access rights"
         post:
             tags:
-                -  "AccessRights"
+                -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/OrganizationAccessRightsRequestBody"
             responses:
@@ -2335,7 +2361,7 @@ paths:
                                     $ref: "#/components/schemas/CursorOnRequest"
             responses:
                 200:
-                    description: "Returned list of user records"
+                    description: "Returned list of team records"
                     content:
                         application/json:
                             schema:
@@ -2434,7 +2460,7 @@ paths:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
             responses:
                 200:
-                    description: "Returned list of team records"
+                    description: "Returned list of team user records"
                     content:
                         application/json:
                             schema:
@@ -2464,7 +2490,7 @@ paths:
                                     $ref: "#/components/schemas/CursorOnRequest"
             responses:
                 200:
-                    description: "Returned list of user records"
+                    description: "Returned list of team user records"
                     content:
                         application/json:
                             schema:
@@ -2477,7 +2503,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/NewTeamUser:
-        summary: "Create a new team's record"
+        summary: "Create a new team user's record"
         post:
             tags:
                 -  "Team"
@@ -2553,6 +2579,149 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetAccessRightObject:
+        summary: "Get access rights's object"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                accessRightObject:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - accessRightObject
+            responses:
+                200:
+                    description: "Returned list of access rights object records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    accessRightObjects:
+                                        $ref: "#/components/schemas/AccessRightObjectRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchAccessRightObject:
+        summary: "Fetch more access right object's details with cursor"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of access right object records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    accessRightObjects:
+                                        $ref: "#/components/schemas/AccessRightObjectRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewAccessRightObject:
+        summary: "Create a new access right object's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                accessRightObject:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        restricted:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - accessRightObject
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateAccessRightObject:
+        summary: "Update an existing access right object's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                accessRightObject:
+                                    allOf:
+                                        - type: "object"
+                                          properties:
+                                            name:
+                                                type: "string"
+                                          required:
+                                            - name
+                                        - $ref: "#/components/schemas/RecordStatus"
+                            required:
+                                - accessRightObject
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteAccessRightObject:
+        summary: "Delete an existing access right object's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                accessRightObject:
+                                    type: "object"
+                                        properties:
+                                            name:
+                                                type: "string"
+                                        required:
+                                            - name
+                            required:
+                                - accessRightObject
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetPasswordPolicy:
         summary: "Get password policy's details"
         post:
@@ -2574,7 +2743,7 @@ paths:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
             responses:
                 200:
-                    description: "Returned list of team records"
+                    description: "Returned list of password policy records"
                     content:
                         application/json:
                             schema:
@@ -2604,7 +2773,7 @@ paths:
                                     $ref: "#/components/schemas/CursorOnRequest"
             responses:
                 200:
-                    description: "Returned list of user records"
+                    description: "Returned list of password policy records"
                     content:
                         application/json:
                             schema:
