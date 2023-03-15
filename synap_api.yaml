@@ -2289,8 +2289,20 @@ paths:
                                     properties:
                                         name:
                                             type: "string"
+                                    required:
+                                        - name
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - team
+                                - user
             responses:
                 200:
                     description: "Returned list of team records"
