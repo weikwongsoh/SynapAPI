@@ -507,6 +507,23 @@ components:
                         $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
                     accessRightObject:
                         $ref: "#/components/schemas/AccessRightObjectRecord"
+        AccessRightActionRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    cursor:
+                        $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
+                    accessRightObject:
+                        type: "object"
+                        properties:
+                            name:
+                                type: "string"
+                            identifier:
+                                type: "string"
+                            accessRightActions:
+                                description: "The list of access right actions related to an object"
+                                type: "object"
         ValidationChecks:
             type: "object"
             properties:
@@ -2712,11 +2729,159 @@ paths:
                             properties:
                                 accessRightObject:
                                     type: "object"
-                                        properties:
-                                            name:
-                                                type: "string"
-                                        required:
-                                            - name
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - accessRightObject
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetAccessRightAction:
+        summary: "Get access rights's action"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                accessRightObject:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - accessRightObject
+            responses:
+                200:
+                    description: "Returned list of access rights action records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    accessRightObjects:
+                                        $ref: "#/components/schemas/AccessRightActionRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchAccessRightAction:
+        summary: "Fetch more access right actions with cursor"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of access right action records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    accessRightObjects:
+                                        $ref: "#/components/schemas/AccessRightActionRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewAccessRightAction:
+        summary: "Create a new access right action's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                accessRightObject:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        actionName:
+                                            type: "string"
+                                    required:
+                                        - name
+                                        - actionName
+                            required:
+                                - accessRightObject
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateAccessRightAction:
+        summary: "Update an existing access right action's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                accessRightObject:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        actionName:
+                                            type: "string"
+                                    required:
+                                        - name
+                                        - actionName
+                            required:
+                                - accessRightObject
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteAccessRightAction:
+        summary: "Delete an existing access right action's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                accessRightObject:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        actionName:
+                                            type: "string"
+                                    required:
+                                        - name
+                                        - actionName
                             required:
                                 - accessRightObject
             responses:
