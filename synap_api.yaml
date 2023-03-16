@@ -661,6 +661,60 @@ components:
                                     type: "number"
                                 identifier:
                                     type: "string"
+        SessionUserRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    cursor:
+                        $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
+                    sessionUser:
+                        type: "object"
+                        properties:
+                            name:
+                                type: "string"
+                            identifier:
+                                type: "string"
+                            nodeIdentifier:
+                                type: "string"
+                            recordStatus:
+                                type: "string"
+                            lastActivityDateTime:
+                                description: "date & time of last activity"
+                                type: "string"
+                                format: "date-time"
+                            expiryInSeconds:
+                                type: "number"
+                            activeSessions:
+                                type: "number"
+        SessionRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    cursor:
+                        $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
+                    session:
+                        type: "object"
+                        properties:
+                            number:
+                                type: "number"
+                            flags:
+                                type: "number"
+                            loginMethod:
+                                type: "string"
+                            recordStatus:
+                                type: "string"
+                            lastActivityDateTime:
+                                description: "date & time of last activity"
+                                type: "string"
+                                format: "date-time"
+                            createDateTime:
+                                description: "date & time of session was created"
+                                type: "string"
+                                format: "date-time"
+                            location:
+                                type: "string"
         CountryRecord:
             type: "object"
             properties:
@@ -2984,7 +3038,7 @@ paths:
         summary: "Fetch more password policy with cursor"
         post:
             tags:
-                -  "Team"
+                -  "Password Policy"
             requestBody:
                 required: true
                 content:
@@ -3056,6 +3110,272 @@ paths:
                             properties:
                                 passwordPolicy:
                                     $ref: "#/components/schemas/PasswordPolicyName"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetSessionUser:
+        summary: "Get list of session user records"
+        post:
+            tags:
+                -  "Session"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of session user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    totalUsers:
+                                        description: "The total number of users whom has session records"
+                                        type: "number"
+                                    totalSessions:
+                                        description: "The total number of session records in the system"
+                                        type: "number"
+                                    sessionUsers:
+                                        $ref: "#/components/schemas/SessionUserRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchSessionUser:
+        summary: "Fetch more session users with cursor"
+        post:
+            tags:
+                -  "Session"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of session user records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    sessionUsers:
+                                        $ref: "#/components/schemas/SessionUserRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUserSession:
+        summary: "Get list of user's session records"
+        post:
+            tags:
+                -  "Session"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user's session records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    sessionUsers:
+                                        $ref: "#/components/schemas/SessionRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchUserSession:
+        summary: "Fetch more user's session with cursor"
+        post:
+            tags:
+                -  "Session"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user's session records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    sessionUsers:
+                                        $ref: "#/components/schemas/SessionRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/LockSession:
+        summary: "Lock one or more user's session records"
+        post:
+            tags:
+                -  "Session"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            oneOf:
+                                - type: "object"
+                                  properties:
+                                    user:
+                                        type: "object"
+                                        properties:
+                                            name:
+                                                type: "string"
+                                        required:
+                                            - name
+                                  required:
+                                    - user
+                                - type: "object"
+                                  properties:
+                                    session:
+                                        type: "object"
+                                        properties:
+                                            identifier:
+                                                type: "string"
+                                        required:
+                                            - identifier
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UnlockSession:
+        summary: "Unlock one or more user's session records"
+        post:
+            tags:
+                -  "Session"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            oneOf:
+                                - type: "object"
+                                  properties:
+                                    user:
+                                        type: "object"
+                                        properties:
+                                            name:
+                                                type: "string"
+                                        required:
+                                            - name
+                                  required:
+                                    - user
+                                - type: "object"
+                                  properties:
+                                    session:
+                                        type: "object"
+                                        properties:
+                                            identifier:
+                                                type: "string"
+                                        required:
+                                            - identifier
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteSession:
+        summary: "Delete one or more user's session records"
+        post:
+            tags:
+                -  "Session"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            oneOf:
+                                - type: "object"
+                                  properties:
+                                    user:
+                                        type: "object"
+                                        properties:
+                                            name:
+                                                type: "string"
+                                        required:
+                                            - name
+                                  required:
+                                    - user
+                                - type: "object"
+                                  properties:
+                                    session:
+                                        type: "object"
+                                        properties:
+                                            identifier:
+                                                type: "string"
+                                        required:
+                                            - identifier
+                                  required:
+                                    - session
+                                - type: "object"
+                                  properties:
+                                    session:
+                                        type: "object"
+                                        properties:
+                                            lastActivityDateTime:
+                                                type: "string"
+                                                format: "date-time"
+                                        required:
+                                            - lastActivityDateTime
+                                  required:
+                                    - session
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteExpiredSession:
+        summary: "Delete all expired user's session records"
+        post:
+            tags:
+                -  "Session"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteDeadSession:
+        summary: "Delete all dead user's session records"
+        post:
+            tags:
+                -  "Session"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
