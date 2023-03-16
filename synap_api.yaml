@@ -474,6 +474,8 @@ components:
                     type: "string"
                     description: "name of the object which the rights are processed"
                     example: "frog"
+            required:
+                - name
         AccessRightActions:
             type: "object"
             description: "one or more actions"
@@ -1614,7 +1616,24 @@ paths:
             tags:
                 -  "Access Rights"
             requestBody:
-                $ref: "#/components/requestBodies/UserAccessRightsRequestBody"
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                accessRightObject:
+                                    $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                            required:
+                                - user
+                                - accessRightObject
             responses:
                 200:
                     $ref: "#/components/responses/GetAccessRightsResponse"
@@ -1626,7 +1645,24 @@ paths:
             tags:
                 -  "Access Rights"
             requestBody:
-                $ref: "#/components/requestBodies/TeamAccessRightsRequestBody"
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                accessRightObject:
+                                    $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                            required:
+                                - team
+                                - accessRightObject
             responses:
                 200:
                     $ref: "#/components/responses/GetAccessRightsResponse"
@@ -1638,7 +1674,24 @@ paths:
             tags:
                 -  "Access Rights"
             requestBody:
-                $ref: "#/components/requestBodies/OrganizationAccessRightsRequestBody"
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                accessRightObject:
+                                    $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                            required:
+                                - organization
+                                - accessRightObject
             responses:
                 200:
                     $ref: "#/components/responses/GetAccessRightsResponse"
@@ -2457,7 +2510,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetTeamUser:
-        summary: "Get list of team users"
+        summary: "Get list of users for a team or list of teams for an user"
         post:
             tags:
                 -  "Team"
@@ -2469,6 +2522,11 @@ paths:
                             type: "object"
                             properties:
                                 team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                user:
                                     type: "object"
                                     properties:
                                         name:
