@@ -958,16 +958,23 @@ components:
                                 - description
                                 - amount
                                 - amountIsFlexible
+                    merchant:
+                        type: "object"
+                        properties:
+                            identifier:
+                                type: "string"
+                        required:
+                            - identifier
                     url:
                         type: "object"
                         properties:
-                            address:
+                            path:
                                 description: "Full URL path with end point to initiate the payment process"
                                 type: "string"
                                 format: "uri"
                                 example: "https://pay.example.com/paymentToken/payment_token_identifier"
                         required:
-                            - address
+                            - path
                 required:
                     - paymentToken
                     - url
@@ -3619,7 +3626,7 @@ paths:
         summary: "Get payment token"
         post:
             tags:
-                -  "Payment Token [TODO]"
+                -  "Payment Token"
             requestBody:
                 required: true
                 content:
@@ -3663,7 +3670,7 @@ paths:
         summary: "Fetch more payment tokens with cursor"
         post:
             tags:
-                -  "Payment Token [TODO]"
+                -  "Payment Token"
             requestBody:
                 required: true
                 content:
@@ -3696,7 +3703,7 @@ paths:
         summary: "Create a new payment token"
         post:
             tags:
-                -  "Payment Token [TODO]"
+                -  "Payment Token"
             requestBody:
                 required: true
                 content:
@@ -3748,7 +3755,7 @@ paths:
         summary: "Update a payment token"
         post:
             tags:
-                -  "Payment Token [TODO]"
+                -  "Payment Token"
             requestBody:
                 required: true
                 content:
@@ -3770,7 +3777,7 @@ paths:
         summary: "Delete an existing payment token"
         post:
             tags:
-                -  "Payment Token [TODO]"
+                -  "Payment Token"
             requestBody:
                 required: true
                 content:
