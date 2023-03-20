@@ -3939,10 +3939,10 @@ paths:
                                     url:
                                         type: "object"
                                         properties:
-                                            address:
+                                            path:
                                                 type: "string"
                                         required:
-                                            - address
+                                            - path
                                 required:
                                     - result
                                     - paymentToken
