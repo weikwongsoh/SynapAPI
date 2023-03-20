@@ -4134,6 +4134,14 @@ paths:
                                             - description
                                             - amountIsFlexible
                                             - payButtonText
+                                url:
+                                    type: "object"
+                                    properties:
+                                        baseURL:
+                                            type: "string"
+                                            format: "uri"
+                                    required:
+                                        - baseURL
                             required:
                                 - merchant
                                 - paymentToken
@@ -4179,6 +4187,14 @@ paths:
                                         - $ref: "#/components/schemas/RecordStatus"
                                         - $ref: "#/components/schemas/EntityIdentifier"
                                         - $ref: "#/components/schemas/PaymentTokenRecord"
+                                url:
+                                    type: "object"
+                                    properties:
+                                        baseURL:
+                                            type: "string"
+                                            format: "uri"
+                                    required:
+                                        - baseURL
                             required:
                                 - paymentToken
             responses:
