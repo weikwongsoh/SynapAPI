@@ -722,6 +722,61 @@ components:
                 required:
                     - authenticationPolicy
                     - passwordPolicy
+        OrganizationName:
+            type: "object"
+            properties:
+                name:
+                    description: "The name assigned to this organization"
+                    type: "string"
+            required:
+                - name
+        OrganizationRecord:
+            allOf:
+                - $ref: "#/components/schemas/OrganizationName"
+                - type: "object"
+                  properties:
+                    externalIdentifier:
+                        type: "string"
+                    serverLoginScriptPath:
+                        type: "string"
+                    description:
+                        description: "full name of an organization"
+                        type: "string"
+                    restricted:
+                        description: "This indicates if this organization should be marked as restricted (true) or unnrestricted (false). The default is 'false'."
+                        type: "boolean"
+        OrganizationRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    cursor:
+                        $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
+                    organization:
+                        allOf:
+                            - $ref: "#/components/schemas/RecordStatus"
+                            - $ref: "#/components/schemas/RecordDateTime"
+                            - $ref: "#/components/schemas/EntityIdentifier"
+                            - $ref: "#/components/schemas/OrganizationName"
+                            - $ref: "#/components/schemas/OrganizationRecord"
+                    authenticationPolicy:
+                        type: "object"
+                        properties:
+                            identifier:
+                                type: "string"
+                        required:
+                            - identifier
+                    team:
+                        type: "object"
+                        properties:
+                            identifier:
+                                type: "string"
+                        required:
+                            - identifier
+                required:
+                    - organization
+                    - authenticationPolicy
+                    - team
         SessionUserRecords:
             type: "array"
             items:
@@ -2626,8 +2681,17 @@ paths:
                                     properties:
                                         name:
                                             type: "string"
-                                        migrateToTeam:
+                                    required:
+                                        - name
+                                migrateToTeam:
+                                    type: "object"
+                                    properties:
+                                        name:
                                             type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - team
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -3302,10 +3366,159 @@ paths:
                                 authenticationPolicy:
                                     $ref: "#/components/schemas/AuthenticationPolicyName"
                                 migrateToAuthenticationPolicy:
-                                    type: "string"
+                                    $ref: "#/components/schemas/AuthenticationPolicyName"
                             required:
                                 - authenticationPolicy
                                 - migrateToAuthenticationPolicy
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetOrganization:
+        summary: "Get organization's details"
+        post:
+            tags:
+                -  "Organization"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    $ref: "#/components/schemas/OrganizationName"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - organization
+            responses:
+                200:
+                    description: "Returned list of organization records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    organizations:
+                                        $ref: "#/components/schemas/OrganizationRecords"
+                                required:
+                                    - result
+                                    - organizations
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchOrganization:
+        summary: "Fetch more organization with cursor"
+        post:
+            tags:
+                -  "Organization"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+                            required:
+                                - cursor
+            responses:
+                200:
+                    description: "Returned list of organization records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    organizations:
+                                        $ref: "#/components/schemas/OrganizationRecords"
+                                required:
+                                    - result
+                                    - organizations
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewOrganization:
+        summary: "Create a new organization's record"
+        post:
+            tags:
+                -  "Organization"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    $ref: "#/components/schemas/OrganizationRecord"
+                                authenticationPolicy:
+                                    $ref: "#/components/schemas/AuthenticationPolicyName"
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - organization
+                                - authenticationPolicy
+                                - team
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateOrganization:
+        summary: "Update an existing organization's record"
+        post:
+            tags:
+                -  "Organization"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    $ref: "#/components/schemas/OrganizationRecord"
+                                authenticationPolicy:
+                                    $ref: "#/components/schemas/AuthenticationPolicyName"
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - organization
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteOrganization:
+        summary: "Update an existing organization's record"
+        post:
+            tags:
+                -  "Organization"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    $ref: "#/components/schemas/OrganizationName"
+                                migrateToOrganization:
+                                    $ref: "#/components/schemas/OrganizationName"
+                            required:
+                                - organization
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
