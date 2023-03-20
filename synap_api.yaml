@@ -3323,6 +3323,15 @@ paths:
                             properties:
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - user
             responses:
                 200:
                     description: "Returned list of session user records"
