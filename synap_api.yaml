@@ -661,6 +661,67 @@ components:
                                     type: "number"
                                 identifier:
                                     type: "string"
+        AuthenticationPolicyName:
+            type: "object"
+            properties:
+                name:
+                    description: "The name assigned to this authentication policy"
+                    type: "string"
+            required:
+                - name
+        AuthenticationPolicyRecord:
+            allOf:
+                - $ref: "#/components/schemas/AuthenticationPolicyName"
+                - type: "object"
+                  properties:
+                    externalValidator:
+                        type: "string"
+                    multiFactorName:
+                        type: "string"
+                    authenticationFlags:
+                        type: "integer"
+                        format: "int32"
+                    inactivityTimeout:
+                        description: "The number of idle seconds before a session is automatically logged off. A value of zero implies no inactivity timeout. A negative value implies that idle timeout will be managed by an external entity such as portal rather than main server."
+                        type: "integer"
+                        format: "int32"
+                    maximumSessions:
+                        description: "The maximum number of concurrent sessions this policy allows a user. A value of zero indicates that there is no maximum."
+                        type: "integer"
+                        format: "int32"
+                    sessionExceededPolicy:
+                        description: "The policy to use when a user exceeds their allowed maximum session count."
+                        type: "string"
+                        enum:
+                            - "reject"
+                            - "makeRoom"
+                    restricted:
+                        description: "The name of the organization to which this policy is restricted."
+                        type: "string"
+        AuthenticationPolicyRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    cursor:
+                        $ref: "#/components/schemas/CursorRecordIdentifierOnResponse"
+                    authenticationPolicy:
+                        allOf:
+                            - $ref: "#/components/schemas/RecordStatus"
+                            - $ref: "#/components/schemas/RecordDateTime"
+                            - $ref: "#/components/schemas/EntityIdentifier"
+                            - $ref: "#/components/schemas/AuthenticationPolicyName"
+                            - $ref: "#/components/schemas/AuthenticationPolicyRecord"
+                    passwordPolicy:
+                        allOf:
+                            - $ref: "#/components/schemas/EntityIdentifier"
+                            - type: "object"
+                              properties:
+                                module:
+                                    type: "string"
+                required:
+                    - authenticationPolicy
+                    - passwordPolicy
         SessionUserRecords:
             type: "array"
             items:
@@ -3117,6 +3178,134 @@ paths:
                             properties:
                                 passwordPolicy:
                                     $ref: "#/components/schemas/PasswordPolicyName"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetAuthenticationPolicy:
+        summary: "Get authentication policy's details"
+        post:
+            tags:
+                -  "Authentication Policy"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                authenticationPolicy:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of authentication policy records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    authenticationPolicies:
+                                        $ref: "#/components/schemas/AuthenticationPolicyRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchAuthenticationPolicy:
+        summary: "Fetch more authentication policy with cursor"
+        post:
+            tags:
+                -  "Authentication Policy"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of authentication policy records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    authenticationPolicies:
+                                        $ref: "#/components/schemas/AuthenticationPolicyRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewAuthenticationPolicy:
+        summary: "Create a new authentication policy's record"
+        post:
+            tags:
+                -  "Authentication Policy"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                authenticationPolicy:
+                                    $ref: "#/components/schemas/AuthenticationPolicyRecord"
+                                passwordPolicy:
+                                    $ref: "#/components/schemas/PasswordPolicyName"
+                            required:
+                                - authenticationPolicy
+                                - passwordPolicy
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateAuthenticationPolicy:
+        summary: "Update an existing authentication policy's record"
+        post:
+            tags:
+                -  "Authentication Policy"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                authenticationPolicy:
+                                    $ref: "#/components/schemas/AuthenticationPolicyRecord"
+                                passwordPolicy:
+                                    $ref: "#/components/schemas/PasswordPolicyName"
+                            required:
+                                - authenticationPolicy
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteAuthenticationPolicy:
+        summary: "Delete an existing authentication policy's record"
+        post:
+            tags:
+                -  "Authentication Policy"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                authenticationPolicy:
+                                    $ref: "#/components/schemas/AuthenticationPolicyName"
+                                migrateToAuthenticationPolicy:
+                                    type: "string"
+                            required:
+                                - authenticationPolicy
+                                - migrateToAuthenticationPolicy
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
