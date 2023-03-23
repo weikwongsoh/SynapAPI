@@ -73,11 +73,11 @@ components:
                     enum:
                         - active
                         - inactive
-                        - suspensed
+                        - suspense
                         - pendingApproval
-                        - disabled
+                        - disable
                         - locked
-                        - removed
+                        - deleted
                         - noPassword
                     example: "active"
         CreateDateTime:
@@ -1440,8 +1440,7 @@ components:
             name: x-synap-SessionToken
             in: header
 security:
-    -
-        synapSessionToken: []
+    - synapSessionToken: []
 paths:
     /Echo:
         summary: "Ping the server"
@@ -4043,21 +4042,24 @@ paths:
                 content:
                     application/json:
                         schema:
-                            oneOf:
-                              - type: "object"
-                                properties:
-                                    merchant:
-                                        $ref: "#/components/schemas/MerchantIdentifier"
-                                    cursor:
-                                        $ref: "#/components/schemas/CursorRecordCountOnRequest"
-                                required:
-                                    - merchant
-                              - type: "object"
-                                properties:
-                                    paymentToken:
-                                        $ref: "#/components/schemas/EntityIdentifier"
-                                required:
-                                    - paymentToken
+                            type: "object"
+                            properties:
+                                merchant:
+                                    $ref: "#/components/schemas/MerchantIdentifier"
+                                paymentToken:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            description: "indicates the specific payment token details to retrieved. 'all' will retrieve all payment tokens for the merchant."
+                                            type: "string"
+                                            example: "all"
+                                    required:
+                                        - identifier
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - merchant
+                                - paymentToken
             responses:
                 200:
                     description: "Receive result object and payment tokens on response"
@@ -4653,6 +4655,575 @@ paths:
                             required:
                                 - customer
             responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetLifeMedicalInsuranceCity:
+        summary: "Get list of city object for life medical insurance"
+        post:
+            tags:
+                -  "Life Medical Insurance [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                contentProvision:
+                                    type: "object"
+                                    properties:
+                                        serverIdentifier:
+                                            type: "string"
+                                    required:
+                                        - serverIdentifier
+                            required:
+                                - contentProvision
+            responses:
+                200:
+                    description: "Returned list of city objects"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    lifeMedicalInsuranceCities:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                city:
+                                                    type: "object"
+                                                    properties:
+                                                        code:
+                                                            type: "string"
+                                                        name:
+                                                            type: "string"
+                                                    required:
+                                                        - code
+                                                        - name
+                                            required:
+                                                - city
+                                required:
+                                    - result
+                                    - lifeMedicalInsuranceCities
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetLifeMedicalInsuranceProduct:
+        summary: "Get list of life medical insurance product object"
+        post:
+            tags:
+                -  "Life Medical Insurance [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                contentProvision:
+                                    type: "object"
+                                    properties:
+                                        serverIdentifier:
+                                            type: "string"
+                                    required:
+                                        - serverIdentifier
+                            required:
+                                - contentProvision
+            responses:
+                200:
+                    description: "Returned list of life medical insurance product objects"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    lifeMedicalInsuranceProducts:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                lifeMedicalInsuranceProduct:
+                                                    type: "object"
+                                                    properties:
+                                                        identifier:
+                                                            type: "string"
+                                                        name:
+                                                            type: "string"
+                                                        description:
+                                                            type: "string"
+                                                        status:
+                                                            type: "string"
+                                                            enum:
+                                                                - "active"
+                                                                - "inactive"
+                                                        type:
+                                                            type: "string"
+                                                            enum:
+                                                                - "individual"
+                                                                - "family"
+                                                    required:
+                                                        - identifier
+                                                        - name
+                                                        - description
+                                                        - status
+                                                        - type
+                                            required:
+                                                - lifeMedicalInsuranceProduct
+                                required:
+                                    - result
+                                    - lifeMedicalInsuranceProducts
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetLifeMedicalInsurancePlan:
+        summary: "Get list of life medical insurance plan object"
+        post:
+            tags:
+                -  "Life Medical Insurance [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                contentProvision:
+                                    type: "object"
+                                    properties:
+                                        serverIdentifier:
+                                            type: "string"
+                                    required:
+                                        - serverIdentifier
+                                lifeMedicalInsuranceProduct:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                            required:
+                                - contentProvision
+            responses:
+                200:
+                    description: "Returned list of life medical insurance plan objects"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    lifeMedicalInsurancePlans:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                lifeMedicalInsuranceProduct:
+                                                    type: "object"
+                                                    properties:
+                                                        identifier:
+                                                            type: "string"
+                                                    required:
+                                                        - identifier
+                                                lifeMedicalInsurancePlan:
+                                                    type: "object"
+                                                    properties:
+                                                        identifier:
+                                                            type: "string"
+                                                        name:
+                                                            type: "string"
+                                                        description:
+                                                            type: "string"
+                                                        recordStatus:
+                                                            type: "string"
+                                                            enum:
+                                                                - "active"
+                                                                - "inactive"
+                                                        maximumHospitalizationCoverage:
+                                                            type: "number"
+                                                        premiumType:
+                                                            type: "string"
+                                                            enum:
+                                                                - "flat"
+                                                                - "band"
+                                                        premiumAmount:
+                                                            type: "number"
+                                                        outpatientCoverageType:
+                                                            type: "string"
+                                                            enum:
+                                                                - "individual"
+                                                                - "family"
+                                                        maximumOutpatientCoverage:
+                                                            type: "number"
+                                                        maximumHospitalizationRoomCoveragePerDay:
+                                                            type: "number"
+                                                        maximumNormalDeliveryCoverage:
+                                                            type: "number"
+                                                        maximumCSectionDeliveryCoverage:
+                                                            type: "number"
+                                                        maternityPremiumType:
+                                                            type: "string"
+                                                            enum:
+                                                                - "flat"
+                                                                - "band"
+                                                        maternityPremiumAmount:
+                                                            type: "number"
+                                                        minimumMaternityCoverageAge:
+                                                            type: "integer"
+                                                            format: "int32"
+                                                        maximumMaternityCoverageAge:
+                                                            type: "integer"
+                                                            format: "int32"
+                                                        maternityCoverage:
+                                                            type: "boolean"
+                                                        minimumHospitalizationCoverageAge:
+                                                            type: "integer"
+                                                            format: "int32"
+                                                        maximumHospitalizationCoverageAge:
+                                                            type: "integer"
+                                                            format: "int32"
+                                                    required:
+                                                        - identifier
+                                                        - name
+                                                        - description
+                                                        - status
+                                                        - type
+                                            required:
+                                                - lifeMedicalInsuranceProduct
+                                required:
+                                    - result
+                                    - lifeMedicalInsuranceProducts
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetLifeMedicalInsurancePlanBandPremiumsByProduct:
+        summary: "Get list of life medical insurance plan premium by product"
+        post:
+            tags:
+                -  "Life Medical Insurance [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                contentProvision:
+                                    type: "object"
+                                    properties:
+                                        serverIdentifier:
+                                            type: "string"
+                                    required:
+                                        - serverIdentifier
+                                lifeMedicalInsuranceProduct:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                            required:
+                                - contentProvision
+                                - lifeMedicalInsuranceProduct
+            responses:
+                200:
+                    description: "Returned list of life medical insurance plan premiums"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    lifeMedicalInsurancePremiums:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                lifeMedicalInsuranceProduct:
+                                                    type: "object"
+                                                    properties:
+                                                        identifier:
+                                                            type: "string"
+                                                    required:
+                                                        - identifier
+                                                lifeMedicalInsurancePlan:
+                                                    type: "object"
+                                                    properties:
+                                                        identifier:
+                                                            type: "string"
+                                                lifeMedicalInsurancePremium:
+                                                    type: "object"
+                                                    properties:
+                                                        minimumAge:
+                                                            type: "integer"
+                                                            format: "int32"
+                                                        maximumAge:
+                                                            type: "integer"
+                                                            format: "int32"
+                                                        hospitalizationPremiumForMale:
+                                                            type: "number"
+                                                        hospitalizationPremiumForFemale:
+                                                            type: "number"
+                                                        maternityPremiumAmount:
+                                                            type: "number"
+                                                        outPatientPremiumAmount:
+                                                            type: "number"
+                                                    required:
+                                                        - minimumAge
+                                                        - maximumAge
+                                                        - hospitalizationPremiumForMale
+                                                        - hospitalizationPremiumForFemale
+                                                        - maternityPremiumAmount
+                                                        - outPatientPremiumAmount
+                                            required:
+                                                - lifeMedicalInsuranceProduct
+                                                - lifeMedicalInsurancePlan
+                                                - lifeMedicalInsurancePremium
+                                required:
+                                    - result
+                                    - lifeMedicalInsurancePremiums
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetLifeMedicalInsurancePlanBandPremiumsByPlan:
+        summary: "Get list of life medical insurance plan premium by plan"
+        post:
+            tags:
+                -  "Life Medical Insurance [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                contentProvision:
+                                    type: "object"
+                                    properties:
+                                        serverIdentifier:
+                                            type: "string"
+                                    required:
+                                        - serverIdentifier
+                                lifeMedicalInsuranceProduct:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                                lifeMedicalInsurancePlan:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                            required:
+                                - contentProvision
+                                - lifeMedicalInsurancePlan
+            responses:
+                200:
+                    description: "Returned list of life medical insurance plan premiums"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    lifeMedicalInsurancePremiums:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                lifeMedicalInsuranceProduct:
+                                                    type: "object"
+                                                    properties:
+                                                        identifier:
+                                                            type: "string"
+                                                    required:
+                                                        - identifier
+                                                lifeMedicalInsurancePlan:
+                                                    type: "object"
+                                                    properties:
+                                                        identifier:
+                                                            type: "string"
+                                                lifeMedicalInsurancePremium:
+                                                    type: "object"
+                                                    properties:
+                                                        minimumAge:
+                                                            type: "integer"
+                                                            format: "int32"
+                                                        maximumAge:
+                                                            type: "integer"
+                                                            format: "int32"
+                                                        hospitalizationPremiumForMale:
+                                                            type: "number"
+                                                        hospitalizationPremiumForFemale:
+                                                            type: "number"
+                                                        maternityPremiumAmount:
+                                                            type: "number"
+                                                        outPatientPremiumAmount:
+                                                            type: "number"
+                                                    required:
+                                                        - minimumAge
+                                                        - maximumAge
+                                                        - hospitalizationPremiumForMale
+                                                        - hospitalizationPremiumForFemale
+                                                        - maternityPremiumAmount
+                                                        - outPatientPremiumAmount
+                                            required:
+                                                - lifeMedicalInsurancePlan
+                                                - lifeMedicalInsurancePremium
+                                required:
+                                    - result
+                                    - lifeMedicalInsurancePremiums
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetLifeMedicalInsurancePlanPremiumToPay:
+        summary: "Get list of life medical insurance plan premium by plan"
+        post:
+            tags:
+                -  "Life Medical Insurance [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                contentProvision:
+                                    type: "object"
+                                    properties:
+                                        serverIdentifier:
+                                            type: "string"
+                                    required:
+                                        - serverIdentifier
+                                lifeMedicalInsuranceProduct:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                                lifeMedicalInsurancePlan:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                                insuredPersons:
+                                    type: "array"
+                                    items:
+                                        type: "object"
+                                        properties:
+                                            insuredPerson:
+                                                type: "object"
+                                                properties:
+                                                    name:
+                                                        type: "string"
+                                                    gender:
+                                                        type: "string"
+                                                        enum:
+                                                            - "M"
+                                                            - "F"
+                                                    nationalRegistrationIdentityCard:
+                                                        type: "string"
+                                                    birthdate:
+                                                        type: "string"
+                                                        format: "date"
+                                                    emailAddress:
+                                                        type: "string"
+                                                        format: "email"
+                                                    phoneNumber:
+                                                        type: "string"
+                                                    maternityCoverage:
+                                                        type: "boolean"
+                                                    relationship:
+                                                        type: "string"
+                                                        enum:
+                                                            - "self"
+                                                            - "spouse"
+                                                            - "child"
+                                                required:
+                                                    - name
+                                                    - gender
+                                                    - nationalRegistrationIdentityCard
+                                                    - birthdate
+                                                    - maternityCoverage
+                                            correspondenceAddress:
+                                                $ref: "#/components/schemas/MailingAddress"
+                            required:
+                                - contentProvision
+                                - lifeMedicalInsurancePlan
+                                - insuredPersons
+            responses:
+                200:
+                    description: "Returned list of life medical insurance plan premiums"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                insuredPersons:
+                                    type: "array"
+                                    items:
+                                        type: "object"
+                                        properties:
+                                            insuredPerson:
+                                                type: "object"
+                                                properties:
+                                                    name:
+                                                        type: "string"
+                                                    gender:
+                                                        type: "string"
+                                                        enum:
+                                                            - "M"
+                                                            - "F"
+                                                    nationalRegistrationIdentityCard:
+                                                        type: "string"
+                                                    birthdate:
+                                                        type: "string"
+                                                        format: "date"
+                                                    emailAddress:
+                                                        type: "string"
+                                                        format: "email"
+                                                    phoneNumber:
+                                                        type: "string"
+                                                    maternityCoverage:
+                                                        type: "boolean"
+                                                    relationship:
+                                                        type: "string"
+                                                        enum:
+                                                            - "self"
+                                                            - "spouse"
+                                                            - "child"
+                                                    insurancePremiumReferenceNumber:
+                                                        type: "string"
+                                                    netPremiumAmount:
+                                                        type: "number"
+                                                    hospitalizationCoveragePremiumAmount:
+                                                        type: "number"
+                                                    maternityCoveragePremiumAmount:
+                                                        type: "number"
+                                                    discountAmounnt:
+                                                        type: "number"
+                                                required:
+                                                    - name
+                                                    - gender
+                                                    - nationalRegistrationIdentityCard
+                                                    - birthdate
+                                                    - maternityCoverage
+                                            correspondenceAddress:
+                                                $ref: "#/components/schemas/MailingAddress"
+                                required:
+                                    - result
+                                    - insuredPersons
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/DestroyCursor:
