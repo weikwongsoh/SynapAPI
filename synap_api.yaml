@@ -1667,7 +1667,12 @@ paths:
                                     properties:
                                         identifier:
                                             type: "string"
-                                userContact:
+                                email:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                mobile:
                                     type: "object"
                                     properties:
                                         identifier:
