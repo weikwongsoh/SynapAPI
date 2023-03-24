@@ -1178,6 +1178,10 @@ components:
                         allOf:
                             - $ref: "#/components/schemas/EntityIdentifier"
                             - $ref: "#/components/schemas/CustomerRecord"
+                    merchant:
+                        $ref: "#/components/schemas/MerchantIdentifier"
+                    organization:
+                        $ref: "#/components/schemas/OrganizationName"
     parameters:
         SessionToken:
             name: "x-synap-SessionToken"
@@ -2023,6 +2027,12 @@ paths:
                                     properties:
                                         name:
                                             type: "string"
+                                        inactivityTimeout:
+                                            type: "integer"
+                                            format: "int32"
+                                        maximumSessions:
+                                            type: "integer"
+                                            format: "int32"
                                 team:
                                     type: "object"
                                     properties:
@@ -2036,12 +2046,6 @@ paths:
                                             type: "string"
                                         preferName:
                                             type: "string"
-                                        inactivityTimeout:
-                                            type: "integer"
-                                            format: "int32"
-                                        maximumSessions:
-                                            type: "integer"
-                                            format: "int32"
                                         newPassword:
                                             type: "string"
                                         oneTimePassword:
@@ -2068,6 +2072,12 @@ paths:
                                     properties:
                                         name:
                                             type: "string"
+                                        inactivityTimeout:
+                                            type: "integer"
+                                            format: "int32"
+                                        maximumSessions:
+                                            type: "integer"
+                                            format: "int32"
                                 team:
                                     type: "object"
                                     properties:
@@ -2083,12 +2093,6 @@ paths:
                                                 type: "string"
                                             preferName:
                                                 type: "string"
-                                            inactivityTimeout:
-                                                type: "integer"
-                                                format: "int32"
-                                            maximumSessions:
-                                                type: "integer"
-                                                format: "int32"
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
@@ -4486,21 +4490,20 @@ paths:
                 content:
                     application/json:
                         schema:
-                            oneOf:
-                              - type: "object"
-                                properties:
-                                    merchant:
-                                        $ref: "#/components/schemas/MerchantIdentifier"
-                                    cursor:
-                                        $ref: "#/components/schemas/CursorRecordCountOnRequest"
-                                required:
-                                    - merchant
-                              - type: "object"
-                                properties:
-                                    customer:
-                                        $ref: "#/components/schemas/EntityIdentifier"
-                                required:
-                                    - customer
+                            type: "object"
+                            properties:
+                                organization:
+                                    $ref: "#/components/schemas/OrganizationName"
+                                merchant:
+                                    $ref: "#/components/schemas/MerchantIdentifier"
+                                customer:
+                                    $ref: "#/components/schemas/EntityIdentifier"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - organization
+                                - merchant
+                                - customer
             responses:
                 200:
                     description: "Returned list of customer records"
@@ -4565,6 +4568,8 @@ paths:
                         schema:
                             type: "object"
                             properties:
+                                organization:
+                                    $ref: "#/components/schemas/OrganizationName"
                                 merchant:
                                     $ref: "#/components/schemas/MerchantIdentifier"
                                 customer:
