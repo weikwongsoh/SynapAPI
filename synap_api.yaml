@@ -2,9 +2,9 @@
 ---
 openapi: "3.0.0"
 info:  # (MANDATORY)
-    title: "SYNAP WEB API"
+    title: "SYNAP API"
     version: "0.0.1"  # major.minor.patch
-    description: "WEB API for SYNAP"
+    description: "SYNAP's API specification"
     contact:
         name: "Cranium Ventures Pte Ltd"
         url:  "https://www.craniumventures.com"
