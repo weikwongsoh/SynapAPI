@@ -1131,6 +1131,7 @@ components:
             allOf:
                 - $ref: "#/components/schemas/BusinessPersonName"
                 - $ref: "#/components/schemas/EmailAddress"
+                - $ref: "#/components/schemas/PhoneNumber"
                 - type: "object"
                   properties:
                     description:
