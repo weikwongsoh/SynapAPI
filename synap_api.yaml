@@ -4597,15 +4597,8 @@ paths:
                                             - city
                                             - provinceState
                                             - postalCode
-                                taxes:
-                                    type: "array"
-                                    items:
-                                        type: "object"
-                                        properties:
-                                            tax:
-                                                $ref: "#/components/schemas/TaxRecord"
-                                        required:
-                                            - tax
+                                tax:
+                                    $ref: "#/components/schemas/TaxRecord"
                             required:
                                 - merchant
                                 - customer
@@ -5181,57 +5174,57 @@ paths:
                                 properties:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
-                                insuredPersons:
-                                    type: "array"
-                                    items:
-                                        type: "object"
-                                        properties:
-                                            insuredPerson:
-                                                type: "object"
-                                                properties:
-                                                    name:
-                                                        type: "string"
-                                                    gender:
-                                                        type: "string"
-                                                        enum:
-                                                            - "M"
-                                                            - "F"
-                                                    nationalRegistrationIdentityCard:
-                                                        type: "string"
-                                                    birthdate:
-                                                        type: "string"
-                                                        format: "date"
-                                                    emailAddress:
-                                                        type: "string"
-                                                        format: "email"
-                                                    phoneNumber:
-                                                        type: "string"
-                                                    maternityCoverage:
-                                                        type: "boolean"
-                                                    relationship:
-                                                        type: "string"
-                                                        enum:
-                                                            - "self"
-                                                            - "spouse"
-                                                            - "child"
-                                                    insurancePremiumReferenceNumber:
-                                                        type: "string"
-                                                    netPremiumAmount:
-                                                        type: "number"
-                                                    hospitalizationCoveragePremiumAmount:
-                                                        type: "number"
-                                                    maternityCoveragePremiumAmount:
-                                                        type: "number"
-                                                    discountAmounnt:
-                                                        type: "number"
-                                                required:
-                                                    - name
-                                                    - gender
-                                                    - nationalRegistrationIdentityCard
-                                                    - birthdate
-                                                    - maternityCoverage
-                                            correspondenceAddress:
-                                                $ref: "#/components/schemas/MailingAddress"
+                                    insuredPersons:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                insuredPerson:
+                                                    type: "object"
+                                                    properties:
+                                                        name:
+                                                            type: "string"
+                                                        gender:
+                                                            type: "string"
+                                                            enum:
+                                                                - "M"
+                                                                - "F"
+                                                        nationalRegistrationIdentityCard:
+                                                            type: "string"
+                                                        birthdate:
+                                                            type: "string"
+                                                            format: "date"
+                                                        emailAddress:
+                                                            type: "string"
+                                                            format: "email"
+                                                        phoneNumber:
+                                                            type: "string"
+                                                        maternityCoverage:
+                                                            type: "boolean"
+                                                        relationship:
+                                                            type: "string"
+                                                            enum:
+                                                                - "self"
+                                                                - "spouse"
+                                                                - "child"
+                                                        insurancePremiumReferenceNumber:
+                                                            type: "string"
+                                                        netPremiumAmount:
+                                                            type: "number"
+                                                        hospitalizationCoveragePremiumAmount:
+                                                            type: "number"
+                                                        maternityCoveragePremiumAmount:
+                                                            type: "number"
+                                                        discountAmounnt:
+                                                            type: "number"
+                                                    required:
+                                                        - name
+                                                        - gender
+                                                        - nationalRegistrationIdentityCard
+                                                        - birthdate
+                                                        - maternityCoverage
+                                                correspondenceAddress:
+                                                    $ref: "#/components/schemas/MailingAddress"
                                 required:
                                     - result
                                     - insuredPersons
