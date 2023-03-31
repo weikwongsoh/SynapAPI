@@ -4485,7 +4485,7 @@ paths:
         summary: "Get list of customers"
         post:
             tags:
-                -  "Customer [TODO]"
+                -  "Customer"
             requestBody:
                 required: true
                 content:
@@ -4493,8 +4493,6 @@ paths:
                         schema:
                             type: "object"
                             properties:
-                                organization:
-                                    $ref: "#/components/schemas/OrganizationName"
                                 merchant:
                                     $ref: "#/components/schemas/MerchantIdentifier"
                                 customer:
@@ -4528,7 +4526,7 @@ paths:
         summary: "Fetch more customer records with cursor"
         post:
             tags:
-                -  "Customer [TODO]"
+                -  "Customer"
             requestBody:
                 required: true
                 content:
@@ -4561,7 +4559,7 @@ paths:
         summary: "Create a new customer"
         post:
             tags:
-                -  "Customer [TODO]"
+                -  "Customer"
             requestBody:
                 required: true
                 content:
@@ -4608,7 +4606,7 @@ paths:
         summary: "Update a customer record"
         post:
             tags:
-                -  "Customer [TODO]"
+                -  "Customer"
             requestBody:
                 required: true
                 content:
@@ -4625,16 +4623,8 @@ paths:
                                     $ref: "#/components/schemas/BillingAddress"
                                 shippingAddress:
                                     $ref: "#/components/schemas/ShippingAddress"
-                                taxes:
-                                    type: "array"
-                                    minItems: 1
-                                    items:
-                                        type: "object"
-                                        properties:
-                                            tax:
-                                                $ref: "#/components/schemas/TaxRecord"
-                                        required:
-                                            - tax
+                                tax:
+                                    $ref: "#/components/schemas/TaxRecord"
                             required:
                                 - customer
             responses:
@@ -4644,7 +4634,7 @@ paths:
         summary: "Delete an existing customer record"
         post:
             tags:
-                -  "Customer [TODO]"
+                -  "Customer"
             requestBody:
                 required: true
                 content:
