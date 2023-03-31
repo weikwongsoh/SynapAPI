@@ -4569,8 +4569,6 @@ paths:
                         schema:
                             type: "object"
                             properties:
-                                organization:
-                                    $ref: "#/components/schemas/OrganizationName"
                                 merchant:
                                     $ref: "#/components/schemas/MerchantIdentifier"
                                 customer:
