@@ -18,6 +18,13 @@ components:
         CursorRecordCountOnRequest:
             type: "object"
             properties:
+                creation:
+                    description: "should a cursor be created?"
+                    type: "string"
+                    enum:
+                        - always
+                        - auto
+                        - never
                 recordOffset:
                     description: "offset of the record to retrieve"
                     type: "integer"
