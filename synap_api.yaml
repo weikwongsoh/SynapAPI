@@ -2451,6 +2451,61 @@ paths:
                                     - users
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUserContactOfAnUser:
+        summary: "Get an user's contact"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                contact:
+                                    allOf:
+                                        - $ref: "#/components/schemas/UserContactType"
+                                        - type: "object"
+                                          properties:
+                                            identifier:
+                                                type: "string"
+                            required:
+                                - user
+            responses:
+                200:
+                    description: "Returned list of contact records of an user"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    user:
+                                        type: "object"
+                                        properties:
+                                            name:
+                                                type: "string"
+                                        required:
+                                            - name
+                                    mobiles:
+                                        $ref: "#/components/schemas/UserMobileContactRecords"
+                                    emails:
+                                        $ref: "#/components/schemas/UserEmailContactRecords"
+                                    landlines:
+                                        $ref: "#/components/schemas/UserLandlineContactRecords"
+                                required:
+                                    - result
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/NewUserContact:
         summary: "Create a new contact's record"
         post:
