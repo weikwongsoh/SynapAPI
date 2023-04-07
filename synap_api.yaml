@@ -2013,7 +2013,7 @@ paths:
                                         $ref: "#/components/schemas/UserRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
-    /command/GetUserDetails:
+    /command/GetUserDetailsOfAnUser:
         summary: "Get user's details of an user"
         post:
             tags:
