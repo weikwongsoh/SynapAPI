@@ -5040,6 +5040,54 @@ paths:
                                     - paymentInstruments
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetPaymentInstrumentDetails:
+        summary: "Retrieve details of user's payment instrument record"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                paymentInstrument:
+                                    $ref: "#/components/schemas/paymentInstrument.identifier"
+                            required:
+                                - paymentInstrument
+            responses:
+                200:
+                    description: "Returned list of payment instrument records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    paymentInstrument:
+                                        allOf:
+                                            - $ref: "#/components/schemas/RecordStatus"
+                                            - $ref: "#/components/schemas/CreateDateTime"
+                                            - $ref: "#/components/schemas/RecordDateTime"
+                                            - $ref: "#/components/schemas/paymentInstrument.identifier"
+                                            - $ref: "#/components/schemas/PaymentInstrumentRecord"
+                                    paymentInstrumentProduct:
+                                        $ref: "#/components/schemas/paymentInstrumentProduct.identifier"
+                                    paymentInstrumentFunding:
+                                        $ref: "#/components/schemas/paymentInstrumentFunding.identifier"
+                                    user:
+                                        $ref: "#/components/schemas/user.identifier"
+                                    merchant:
+                                        $ref: "#/components/schemas/merchant.identifier"
+                                    organization:
+                                        $ref: "#/components/schemas/organization.identifier"
+                                required:
+                                    - result
+                                    - paymentInstrument
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/NewPaymentInstrument:
         summary: "Create a new payment instrument"
         post:
