@@ -2013,6 +2013,41 @@ paths:
                                         $ref: "#/components/schemas/UserRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUserDetails:
+        summary: "Get user's details of an user"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - user
+            responses:
+                200:
+                    description: "Returned user details record of an user"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    user:
+                                        $ref: "#/components/schemas/UserRecord"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/NewUser:
         summary: "Create a new user's record"
         post:
