@@ -1190,6 +1190,169 @@ components:
                         $ref: "#/components/schemas/MerchantIdentifier"
                     organization:
                         $ref: "#/components/schemas/OrganizationName"
+        PaymentInstrumentRecord:
+            allOf:
+                - type: "object"
+                  properties:
+                    description:
+                        description: "A brief desctiptive text about the payment instrument"
+                        type: "string"
+                        minLength: 1
+                        example: "Help us protect children around the world"
+                    currencyCode:
+                        $ref: "#/components/schemas/CountryCode"
+                    expiryDate:
+                        type: "string"
+                        format: "date"
+                    lastExpiryDate:
+                        type: "string"
+                        format: "date"
+                    branch:
+                        type: "string"
+                    status:
+                        type: "string"
+                    lastStatus:
+                        type: "string"
+                    issuanceSerial:
+                        type: "number"
+                    issuanceIndex:
+                        type: "number"
+                    issuanceCount:
+                        type: "number"
+                    issuanceSequence:
+                        type: "number"
+                    embossIndicator:
+                        type: "string"
+                    nextCycleDate:
+                        type: "string"
+                        format: "date"
+                    availableBalanceAmount:
+                        type: "number"
+                    ledgerBalanceAmount:
+                        type: "number"
+                    onHoldDebitAmount:
+                        type: "number"
+                    onHoldCreditAmount:
+                        type: "number"
+                    totalAmountSpent:
+                        type: "number"
+                    totalFeeCharged:
+                        type: "number"
+                    cycleAmountSpent:
+                        type: "number"
+                    cycleFeeCharged:
+                        type: "number"
+                    appliedIndicator:
+                        type: "string"
+                - $ref: "#/components/schemas/paymentInstrument.autoTopup"
+        PaymentInstrumentRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    paymentInstrument:
+                        allOf:
+                            - $ref: "#/components/schemas/RecordStatus"
+                            - $ref: "#/components/schemas/CreateDateTime"
+                            - $ref: "#/components/schemas/RecordDateTime"
+                            - $ref: "#/components/schemas/paymentInstrument.identifier"
+                            - $ref: "#/components/schemas/PaymentInstrumentRecord"
+                    paymentInstrumentProduct:
+                        $ref: "#/components/schemas/paymentInstrumentProduct.identifier"
+                    paymentInstrumentFunding:
+                        $ref: "#/components/schemas/paymentInstrumentFunding.identifier"
+                    user:
+                        $ref: "#/components/schemas/user.identifier"
+                    merchant:
+                        $ref: "#/components/schemas/merchant.identifier"
+                    organization:
+                        $ref: "#/components/schemas/organization.identifier"
+        user.name:
+            type: "object"
+            properties:
+                name:
+                    description: "The user's login name"
+                    type: "string"
+                    example: "john.smith"
+            required:
+                - name
+        user.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique number to identify an user"
+                    type: "string"
+                    example: "1"
+            required:
+                - identifier
+        merchant.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique number to identify a merchant"
+                    type: "string"
+                    example: "1"
+            required:
+                - identifier
+        organization.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique number to identify an organization"
+                    type: "string"
+                    example: "1"
+            required:
+                - identifier
+        organization.name:
+            type: "object"
+            properties:
+                name:
+                    description: "An unique name to identify an organization"
+                    type: "string"
+                    example: "john_smith_company"
+            required:
+                - name
+        paymentInstrumentProduct.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique number to identify an payment instrument product"
+                    type: "string"
+                    example: "1"
+            required:
+                - identifier
+        paymentInstrumentFunding.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique number to identify an payment instrument funding source"
+                    type: "string"
+                    example: "1"
+            required:
+                - identifier
+        paymentInstrument.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique number to identify an payment instrument"
+                    type: "string"
+                    example: "1"
+            required:
+                - identifier
+        paymentInstrument.autoTopup:
+            type: "object"
+            properties:
+                autoTopupMode:
+                    description: "This indicates how an instrument should be topup"
+                    type: "string"
+                    enum:
+                        - "disable"
+                        - "auto"
+                        - "transactionAmountOnly"
+                autoTopupAmount:
+                    type: "number"
+                autoTopupThresholdBalance:
+                    type: "number"
     parameters:
         SessionToken:
             name: "x-synap-SessionToken"
@@ -4743,6 +4906,228 @@ paths:
                                     $ref: "#/components/schemas/EntityIdentifier"
                             required:
                                 - customer
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/ActivatePaymentInstrument:
+        summary: "Activate payment instrument function for an user"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    $ref: "#/components/schemas/user.name"
+                            required:
+                                - user
+            responses:
+                200:
+                    description: "Returned list of payment instrument records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    paymentInstrumentProducts:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                paymentInstrumentProduct:
+                                                    type: "object"
+                                                    properties:
+                                                        identifier:
+                                                            description: "An unique number to identify a payment instrument product"
+                                                            type: "string"
+                                                            example: "1"
+                                                        type:
+                                                            description: "type pf payment instrument product"
+                                                            type: "string"
+                                                            example: "wallet"
+                                                        name:
+                                                            description: "name of payment instrument product"
+                                                            type: "string"
+                                                            example: "USD Wallet"
+                                required:
+                                    - result
+                                    - paymentInstrumentProducts
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetPaymentInstrument:
+        summary: "Retrieve list of user's payment instrument records"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    $ref: "#/components/schemas/user.name"
+                                paymentInstrument:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            description: "An unique number to identify a payment instrument; value of 'all' indicates to retrieve all records of an user"
+                                            type: "string"
+                                            example: "all"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - user
+                                - paymentInstrument
+            responses:
+                200:
+                    description: "Returned list of payment instrument records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    paymentInstruments:
+                                        $ref: "#/components/schemas/PaymentInstrumentRecords"
+                                required:
+                                    - result
+                                    - paymentInstruments
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchPaymentInstrument:
+        summary: "Fetch more payment instrument records with cursor"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+                            required:
+                                - cursor
+            responses:
+                200:
+                    description: "Returned list of payment instrument records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    paymentInstruments:
+                                        $ref: "#/components/schemas/PaymentInstrumentRecords"
+                                required:
+                                    - result
+                                    - paymentInstruments
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewPaymentInstrument:
+        summary: "Create a new payment instrument"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    $ref: "#/components/schemas/organization.name"
+                                user:
+                                    $ref: "#/components/schemas/user.name"
+                                merchant:
+                                    $ref: "#/components/schemas/merchant.identifier"
+                                paymentInstrumentProduct:
+                                    $ref: "#/components/schemas/paymentInstrumentProduct.identifier"
+                                paymentInstrumentFunding:
+                                    $ref: "#/components/schemas/paymentInstrumentFunding.identifier"
+                                paymentInstrument:
+                                    allOf:
+                                        - type: "object"
+                                          properties:
+                                            description:
+                                                type: "string"
+                                            branch:
+                                                type: "string"
+                                        - $ref: "#/components/schemas/paymentInstrument.autoTopup"
+                                        - required:
+                                            - description
+                            required:
+                                - organization
+                                - user
+                                - paymentInstrumentProduct
+                                - paymentInstrument
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdatePaymentInstrument:
+        summary: "Update a payment instrument record"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                paymentInstrumentFunding:
+                                    $ref: "#/components/schemas/paymentInstrumentFunding.identifier"
+                                paymentInstrument:
+                                    allOf:
+                                        - $ref: "#/components/schemas/paymentInstrument.identifier"
+                                        - type: "object"
+                                          properties:
+                                            status:
+                                                type: "string"
+                                            description:
+                                                type: "string"
+                                            branch:
+                                                type: "string"
+                                        - $ref: "#/components/schemas/paymentInstrument.autoTopup"
+                                        - required:
+                                            - identifier
+                            required:
+                                - paymentInstrument
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeletePaymentInstrument:
+        summary: "Delete an existing payment instrument record"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                paymentInstrument:
+                                    $ref: "#/components/schemas/paymentInstrument.identifier"
+                            required:
+                                - paymentInstrument
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
