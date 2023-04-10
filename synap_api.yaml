@@ -5181,6 +5181,64 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetSubscribedContent:
+        summary: "Retrieve list of subscribed content"
+        post:
+            tags:
+                -  "Content"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    $ref: "#/components/schemas/organization.name"
+                            required:
+                                - organization
+            responses:
+                200:
+                    description: "Returned list of subscribed content records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    contents:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                content:
+                                                    type: "object"
+                                                    properties:
+                                                        rowId:
+                                                            type: "string"
+                                    paymentInstrument:
+                                        allOf:
+                                            - $ref: "#/components/schemas/RecordStatus"
+                                            - $ref: "#/components/schemas/CreateDateTime"
+                                            - $ref: "#/components/schemas/RecordDateTime"
+                                            - $ref: "#/components/schemas/paymentInstrument.identifier"
+                                            - $ref: "#/components/schemas/PaymentInstrumentRecord"
+                                    paymentInstrumentProduct:
+                                        $ref: "#/components/schemas/paymentInstrumentProduct.identifier"
+                                    paymentInstrumentFunding:
+                                        $ref: "#/components/schemas/paymentInstrumentFunding.identifier"
+                                    user:
+                                        $ref: "#/components/schemas/user.identifier"
+                                    merchant:
+                                        $ref: "#/components/schemas/merchant.identifier"
+                                    organization:
+                                        $ref: "#/components/schemas/organization.identifier"
+                                required:
+                                    - result
+                                    - paymentInstrument
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetLifeMedicalInsuranceCity:
         summary: "Get list of city object for life medical insurance"
         post:
