@@ -1111,6 +1111,7 @@ components:
         ShippingAddress:
             allOf:
                 - $ref: "#/components/schemas/BusinessPersonName"
+                - $ref: "#/components/schemas/EmailAddress"
                 - $ref: "#/components/schemas/PhoneNumber"
                 - $ref: "#/components/schemas/MailingAddress"
         Locale:
