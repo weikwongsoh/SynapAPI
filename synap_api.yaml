@@ -1268,6 +1268,103 @@ components:
                         $ref: "#/components/schemas/merchant.identifier"
                     organization:
                         $ref: "#/components/schemas/organization.identifier"
+        PaymentInstrumentProductRecord:
+            type: "object"
+            properties:
+                name:
+                    description: "An unique name of the payment instrument's product"
+                    type: "string"
+                    minLength: 1
+                    example: "USD_wallet"
+                type:
+                    description: "Type of the payment instrument's product"
+                    type: "string"
+                    minLength: 1
+                    example: "wallet"
+                category:
+                    type: "string"
+                    example: "default"
+                issuancePrefix:
+                    type: "string"
+                    example: "586070"
+                currencyCode:
+                    $ref: "#/components/schemas/CountryCode"
+                startSequence:
+                    type: "number"
+                    example: 1
+                expiryExpectancy:
+                    type: "string"
+                    example: "none"
+                    enum:
+                        - "none"
+                        - "day"
+                        - "month"
+                        - "year"
+                expiryLife:
+                    type: "number"
+                    example: 0
+                cyclePeriod:
+                    type: "number"
+                    example: 0
+                appliedIndicator:
+                    type: "string"
+                minimumScore:
+                    type: "number"
+                    example: 0
+                kycDefaultMaximumBalance:
+                    type: "number"
+                    example: 100
+                kycLevel1Score:
+                    type: "number"
+                kycLevel1MaximumBalance:
+                    type: "number"
+                kycLevel2Score:
+                    type: "number"
+                kycLevel2MaximumBalance:
+                    type: "number"
+                kycLevel3Score:
+                    type: "number"
+                kycLevel3MaximumBalance:
+                    type: "number"
+                kycLevel4Score:
+                    type: "number"
+                kycLevel4MaximumBalance:
+                    type: "number"
+                kycLevel5Score:
+                    type: "number"
+                kycLevel5MaximumBalance:
+                    type: "number"
+                productAmount1:
+                    type: "number"
+                productAmount2:
+                    type: "number"
+                productAmount3:
+                    type: "number"
+                productAmount4:
+                    type: "number"
+                productAmount5:
+                    type: "number"
+            required:
+                - name
+                - type
+        PaymentInstrumentProductRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    paymentInstrumentProduct:
+                        allOf:
+                            - $ref: "#/components/schemas/RecordStatus"
+                            - $ref: "#/components/schemas/CreateDateTime"
+                            - $ref: "#/components/schemas/RecordDateTime"
+                            - $ref: "#/components/schemas/paymentInstrumentProduct.identifier"
+                            - $ref: "#/components/schemas/PaymentInstrumentProductRecord"
+                    paymentInstrumentNumber:
+                        $ref: "#/components/schemas/paymentInstrumentNumber.name"
+                    paymentInstrumentSerial:
+                        $ref: "#/components/schemas/paymentInstrumentSerial.name"
+                    organization:
+                        $ref: "#/components/schemas/organization.identifier"
         user.name:
             type: "object"
             properties:
@@ -1311,6 +1408,24 @@ components:
                     description: "An unique name to identify an organization"
                     type: "string"
                     example: "john_smith_company"
+            required:
+                - name
+        paymentInstrumentNumber.name:
+            type: "object"
+            properties:
+                name:
+                    description: "An unique name to identify an payment instrument's number"
+                    type: "string"
+                    example: "unique_name"
+            required:
+                - name
+        paymentInstrumentSerial.name:
+            type: "object"
+            properties:
+                name:
+                    description: "An unique name to identify an payment instrument's serial"
+                    type: "string"
+                    example: "unique_name"
             required:
                 - name
         paymentInstrumentProduct.identifier:
@@ -4909,6 +5024,167 @@ paths:
                                     $ref: "#/components/schemas/EntityIdentifier"
                             required:
                                 - customer
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetPaymentInstrumentProduct:
+        summary: "Retrieve list of payment instrument's product records"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    $ref: "#/components/schemas/organization.name"
+                                user:
+                                    $ref: "#/components/schemas/user.identifier"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - organization
+            responses:
+                200:
+                    description: "Returned list of payment instrument's product records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    paymentInstrumentProducts:
+                                        $ref: "#/components/schemas/PaymentInstrumentProductRecords"
+                                required:
+                                    - result
+                                    - paymentInstrumentProducts
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchPaymentInstrumentProduct:
+        summary: "Fetch more payment instrument's product records with cursor"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+                            required:
+                                - cursor
+            responses:
+                200:
+                    description: "Returned list of payment instrument's product records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    paymentInstrumentProducts:
+                                        $ref: "#/components/schemas/PaymentInstrumentProductRecords"
+                                required:
+                                    - result
+                                    - paymentInstrumentProducts
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewPaymentInstrumentProduct:
+        summary: "Create a new payment instrument's product"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    $ref: "#/components/schemas/organization.name"
+                                paymentInstrumentNumber:
+                                    $ref: "#/components/schemas/paymentInstrumentNumber.name"
+                                paymentInstrumentSerial:
+                                    $ref: "#/components/schemas/paymentInstrumentSerial.name"
+                                paymentInstrumentProduct:
+                                    allOf:
+                                        - $ref: "#/components/schemas/PaymentInstrumentProductRecord"
+                                        - required:
+                                            - category
+                                            - issuancePrefix
+                                            - currencyCode
+                                            - expiryExpectancy
+                                            - expiryLife
+                                            - cyclePeriod
+                                            - appliedIndicator
+                                            - minimumScore
+                                            - kycDefaultMaximumBalance
+                            required:
+                                - organization
+                                - paymentInstrumentNumber
+                                - paymentInstrumentSerial
+                                - paymentInstrumentProduct
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdatePaymentInstrumentProduct:
+        summary: "Update a payment instrument's product record"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                paymentInstrumentNumber:
+                                    $ref: "#/components/schemas/paymentInstrumentNumber.name"
+                                paymentInstrumentSerial:
+                                    $ref: "#/components/schemas/paymentInstrumentSerial.name"
+                                paymentInstrumentProduct:
+                                    $ref: "#/components/schemas/PaymentInstrumentProductRecord"
+                            required:
+                                - paymentInstrumentProduct
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeletePaymentInstrumentProduct:
+        summary: "Delete an existing payment instrument's product record"
+        post:
+            tags:
+                -  "Payment Instrument"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                paymentInstrumentProduct:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        type:
+                                            type: "string"
+                                    required:
+                                        - name
+                                        - type
+                            required:
+                                - paymentInstrumentProduct
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
