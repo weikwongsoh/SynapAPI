@@ -5942,7 +5942,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetLifeMedicalInsurancePlanPremiumToPay:
-        summary: "Get list of life medical insurance plan premium by plan"
+        summary: "Get the life medical insurance plan premium for payment"
         post:
             tags:
                 -  "Life Medical Insurance [TODO]"
@@ -6021,7 +6021,7 @@ paths:
                                 - insuredPersons
             responses:
                 200:
-                    description: "Returned list of life medical insurance plan premiums"
+                    description: "Returned life medical insurance plan premium"
                     content:
                         application/json:
                             schema:
@@ -6029,6 +6029,13 @@ paths:
                                 properties:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
+                                    lifeMedicalInsurancePolicy:
+                                        type: "object"
+                                        properties:
+                                            referenceNumber:
+                                                type: "string"
+                                        required:
+                                            - referenceNumber
                                     insuredPersons:
                                         type: "array"
                                         items:
@@ -6082,7 +6089,141 @@ paths:
                                                     $ref: "#/components/schemas/MailingAddress"
                                 required:
                                     - result
+                                    - lifeMedicalInsurancePolicy
                                     - insuredPersons
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/PayLifeMedicalInsurancePlanPremium:
+        summary: "Purchase life medical insurance policy"
+        post:
+            tags:
+                -  "Life Medical Insurance [TODO]"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                contentProvision:
+                                    type: "object"
+                                    properties:
+                                        serverIdentifier:
+                                            type: "string"
+                                    required:
+                                        - serverIdentifier
+                                lifeMedicalInsurancePlan:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                                lifeMedicalInsurancePolicy:
+                                    type: "object"
+                                    properties:
+                                        referenceNumber:
+                                            type: "string"
+                                    required:
+                                        - referenceNumber
+                                insuredPersons:
+                                    type: "array"
+                                    items:
+                                        type: "object"
+                                        properties:
+                                            insuredPerson:
+                                                type: "object"
+                                                properties:
+                                                    name:
+                                                        type: "string"
+                                                    gender:
+                                                        type: "string"
+                                                        enum:
+                                                            - "M"
+                                                            - "F"
+                                                    nationalRegistrationIdentityCard:
+                                                        type: "string"
+                                                    birthdate:
+                                                        type: "string"
+                                                        format: "date"
+                                                    emailAddress:
+                                                        type: "string"
+                                                        format: "email"
+                                                    phoneNumber:
+                                                        type: "string"
+                                                    maternityCoverage:
+                                                        type: "boolean"
+                                                    relationship:
+                                                        type: "string"
+                                                        enum:
+                                                            - "self"
+                                                            - "spouse"
+                                                            - "child"
+                                                    insurancePremiumReferenceNumber:
+                                                        type: "string"
+                                                    netPremiumAmount:
+                                                        type: "number"
+                                                    hospitalizationCoveragePremiumAmount:
+                                                        type: "number"
+                                                    maternityCoveragePremiumAmount:
+                                                        type: "number"
+                                                    discountAmounnt:
+                                                        type: "number"
+                                                required:
+                                                    - name
+                                                    - gender
+                                                    - nationalRegistrationIdentityCard
+                                                    - birthdate
+                                                    - maternityCoverage
+                                            correspondenceAddress:
+                                                $ref: "#/components/schemas/MailingAddress"
+                            required:
+                                - contentProvision
+                                - lifeMedicalInsurancePolicy
+            responses:
+                200:
+                    description: "Returned the details of life medical insurance policy"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    lifeMedicalInsurancePolicy:
+                                        type: "object"
+                                        properties:
+                                            referenceNumber:
+                                                type: "string"
+                                            identifier:
+                                                description: "unique policy number to service provider"
+                                                type: "string"
+                                            issuanceDate:
+                                                type: "string"
+                                                format: "date"
+                                            coverageStartDate:
+                                                type: "string"
+                                                format: "date"
+                                            coverageEndDate:
+                                                type: "string"
+                                                format: "date"
+                                            grossPremiumAmount:
+                                                type: "number"
+                                            netPremiumAmount:
+                                                type: "number"
+                                            policyCode:
+                                                type: "string"
+                                            invoiceURL:
+                                                type: "string"
+                                                format: "url"
+                                        required:
+                                            - identifier
+                                            - issuanceDate
+                                            - coverageStartDate
+                                            - coverageEndDate
+                                required:
+                                    - result
+                                    - lifeMedicalInsurancePolicy
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/DestroyCursor:
