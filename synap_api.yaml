@@ -1365,6 +1365,46 @@ components:
                         $ref: "#/components/schemas/paymentInstrumentSerial.name"
                     organization:
                         $ref: "#/components/schemas/organization.identifier"
+        CustomerPaymentInstrumentRecord:
+            type: "object"
+            properties:
+                description:
+                    name: "payment instrument's name"
+                    type: "string"
+                    example: "John Smith"
+                number:
+                    description: "payment instrument's number"
+                    type: "string"
+                expiryDate:
+                    type: "string"
+                    format: "date"
+                type:
+                    description: "payment instrument type"
+                    type: "string"
+                    example: "CREDIT_CARD"
+                brand:
+                    description: "payment instrument's brand"
+                    type: "string"
+                    example: "MASTERCARD"
+                issuer:
+                    description: "name of issuing bank"
+                    type: "string"
+                issuingCountryCode:
+                    type: "number"
+                    format: "int32"
+                cardVerificationValue:
+                    type: "string"
+                cardVerified:
+                    type: "boolean"
+        CustomerPaymentInstrumentRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    customerPaymentInstrument:
+                        $ref: "#/components/schemas/CustomerPaymentInstrumentRecord"
+                    customer:
+                        $ref: "#/components/schemas/customer.identifier"
         user.name:
             type: "object"
             properties:
@@ -1469,6 +1509,24 @@ components:
                     type: "number"
                 autoTopupThresholdBalance:
                     type: "number"
+        customer.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique number to identify a customer"
+                    type: "string"
+                    example: "1"
+            required:
+                - identifier
+        customerPaymentInstrument.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique number to identify a customer's payment instrument"
+                    type: "string"
+                    example: "1"
+            required:
+                - identifier
     parameters:
         SessionToken:
             name: "x-synap-SessionToken"
@@ -5024,6 +5082,138 @@ paths:
                                     $ref: "#/components/schemas/EntityIdentifier"
                             required:
                                 - customer
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetCustomerPaymentInstrument:
+        summary: "Get list of customer's payment instrument"
+        post:
+            tags:
+                -  "Customer"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                customer:
+                                    $ref: "#/components/schemas/customer.identifier"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - customer
+            responses:
+                200:
+                    description: "Returned list of customer's payment instrument records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    customerPaymentInstruments:
+                                        $ref: "#/components/schemas/CustomerPaymentInstrumentRecords"
+                                required:
+                                    - result
+                                    - customerPaymentInstruments
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchCustomerPaymentInstrument:
+        summary: "Fetch more customer's payment instrument records with cursor"
+        post:
+            tags:
+                -  "Customer"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+                            required:
+                                - cursor
+            responses:
+                200:
+                    description: "Returned list of customer's payment instrument records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    customerPaymentInstruments:
+                                        $ref: "#/components/schemas/CustomerPaymentInstrumentRecords"
+                                required:
+                                    - result
+                                    - customerPaymentInstruments
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/NewCustomerPaymentInstrument:
+        summary: "Create a new customer's payment instrument"
+        post:
+            tags:
+                -  "Customer"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                customer:
+                                    $ref: "#/components/schemas/customer.identifier"
+                                customerPaymentInstrument:
+                                    $ref: "#/components/schemas/CustomerPaymentInstrumentRecord"
+                            required:
+                                - customer
+                                - customerPaymentInstrument
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/UpdateCustomerPaymentInstrument:
+        summary: "Update a customer's payment instrument record"
+        post:
+            tags:
+                -  "Customer"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                customerPaymentInstrument:
+                                    allOf:
+                                        - $ref: "#/components/schemas/customerPaymentInstrument.identifier"
+                                        - $ref: "#/components/schemas/CustomerPaymentInstrumentRecord"
+                            required:
+                                - customerPaymentInstrument
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/DeleteCustomerPaymentInstrument:
+        summary: "Delete an existing customer's payment instrument record"
+        post:
+            tags:
+                -  "Customer"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                customerPaymentInstrument:
+                                    $ref: "#/components/schemas/customerPaymentInstrument.identifier"
+                            required:
+                                - customerPaymentInstrument
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
