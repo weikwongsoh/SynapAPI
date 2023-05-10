@@ -388,6 +388,9 @@ components:
                         type: "string"
                     gender:
                         type: "string"
+                        enum:
+                            - "male"
+                            - "female"
                     nationality:
                         type: "string"
                     race:
