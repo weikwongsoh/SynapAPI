@@ -1181,6 +1181,18 @@ components:
                             - "reverseCharge"
                     metadata:
                         type: "string"
+                    totalNumberOfPayments:
+                        description: "total number of payment made since created"
+                        type: "number"
+                    lastPaymentDate:
+                        type: "string"
+                        format: "date-time"
+                    totalAmountSpent:
+                        type: "number"
+                    totalAmountRefunded:
+                        type: "number"
+                    totalAmountDisputeLost:
+                        type: "number"
         CustomerRecords:
             type: "array"
             items:
@@ -1190,6 +1202,10 @@ components:
                         allOf:
                             - $ref: "#/components/schemas/EntityIdentifier"
                             - $ref: "#/components/schemas/CustomerRecord"
+                    customerPaymentInstrument:
+                        allOf:
+                            - $ref: "#/components/schemas/EntityIdentifier"
+                            - $ref: "#/components/schemas/CustomerPaymentInstrumentRecord"
                     merchant:
                         $ref: "#/components/schemas/MerchantIdentifier"
                     organization:
@@ -1377,6 +1393,9 @@ components:
                     example: "John Smith"
                 number:
                     description: "payment instrument's number"
+                    type: "string"
+                maskedNumber:
+                    description: "masked payment instrument's number"
                     type: "string"
                 expiryDate:
                     type: "string"
@@ -4353,45 +4372,23 @@ paths:
                                     $ref: "#/components/schemas/MerchantIdentifier"
                                 customer:
                                     $ref: "#/components/schemas/EntityIdentifier"
-                                searchText:
-                                    type: "string"
-                                searchFilters:
+                                filters:
                                     type: "object"
                                     properties:
-                                        localDate:
+                                        customer:
                                             type: "object"
                                             properties:
-                                                operator:
+                                                emailAddress:
                                                     type: "string"
-                                                    enum:
-                                                        - "between"
-                                                        - "="
-                                                        - ">"
-                                                        - "<"
-                                                        - ">="
-                                                        - "<="
-                                                        - "<>"
-                                                value:
-                                                    type: "string"
-                                                    format: "date"
-                                                endValue:
-                                                    type: "string"
-                                                    format: "date"
-                                        status:
+                                        payment:
                                             type: "object"
                                             properties:
-                                                operator:
+                                                switchSequence:
                                                     type: "string"
-                                                    enum:
-                                                        - "in"
-                                                values:
-                                                    type: "array"
-                                                    items:
-                                                        type: "string"
-                                                        enum:
-                                                            - "succeeded"
-                                                            - "failed"
-                                                            - "refunded"
+                                        statuses:
+                                            type: "array"
+                                            items:
+                                                type: "string"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
                             required:
@@ -5058,6 +5055,14 @@ paths:
                                         - $ref: "#/components/schemas/RecordStatus"
                                         - $ref: "#/components/schemas/EntityIdentifier"
                                         - $ref: "#/components/schemas/CustomerRecord"
+                                customerPaymentInstrument:
+                                    allOf:
+                                        - $ref: "#/components/schemas/EntityIdentifier"
+                                        - $ref: "#/components/schemas/CustomerPaymentInstrumentRecord"
+                                        - required:
+                                            - identifier
+                                            - number
+                                            - maskedNumber
                                 billingAddress:
                                     $ref: "#/components/schemas/BillingAddress"
                                 shippingAddress:
@@ -5102,6 +5107,15 @@ paths:
                             properties:
                                 customer:
                                     $ref: "#/components/schemas/customer.identifier"
+                                customerPaymentInstrument:
+                                    $ref: "#/components/schemas/customerPaymentInstrument.identifier"
+                                filters:
+                                    type: "object"
+                                    properties:
+                                        paymentInstrumentTypes:
+                                            type: "array"
+                                            items:
+                                                type: "string"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
                             required:
