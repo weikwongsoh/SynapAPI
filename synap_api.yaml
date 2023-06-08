@@ -4378,7 +4378,7 @@ paths:
                                         customer:
                                             type: "object"
                                             properties:
-                                                emailAddress:
+                                                identifier:
                                                     type: "string"
                                         payment:
                                             type: "object"
@@ -4388,10 +4388,29 @@ paths:
                                         filters:
                                             type: "object"
                                             properties:
-                                                statuses:
-                                                type: "array"
-                                                items:
-                                                    type: "string"
+                                                status:
+                                                    type: "object"
+                                                    properties:
+                                                        success:
+                                                            type: "string"
+                                                        refund:
+                                                            type: "string"
+                                                        capture:
+                                                            type: "string"
+                                                        not:
+                                                            type: "object"
+                                                            properties:
+                                                                success:
+                                                                    type: "string
+                                                localDate:
+                                                    type: "object"
+                                                    properties:
+                                                        start:
+                                                            type: "string"
+                                                            format: "date"
+                                                        end:
+                                                            type: "string"
+                                                            format: "date"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
                             required:
