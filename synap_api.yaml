@@ -4385,10 +4385,13 @@ paths:
                                             properties:
                                                 switchSequence:
                                                     type: "string"
-                                        statuses:
-                                            type: "array"
-                                            items:
-                                                type: "string"
+                                        filters:
+                                            type: "object"
+                                            properties:
+                                                statuses:
+                                                type: "array"
+                                                items:
+                                                    type: "string"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
                             required:
