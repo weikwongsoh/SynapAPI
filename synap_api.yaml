@@ -4521,8 +4521,20 @@ paths:
                                             description: "indicates the specific payment token details to retrieved. 'all' will retrieve all payment tokens for the merchant."
                                             type: "string"
                                             example: "all"
+                                        name:
+                                            type: "string"
                                     required:
                                         - identifier
+                                filters:
+                                    type: "object"
+                                    properties:
+                                        recordStatus:
+                                            type: "object"
+                                            properties:
+                                                active:
+                                                    type: "boolean"
+                                                inactive:
+                                                    type: "boolean"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
                             required:
@@ -4955,6 +4967,31 @@ paths:
                                     $ref: "#/components/schemas/MerchantIdentifier"
                                 customer:
                                     $ref: "#/components/schemas/EntityIdentifier"
+                                filters:
+                                    type: "object"
+                                    properties:
+                                        customer:
+                                            type: "object"
+                                            properties:
+                                                identifier:
+                                                    type: "string"
+                                                name:
+                                                    type: "string"
+                                                asGuest:
+                                                    type: "boolean"
+                                                withAccount:
+                                                    type: "boolean"
+                                sortby:
+                                    type: "object"
+                                    properties:
+                                        customer:
+                                            type: "object"
+                                            properties:
+                                                name:
+                                                    type: "string"
+                                                    enum:
+                                                        - "asc"
+                                                        - "desc"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
                             required:
