@@ -1388,7 +1388,7 @@ components:
             type: "object"
             properties:
                 description:
-                    name: "payment instrument's name"
+                    description: "payment instrument's name"
                     type: "string"
                     example: "John Smith"
                 number:
@@ -4401,7 +4401,7 @@ paths:
                                                             type: "object"
                                                             properties:
                                                                 success:
-                                                                    type: "string
+                                                                    type: "string"
                                                 localDate:
                                                     type: "object"
                                                     properties:
