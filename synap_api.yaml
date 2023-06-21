@@ -4981,6 +4981,15 @@ paths:
                                                     type: "boolean"
                                                 withAccount:
                                                     type: "boolean"
+                                                createDate:
+                                                    type: "object"
+                                                    properties:
+                                                        start:
+                                                            type: "string"
+                                                            format: "date"
+                                                        end:
+                                                            type: "string"
+                                                            format: "date"
                                 sortby:
                                     type: "object"
                                     properties:
@@ -4988,6 +4997,21 @@ paths:
                                             type: "object"
                                             properties:
                                                 name:
+                                                    type: "string"
+                                                    enum:
+                                                        - "asc"
+                                                        - "desc"
+                                                totalAmountSpent:
+                                                    type: "string"
+                                                    enum:
+                                                        - "asc"
+                                                        - "desc"
+                                                totalAmountRefunded:
+                                                    type: "string"
+                                                    enum:
+                                                        - "asc"
+                                                        - "desc"
+                                                totalAmountDisputeLost:
                                                     type: "string"
                                                     enum:
                                                         - "asc"
