@@ -4385,9 +4385,6 @@ paths:
                                             properties:
                                                 switchSequence:
                                                     type: "string"
-                                        filters:
-                                            type: "object"
-                                            properties:
                                                 status:
                                                     type: "object"
                                                     properties:
