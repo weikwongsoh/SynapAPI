@@ -6542,3 +6542,123 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetTransactionHistory:
+        summary: "Get list of transaction history"
+        post:
+            tags:
+                -  "Transaction History"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                merchant:
+                                    $ref: "#/components/schemas/MerchantIdentifier"
+                                customer:
+                                    $ref: "#/components/schemas/EntityIdentifier"
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        switchSequence:
+                                            type: "string"
+                                filters:
+                                    type: "object"
+                                    properties:
+                                        customer:
+                                            type: "object"
+                                            properties:
+                                                identifier:
+                                                    type: "string"
+                                        payment:
+                                            type: "object"
+                                            properties:
+                                                messageTypeIdentifiers:
+                                                    type: "array"
+                                                processingCodes:
+                                                    type: "array"
+                                                currencyCode:
+                                                    type: "integer"
+                                                    format: "int32"
+                                                switchSequence:
+                                                    type: "string"
+                                                status:
+                                                    type: "object"
+                                                    properties:
+                                                        success:
+                                                            type: "string"
+                                                        refund:
+                                                            type: "string"
+                                                        capture:
+                                                            type: "string"
+                                                        not:
+                                                            type: "object"
+                                                            properties:
+                                                                success:
+                                                                    type: "string"
+                                                localDate:
+                                                    type: "object"
+                                                    properties:
+                                                        start:
+                                                            type: "string"
+                                                            format: "date"
+                                                        end:
+                                                            type: "string"
+                                                            format: "date"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+                            required:
+                                - merchant
+            responses:
+                200:
+                    description: "Returned list of transaction history records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    transactions:
+                                        $ref: "#/components/schemas/PaymentRecords"
+                                required:
+                                    - result
+                                    - transactions
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchTransactionHistory:
+        summary: "Fetch more transaction history records with cursor"
+        post:
+            tags:
+                -  "Transaction History"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+                            required:
+                                - cursor
+            responses:
+                200:
+                    description: "Returned list of transaction history records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    transactions:
+                                        $ref: "#/components/schemas/PaymentRecords"
+                                required:
+                                    - result
+                                    - transactions
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
