@@ -4372,6 +4372,11 @@ paths:
                                     $ref: "#/components/schemas/MerchantIdentifier"
                                 customer:
                                     $ref: "#/components/schemas/EntityIdentifier"
+                                payment:
+                                    type: "object"
+                                    properties:
+                                        switchSequence:
+                                            type: "string"
                                 filters:
                                     type: "object"
                                     properties:
