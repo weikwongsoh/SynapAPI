@@ -881,6 +881,112 @@ components:
             minimum: 0
             maximum: 999
             example: 840
+        TransactionRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    transaction:
+                        type: "object"
+                        properties:
+                            recordDateTime:
+                                type: "string"
+                                format: "date-time"
+                            applicationIdentifier:
+                                type: "string"
+                            messageTypeIdentifier:
+                                type: "string"
+                            processingCode:
+                                type: "string"
+                            traceNumber:
+                                type: "string"
+                            transmissionDateTime:
+                                type: "string"
+                                format: "date-time"
+                            status:
+                                type: "string"
+                            acquirerInstitution:
+                                type: "string"
+                            switchSequence:
+                                type: "string"
+                            amount:
+                                type: "number"
+                            localTime:
+                                type: "string"
+                            localDate:
+                                type: "string"
+                                format: "date-time"
+                            retrievalReferenceNumber:
+                                type: "string"
+                            currencyCode:
+                                description: "The payment's currency in ISO numeric code"
+                                type: "integer"
+                                format: "int32"
+                    settlement:
+                        type: "object"
+                        properties:
+                            date:
+                                type: "string"
+                                format: "date-time"
+                            amount:
+                                type: "number"
+                            rate:
+                                type: "number"
+                            currencyCode:
+                                description: "The settlement's currency in ISO numeric code"
+                                type: "integer"
+                                format: "int32"
+                    paymentInstrument:
+                        type: "object"
+                        properties:
+                            maskedNumber:
+                                type: "string"
+                            encryptedNumber:
+                                type: "string"
+                            issuerInstitution:
+                                type: "string"
+                            countryCode:
+                                type: "string"
+                            currencyCode:
+                                description: "The payment instrument's currency in ISO numeric code"
+                                type: "integer"
+                                format: "int32"
+                            expiry:
+                                type: "string"
+                    refund:
+                        type: "object"
+                        properties:
+                            amount:
+                                type: "number"
+                            date:
+                                type: "string"
+                                format: "date-time"
+                    adjustment:
+                        type: "object"
+                        properties:
+                            amount:
+                                type: "number"
+                            date:
+                                type: "string"
+                                format: "date-time"
+                    merchant:
+                        type: "object"
+                        properties:
+                            identifier:
+                                type: "string"
+                            categoryCode:
+                                type: "string"
+                            deviceIdentifier:
+                                type: "string"
+                            countryCode:
+                                type: "string"
+                            nameAndLocation:
+                                type: "string"
+                    customer:
+                        type: "object"
+                        properties:
+                            name:
+                                type: "string"
         PaymentRecords:
             type: "array"
             items:
@@ -6558,7 +6664,7 @@ paths:
                                     $ref: "#/components/schemas/MerchantIdentifier"
                                 customer:
                                     $ref: "#/components/schemas/EntityIdentifier"
-                                payment:
+                                transaction:
                                     type: "object"
                                     properties:
                                         switchSequence:
@@ -6566,37 +6672,48 @@ paths:
                                 filters:
                                     type: "object"
                                     properties:
-                                        customer:
+                                        searchText:
+                                            type: "string"
+                                        merchant:
                                             type: "object"
                                             properties:
                                                 identifier:
                                                     type: "string"
-                                        payment:
+                                        transaction:
                                             type: "object"
                                             properties:
                                                 messageTypeIdentifiers:
                                                     type: "array"
-                                                processingCodes:
-                                                    type: "array"
+                                                    items:
+                                                        type: "number"
                                                 currencyCode:
                                                     type: "integer"
                                                     format: "int32"
                                                 switchSequence:
                                                     type: "string"
+                                                type:
+                                                    type: "object"
+                                                    properties:
+                                                        purchase:
+                                                            type: "boolean"
+                                                        refund:
+                                                            type: "boolean"
                                                 status:
                                                     type: "object"
                                                     properties:
                                                         success:
-                                                            type: "string"
-                                                        refund:
-                                                            type: "string"
-                                                        capture:
-                                                            type: "string"
-                                                        not:
-                                                            type: "object"
-                                                            properties:
-                                                                success:
-                                                                    type: "string"
+                                                            type: "boolean"
+                                                        failed:
+                                                            type: "boolean"
+                                                captureMode:
+                                                    type: "object"
+                                                    properties:
+                                                        chip:
+                                                            type: "boolean"
+                                                        magneticStripe:
+                                                            type: "boolean"
+                                                        manualEntry:
+                                                            type: "boolean"
                                                 localDate:
                                                     type: "object"
                                                     properties:
@@ -6623,7 +6740,7 @@ paths:
                                     cursor:
                                         $ref: "#/components/schemas/CursorOnResponse"
                                     transactions:
-                                        $ref: "#/components/schemas/PaymentRecords"
+                                        $ref: "#/components/schemas/TransactionRecords"
                                 required:
                                     - result
                                     - transactions
@@ -6656,7 +6773,7 @@ paths:
                                     result:
                                         $ref: "#/components/schemas/ResponseResult"
                                     transactions:
-                                        $ref: "#/components/schemas/PaymentRecords"
+                                        $ref: "#/components/schemas/TransactionRecords"
                                 required:
                                     - result
                                     - transactions
