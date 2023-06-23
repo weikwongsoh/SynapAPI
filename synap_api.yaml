@@ -6660,15 +6660,6 @@ paths:
                         schema:
                             type: "object"
                             properties:
-                                merchant:
-                                    $ref: "#/components/schemas/MerchantIdentifier"
-                                customer:
-                                    $ref: "#/components/schemas/EntityIdentifier"
-                                transaction:
-                                    type: "object"
-                                    properties:
-                                        switchSequence:
-                                            type: "string"
                                 filters:
                                     type: "object"
                                     properties:
