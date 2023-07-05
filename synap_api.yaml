@@ -4474,23 +4474,15 @@ paths:
                         schema:
                             type: "object"
                             properties:
-                                merchant:
-                                    $ref: "#/components/schemas/MerchantIdentifier"
-                                customer:
-                                    $ref: "#/components/schemas/EntityIdentifier"
-                                payment:
-                                    type: "object"
-                                    properties:
-                                        switchSequence:
-                                            type: "string"
                                 filters:
                                     type: "object"
                                     properties:
+                                        searchText:
+                                            type: "string"
+                                        merchant:
+                                            $ref: "#/components/schemas/MerchantIdentifier"
                                         customer:
-                                            type: "object"
-                                            properties:
-                                                identifier:
-                                                    type: "string"
+                                            $ref: "#/components/schemas/EntityIdentifier"
                                         payment:
                                             type: "object"
                                             properties:
@@ -4499,17 +4491,10 @@ paths:
                                                 status:
                                                     type: "object"
                                                     properties:
-                                                        success:
-                                                            type: "string"
-                                                        refund:
-                                                            type: "string"
-                                                        capture:
-                                                            type: "string"
-                                                        not:
-                                                            type: "object"
-                                                            properties:
-                                                                success:
-                                                                    type: "string"
+                                                        succeeded:
+                                                            type: "boolean"
+                                                        failed:
+                                                            type: "boolean"
                                                 localDate:
                                                     type: "object"
                                                     properties:
@@ -4521,8 +4506,6 @@ paths:
                                                             format: "date"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
-                            required:
-                                - merchant
             responses:
                 200:
                     description: "Returned list of payment records"
