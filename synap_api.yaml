@@ -5081,25 +5081,23 @@ paths:
                         schema:
                             type: "object"
                             properties:
-                                merchant:
-                                    $ref: "#/components/schemas/MerchantIdentifier"
-                                customer:
-                                    $ref: "#/components/schemas/EntityIdentifier"
                                 filters:
                                     type: "object"
                                     properties:
+                                        searchText:
+                                            type: "string"
+                                        merchant:
+                                            $ref: "#/components/schemas/MerchantIdentifier"
                                         customer:
                                             type: "object"
                                             properties:
                                                 identifier:
                                                     type: "string"
-                                                name:
-                                                    type: "string"
                                                 asGuest:
                                                     type: "boolean"
                                                 withAccount:
                                                     type: "boolean"
-                                                createDate:
+                                                recordDate:
                                                     type: "object"
                                                     properties:
                                                         start:
@@ -5108,7 +5106,7 @@ paths:
                                                         end:
                                                             type: "string"
                                                             format: "date"
-                                sortby:
+                                orderBy:
                                     type: "object"
                                     properties:
                                         customer:
@@ -5136,10 +5134,6 @@ paths:
                                                         - "desc"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
-                            required:
-                                - organization
-                                - merchant
-                                - customer
             responses:
                 200:
                     description: "Returned list of customer records"
