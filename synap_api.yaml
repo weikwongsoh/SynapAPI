@@ -4620,29 +4620,56 @@ paths:
                         schema:
                             type: "object"
                             properties:
-                                merchant:
-                                    $ref: "#/components/schemas/MerchantIdentifier"
-                                paymentToken:
-                                    type: "object"
-                                    properties:
-                                        identifier:
-                                            description: "indicates the specific payment token details to retrieved. 'all' will retrieve all payment tokens for the merchant."
-                                            type: "string"
-                                            example: "all"
-                                        name:
-                                            type: "string"
-                                    required:
-                                        - identifier
                                 filters:
                                     type: "object"
                                     properties:
-                                        recordStatus:
+                                        searchText:
+                                            type: "string"
+                                        merchant:
+                                            $ref: "#/components/schemas/MerchantIdentifier"
+                                        paymentToken:
                                             type: "object"
                                             properties:
-                                                active:
-                                                    type: "boolean"
-                                                inactive:
-                                                    type: "boolean"
+                                                identifier:
+                                                    description: "indicates the specific payment token details to retrieved"
+                                                    type: "string"
+                                                recordStatus:
+                                                    type: "object"
+                                                    properties:
+                                                        active:
+                                                            type: "boolean"
+                                                        inactive:
+                                                            type: "boolean"
+                                                recordDate:
+                                                    type: "object"
+                                                    properties:
+                                                        start:
+                                                            type: "string"
+                                                            format: "date"
+                                                        end:
+                                                            type: "string"
+                                                            format: "date"
+                                orderBy:
+                                    type: "object"
+                                    properties:
+                                        paymentToken:
+                                            type: "object"
+                                            properties:
+                                                name:
+                                                    type: "string"
+                                                    enum:
+                                                        - "asc"
+                                                        - "desc"
+                                                amount:
+                                                    type: "string"
+                                                    enum:
+                                                        - "asc"
+                                                        - "desc"
+                                                recordDate:
+                                                    type: "string"
+                                                    enum:
+                                                        - "asc"
+                                                        - "desc"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
                             required:
@@ -6716,8 +6743,6 @@ paths:
                                                             format: "date"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
-                            required:
-                                - merchant
             responses:
                 200:
                     description: "Returned list of transaction history records"
