@@ -471,6 +471,8 @@ components:
                         - ServerTimeout
                         - SystemError
                         - InvalidProvider
+                        - NoRecordFound
+                        - InvalidRecord
                 reason:
                     type: "string"
                     description: "reason for error occur"
