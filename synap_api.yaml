@@ -1526,6 +1526,9 @@ components:
                     type: "string"
                 cardVerified:
                     type: "boolean"
+                asDefault:
+                    description: "indicate if a new payment instrument should be set as default instrument"
+                    type: "boolean"
         CustomerPaymentInstrumentRecords:
             type: "array"
             items:
