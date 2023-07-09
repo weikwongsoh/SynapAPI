@@ -5305,21 +5305,15 @@ paths:
                         schema:
                             type: "object"
                             properties:
-                                customer:
-                                    $ref: "#/components/schemas/customer.identifier"
-                                customerPaymentInstrument:
-                                    $ref: "#/components/schemas/customerPaymentInstrument.identifier"
                                 filters:
                                     type: "object"
                                     properties:
-                                        paymentInstrumentTypes:
-                                            type: "array"
-                                            items:
-                                                type: "string"
+                                        customer:
+                                            $ref: "#/components/schemas/customer.identifier"
+                                        customerPaymentInstrument:
+                                            $ref: "#/components/schemas/customerPaymentInstrument.identifier"
                                 cursor:
                                     $ref: "#/components/schemas/CursorRecordCountOnRequest"
-                            required:
-                                - customer
             responses:
                 200:
                     description: "Returned list of customer's payment instrument records"
