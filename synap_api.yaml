@@ -410,6 +410,26 @@ components:
                         type: "string"
                     otherName:
                         type: "string"
+        UserTeamRecords:
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    user:
+                        type: "object"
+                        properties:
+                            name:
+                                type: "string"
+                    teams:
+                        type: "array"
+                        items:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
         TeamRecord:
             allOf:
                 - $ref: "#/components/schemas/RecordStatus"
@@ -3121,6 +3141,69 @@ paths:
                                 - user
                                 - contact
             responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUserTeam:
+        summary: "Get list of teams for users"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                cursor:
+                                    $ref: "#/components/schemas/CursorRecordCountOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user's team records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    cursor:
+                                        $ref: "#/components/schemas/CursorOnResponse"
+                                    users:
+                                        $ref: "#/components/schemas/UserTeamRecords"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/FetchUserTeam:
+        summary: "Fetch more teams of users with cursor"
+        post:
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                cursor:
+                                    $ref: "#/components/schemas/CursorOnRequest"
+            responses:
+                200:
+                    description: "Returned list of user's team records"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    users:
+                                        $ref: "#/components/schemas/UserTeamRecords"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetTeam:
