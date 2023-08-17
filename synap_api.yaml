@@ -1905,6 +1905,24 @@ components:
                                                     type: "string"
                                         accessRightActions:
                                             $ref: "#/components/schemas/AccessRightActions"
+        GetAccessRightsResponse_v1:
+            description: "Returned list of user's access rights"
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            result:
+                                $ref: "#/components/schemas/ResponseResult"
+                            accessRightObjects:
+                                type: "array"
+                                items:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                        accessRightActions:
+                                            $ref: "#/components/schemas/AccessRightActions"
         PaymentResponse:
             description: "Receive payment's result object and/or action on response"
             content:
@@ -2320,6 +2338,35 @@ paths:
             responses:
                 200:
                     $ref: "#/components/responses/GetAccessRightsResponse"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetUserAccessRights_v1:
+        summary: "Get list of user's access rights"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                user:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                accessRightObject:
+                                    $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                            required:
+                                - user
+                                - accessRightObject
+            responses:
+                200:
+                    $ref: "#/components/responses/GetAccessRightsResponse_v1"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetTeamAccessRights:
