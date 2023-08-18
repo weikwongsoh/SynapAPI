@@ -2398,6 +2398,35 @@ paths:
                     $ref: "#/components/responses/GetAccessRightsResponse"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetTeamAccessRights_v1:
+        summary: "Get list of team's access rights"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                team:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                accessRightObject:
+                                    $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                            required:
+                                - team
+                                - accessRightObject
+            responses:
+                200:
+                    $ref: "#/components/responses/GetAccessRightsResponse_v1"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetOrganizationAccessRights:
         summary: "Get list of organization's access rights"
         post:
@@ -2425,6 +2454,35 @@ paths:
             responses:
                 200:
                     $ref: "#/components/responses/GetAccessRightsResponse"
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetOrganizationAccessRights_v1:
+        summary: "Get list of organization's access rights"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                organization:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                                accessRightObject:
+                                    $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                            required:
+                                - organization
+                                - accessRightObject
+            responses:
+                200:
+                    $ref: "#/components/responses/GetAccessRightsResponse_v1"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GrantUserAccessRights:
