@@ -493,6 +493,7 @@ components:
                         - InvalidProvider
                         - NoRecordFound
                         - InvalidRecord
+                        - InvalidAccessRightOwner
                 reason:
                     type: "string"
                     description: "reason for error occur"
@@ -1690,6 +1691,59 @@ components:
                 type: "string"
                 example: "<session_token>"
     requestBodies:
+        GrantAndRevokeAccessRights:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            - oneOf:
+                                - type: "object"
+                                  properties:
+                                    user:
+                                        type: "object"
+                                        properties:
+                                            name:
+                                                type: "string"
+                                        required:
+                                            - name
+                                  required:
+                                    - user
+                                - type: "object"
+                                  properties:
+                                    team:
+                                        type: "object"
+                                        properties:
+                                            name:
+                                                type: "string"
+                                        required:
+                                            - name
+                                  required:
+                                    - team
+                                - type: "object"
+                                  properties:
+                                    organization:
+                                        type: "object"
+                                        properties:
+                                            name:
+                                                type: "string"
+                                        required:
+                                            - name
+                                  required:
+                                    - organization
+                            - type: "object"
+                              properties:
+                                accessRightObject:
+                                    allOf:
+                                        - $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                                        - type: "object"
+                                          properties:
+                                            accessRightActions:
+                                                $ref: "#/components/schemas/AccessRightActions"
+                                          required:
+                                            - accessRightActions
+                              required:
+                                - accessRightObject
         UserAccessRightsRequestBody:
             required: true
             content:
@@ -1703,9 +1757,12 @@ components:
                                     name:
                                         type: "string"
                             accessRightObject:
-                                $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
-                            accessRightActions:
-                                $ref: "#/components/schemas/AccessRightActions"
+                                allOf:
+                                    - $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                                    - type: "object"
+                                      properties:
+                                            accessRightActions:
+                                                $ref: "#/components/schemas/AccessRightActions"
         TeamAccessRightsRequestBody:
             required: true
             content:
@@ -1719,9 +1776,12 @@ components:
                                     name:
                                         type: "string"
                             accessRightObject:
-                                $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
-                            accessRightActions:
-                                $ref: "#/components/schemas/AccessRightActions"
+                                allOf:
+                                    - $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                                    - type: "object"
+                                      properties:
+                                            accessRightActions:
+                                                $ref: "#/components/schemas/AccessRightActions"
         OrganizationAccessRightsRequestBody:
             required: true
             content:
@@ -1735,9 +1795,12 @@ components:
                                     name:
                                         type: "string"
                             accessRightObject:
-                                $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
-                            accessRightActions:
-                                $ref: "#/components/schemas/AccessRightActions"
+                                allOf:
+                                    - $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
+                                    - type: "object"
+                                      properties:
+                                            accessRightActions:
+                                                $ref: "#/components/schemas/AccessRightActions"
         PaymentRequestBody:
             required: true
             content:
@@ -2311,8 +2374,8 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
-    /command/GetUserAccessRights:
-        summary: "Get list of user's access rights"
+    /command/GetAccessRights:
+        summary: "Get list of access rights for an entity"
         post:
             tags:
                 -  "Access Rights"
@@ -2321,20 +2384,45 @@ paths:
                 content:
                     application/json:
                         schema:
-                            type: "object"
-                            properties:
-                                user:
-                                    type: "object"
-                                    properties:
-                                        name:
-                                            type: "string"
-                                    required:
-                                        - name
-                                accessRightObject:
-                                    $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
-                            required:
-                                - user
-                                - accessRightObject
+                            allOf:
+                                - oneOf:
+                                    - type: "object"
+                                      properties:
+                                        user:
+                                            type: "object"
+                                            properties:
+                                                name:
+                                                    type: "string"
+                                            required:
+                                                - name
+                                      required:
+                                        - user
+                                    - type: "object"
+                                      properties:
+                                        team:
+                                            type: "object"
+                                            properties:
+                                                name:
+                                                    type: "string"
+                                            required:
+                                                - name
+                                      required:
+                                        - team
+                                    - type: "object"
+                                      properties:
+                                        organization:
+                                            type: "object"
+                                            properties:
+                                                name:
+                                                    type: "string"
+                                            required:
+                                                - name
+                                      required:
+                                        - organization
+                                - type: "object"
+                                  properties:
+                                    accessRightObject:
+                                        $ref: "#/components/schemas/AccessRightObjectNameOnRequest"
             responses:
                 200:
                     $ref: "#/components/responses/GetAccessRightsResponse"
@@ -2343,6 +2431,7 @@ paths:
     /command/GetUserAccessRights_v1:
         summary: "Get list of user's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2372,6 +2461,7 @@ paths:
     /command/GetTeamAccessRights:
         summary: "Get list of team's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2401,6 +2491,7 @@ paths:
     /command/GetTeamAccessRights_v1:
         summary: "Get list of team's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2430,6 +2521,7 @@ paths:
     /command/GetOrganizationAccessRights:
         summary: "Get list of organization's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2459,6 +2551,7 @@ paths:
     /command/GetOrganizationAccessRights_v1:
         summary: "Get list of organization's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2485,9 +2578,20 @@ paths:
                     $ref: "#/components/responses/GetAccessRightsResponse_v1"
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GrantAccessRights:
+        summary: "Grant access rights to an entity"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                $ref: "#/components/requestBodies/GrantAndRevokeAccessRights"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/GrantUserAccessRights:
         summary: "Grant user's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2498,6 +2602,7 @@ paths:
     /command/GrantTeamAccessRights:
         summary: "Grant team's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2508,6 +2613,7 @@ paths:
     /command/GrantOrganizationAccessRights:
         summary: "Grant organization's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2515,9 +2621,20 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/RevokeAccessRights:
+        summary: "Revoke access rights of an entity"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                $ref: "#/components/requestBodies/GrantAndRevokeAccessRights"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
     /command/RevokeUserAccessRights:
         summary: "Revoke user's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2528,6 +2645,7 @@ paths:
     /command/RevokeTeamAccessRights:
         summary: "Revoke team's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2538,10 +2656,21 @@ paths:
     /command/RevokeOrganizationAccessRights:
         summary: "Revoke organization's access rights"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
                 $ref: "#/components/requestBodies/OrganizationAccessRightsRequestBody"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/RevokeAndGrantAccessRights:
+        summary: "Revoke and grant access rights of/to an entity"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                $ref: "#/components/requestBodies/GrantAndRevokeAccessRights"
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
