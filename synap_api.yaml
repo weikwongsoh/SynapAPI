@@ -1966,8 +1966,8 @@ components:
                                             properties:
                                                 name:
                                                     type: "string"
-                                        accessRightActions:
-                                            $ref: "#/components/schemas/AccessRightActions"
+                                                accessRightActions:
+                                                    $ref: "#/components/schemas/AccessRightActions"
         GetAccessRightsResponse_v1:
             description: "Returned list of user's access rights"
             content:
