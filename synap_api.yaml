@@ -7088,3 +7088,159 @@ paths:
                                     - transactions
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/GetConfigurationFile:
+        summary: "Retrieve list of configuration files"
+        post:
+            tags:
+                -  "Configuration Service"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                file:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            description: "wildcard expression to retrive full list of configuration files"
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - file
+            responses:
+                200:
+                    description: "Returned list of configuration files"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    paths:
+                                        type: "array"
+                                        items:
+                                            type: "string"
+                                    files:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                name:
+                                                    type: "string"
+                                            required:
+                                                - name
+                                required:
+                                    - result
+                                    - paths
+                                    - files
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/ReadConfigurationFile:
+        summary: "Retrieve content of configuration file"
+        post:
+            tags:
+                -  "Configuration Service"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                file:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            description: "name of file which the content to be retrieved"
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - file
+            responses:
+                200:
+                    description: "Returned content of configuration file"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    files:
+                                        type: "array"
+                                        items:
+                                            type: "object"
+                                            properties:
+                                                name:
+                                                    type: "string"
+                                                content:
+                                                    type: "string"
+                                            required:
+                                                - name
+                                                - content
+                                required:
+                                    - result
+                                    - files
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /command/WriteConfigurationFile:
+        summary: "Write content to configuration file"
+        post:
+            tags:
+                -  "Configuration Service"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                file:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            description: "name of file which the content to be written to"
+                                            type: "string"
+                                        content:
+                                            description: "content to be written to"
+                                            type: "string"
+                                    required:
+                                        - name
+                                        - content
+                            required:
+                                - file
+            responses:
+                200:
+                    description: "Returned result of the operation"
+                    content:
+                        application/json:
+                            schema:
+                                type: "object"
+                                properties:
+                                    result:
+                                        $ref: "#/components/schemas/ResponseResult"
+                                    file:
+                                        type: "object"
+                                        properties:
+                                            name:
+                                                description: "name of file which the content was written to"
+                                                type: "string"
+                                            backup:
+                                                description: "name of backup file which the content was written to"
+                                                type: "string"
+                                            size:
+                                                description: "bytes of the content was written to"
+                                                type: "number"
+                                        required:
+                                            - name
+                                            - size
+                                required:
+                                    - result
+                                    - file
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
