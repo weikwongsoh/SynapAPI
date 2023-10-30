@@ -7244,3 +7244,104 @@ paths:
                                     - file
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/sendMail:
+        summary: "Send email"
+        post:
+            tags:
+                -  "Email Service"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                mail:
+                                    type: "object"
+                                    properties:
+                                        from:
+                                            description: "sender's email address"
+                                            type: "string"
+                                        to:
+                                            description: "list of receiver's email addressses with comma as seperator"
+                                            type: "string"
+                                        subject:
+                                            description: "Email's subject"
+                                            type: "string"
+                                        text:
+                                            description: "Email body in text format"
+                                            type: "string"
+                                        html:
+                                            description: "Email body in html format"
+                                            type: "string"
+                                    required:
+                                        - from
+                                        - to
+                                        - subject
+                                        - text
+                            required:
+                                - mail
+                        examples:
+                            "Single Recipient":
+                                value:
+                                    mail:
+                                        from: "'Sender' <sender@example.com>"
+                                        to: "'recipient' <recipient@example.com>"
+                                        subject: "single recipient"
+                                        text: "Email to SINGLE recipient"
+                                        html: "<p>Email to <b>SINGLE</b> recipient</p>"
+                            "Multiple Recipients":
+                                value:
+                                    mail:
+                                        from: "'Sender' <sender@example.com>"
+                                        to: "'recipient 1' <recipient_1@example.com>; 'recipient 2' <recipient_2@example.com>"
+                                        subject: "multiple recipients"
+                                        text: "Email to MULTIPLE recipient"
+                                        html: "<p>Email to <b>MULTIPLE</b> recipient</p>"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
+    /image/{usage}/{identifier}:
+        summary: "Image Upload & Retrieval"
+        parameters:
+            - name: "usage"
+              in: "path"
+              description: "usage of an image"
+              required: true
+              schema:
+                type: "string"
+            - name: "identifier"
+              in: "path"
+              description: "identifier of an image"
+              required: true
+              schema:
+                type: "string"
+        get:
+            tags:
+                - "Images"
+            summary: "Retrieve An Image"
+            responses:
+                "200":
+                    description: "Successful operation"
+                    content:
+                        image/*:
+                            schema:
+                                type: "string"
+                                format: "binary"
+        post:
+            tags:
+                - "Images"
+            summary: "Upload An Image"
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: "object"
+                            properties:
+                                image:
+                                    type: "string"
+                                    format: "binary"
+            responses:
+                default:
+                    $ref: "#/components/responses/ResultOnlyResponse"
