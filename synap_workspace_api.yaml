@@ -1,0 +1,479 @@
+
+---
+openapi: "3.0.0"
+info:  # (MANDATORY)
+    title: "SYNAP Workspace API"
+    version: "0.0.2"  # major.minor.patch
+    description: "SYNAP's workspace API specification"
+    contact:
+        name: "Cranium Ventures Pte Ltd"
+        url:  "https://www.craniumventures.com"
+        email: "info@craniumventures.com"
+servers:
+    -
+        url: "https://sandbox01.craniumventures.com/synap/workspace"
+        description: "Sandbox Environment"
+components:
+    schemas:
+        file.content:
+            description: "content of a file"
+        response.result:
+            type: "object"
+            properties:
+                code:
+                    type: "string"
+                    description: "success or error code"
+                    example: "Fail"
+                    enum:
+                        - Success
+                        - Fail
+                        - InvalidSessionToken
+                        - FolderNotEmpty
+                        - NoExists
+                reason:
+                    type: "string"
+                    description: "message for success or reason for error occur"
+                    example: "operation failed"
+            required:
+                - code
+        response.folder.content:
+            description: "content of a folder"
+            type: "array"
+            items:
+                type: "object"
+                properties:
+                    name:
+                        type: "string"
+                        description: "name of file or folder"
+                    isFolder:
+                        type: "boolean"
+                        description: "indicate if it is a folder"
+                    stat:
+                        type: "object"
+                        properties:
+                            dev:
+                                type: "number"
+                                description: "numeric identifier of the device"
+                            ino:
+                                type: "number"
+                                description: "file system specific 'Inode' number"
+                            mode:
+                                type: "number"
+                                description: "bit-field describing the file type and mode"
+                            size:
+                                type: "number"
+                                description: "size of the file in bytes"
+                            blksize:
+                                type: "number"
+                                description: "file system block size for IO"
+                            blocks:
+                                type: "number"
+                                description: "number of blocks allocated"
+                            atimeMs:
+                                type: "number"
+                                description: "timestamp indicating the last time it was accessed expressed in milliseconds since the POSIX Epoch"
+                            mtimeMs:
+                                type: "number"
+                                description: "timestamp indicating the last time it was modifed expressed in milliseconds since the POSIX Epoch"
+                            ctimeMs:
+                                type: "number"
+                                description: "timestamp indicating the last time it's status was changed expressed in milliseconds since the POSIX Epoch"
+                            birthtimeMs:
+                                type: "number"
+                                description: "timestamp indicating the creation time expressed in milliseconds since the POSIX Epoch"
+                            atime:
+                                type: "string"
+                                format: "date-time"
+                                description: "timestamp indicating the last time it was accessed"
+                            mtime:
+                                type: "string"
+                                format: "date-time"
+                                description: "timestamp indicating the last time it was modified"
+                            ctime:
+                                type: "string"
+                                format: "date-time"
+                                description: "timestamp indicating the last time it was changed"
+                            birthtime:
+                                type: "string"
+                                format: "date-time"
+                                description: "timestamp indicating the creation time"
+    parameters:
+        session.token:
+            name: "x-synap-SessionToken"
+            in: "header"
+            description: "Synap's session token"
+            required: true
+            schema:
+                type: "string"
+                example: "<session_token>"
+    requestBodies:
+        request.workspace.command:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            workspace:
+                                type: "string"
+                                description: "name of workspace"
+                        required:
+                            - workspace
+        request.folder.command:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            workspace:
+                                type: "string"
+                                description: "name of workspace"
+                            folder:
+                                type: "string"
+                                description: "full path of the folder to be created"
+                        required:
+                            - workspace
+                            - folder
+        request.file.command:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            workspace:
+                                type: "string"
+                                description: "name of workspace"
+                            file:
+                                type: "string"
+                                description: "full path of the file"
+                            content:
+                                type: "string"
+                                description: "content of the file"
+                        required:
+                            - workspace
+                            - file
+    responses:
+        response.result.only:
+            description: "Receive only result object on response"
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            result:
+                                $ref: "#/components/schemas/response.result"
+        response.file.content:
+            description: "Returned content of a file"
+            content:
+                "*":
+                    schema:
+                        $ref: "#/components/schemas/file.content"
+        response.folder.content:
+            description: "Returned content of a folder"
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/response.folder.content"
+    securitySchemes:
+        synap.session.token:
+            type: "apiKey"
+            description: "Synap's session token is required for all commands except few specific purpose commands"
+            name: "x-synap-SessionToken"
+            in: header
+security:
+    - synap.session.token: []
+paths:
+    /command/workspace.new:
+        summary: "Create a new workspace"
+        post:
+            tags:
+                -  "Workspace"
+            requestBody:
+                $ref: "#/components/requestBodies/request.workspace.command"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /command/workspace.delete:
+        summary: "Delete an existing workspace"
+        post:
+            tags:
+                -  "Workspace"
+            requestBody:
+                $ref: "#/components/requestBodies/request.workspace.command"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /command/workspace.folder.new:
+        summary: "Create a new folder"
+        post:
+            tags:
+                -  "Folder"
+            requestBody:
+                $ref: "#/components/requestBodies/request.folder.command"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /command/workspace.folder.delete:
+        summary: "Delete an existing folder"
+        post:
+            tags:
+                -  "Folder"
+            requestBody:
+                $ref: "#/components/requestBodies/request.folder.command"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /command/workspace.folder.get:
+        summary: "Get the content of a folder or workspace"
+        post:
+            tags:
+                -  "Folder"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                workspace:
+                                    type: "string"
+                                    description: "name of workspace"
+                                folder:
+                                    type: "string"
+                                    description: "full path of the folder"
+                            required:
+                                - workspace
+            responses:
+                200:
+                    $ref: "#/components/responses/response.folder.content"
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /command/workspace.file.write:
+        summary: "Create a new file or update an existing file"
+        post:
+            tags:
+                -  "File"
+            requestBody:
+                $ref: "#/components/requestBodies/request.file.command"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /command/workspace.file.delete:
+        summary: "Delete an existing file"
+        post:
+            tags:
+                -  "File"
+            requestBody:
+                $ref: "#/components/requestBodies/request.file.command"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /command/workspace.file.get:
+        summary: "Get content of file"
+        post:
+            tags:
+                -  "File"
+            requestBody:
+                $ref: "#/components/requestBodies/request.file.command"
+            responses:
+                200:
+                    $ref: "#/components/responses/response.file.content"
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /workspace/{workspace}:
+        summary: "Workspace management"
+        parameters:
+            - name: workspace
+              in: path
+              description: "name of workspace"
+              required: true
+              schema:
+                type: "string"
+        put:
+            summary: "Create a new workspace"
+            tags:
+                -  "Workspace"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+        delete:
+            summary: "Delete an existing workspace"
+            tags:
+                -  "Workspace"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+        post:
+            tags:
+                - "File"
+            summary: "Upload a file onto a workspace"
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: "object"
+                            properties:
+                                file:
+                                    type: "string"
+                                    format: "binary"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /workspace/{workspace}/folder/{folderPath}:
+        summary: "Folder management"
+        parameters:
+            - name: workspace
+              in: path
+              description: "name of workspace"
+              required: true
+              schema:
+                type: "string"
+            - name: folderPath
+              in: path
+              description: "Full folder path"
+              required: true
+              schema:
+                type: "string"
+        put:
+            summary: "Create a new folder"
+            tags:
+                -  "Folder"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+        delete:
+            summary: "Delete an existing file"
+            tags:
+                -  "Folder"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+        get:
+            summary: "Get content of a folder"
+            tags:
+                -  "Folder"
+            responses:
+                200:
+                    $ref: "#/components/responses/response.folder.content"
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /workspace/{workspace}/file/{filePath}:
+        summary: "File management"
+        parameters:
+            - name: workspace
+              in: path
+              description: "name of workspace"
+              required: true
+              schema:
+                type: "string"
+            - name: filePath
+              in: path
+              description: "Full file path"
+              required: true
+              schema:
+                type: "string"
+        put:
+            summary: "Create a new file or update an existing file"
+            tags:
+                -  "File"
+            requestBody:
+                required: true
+                content:
+                    text/plain:
+                        schema:
+                            type: "string"
+                            description: "content to be written onto the file"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+        delete:
+            summary: "Delete an existing file"
+            tags:
+                -  "File"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+        get:
+            summary: "Get content of a file"
+            tags:
+                -  "File"
+            responses:
+                200:
+                    $ref: "#/components/responses/response.file.content"
+                default:
+                    $ref: "#/components/responses/response.result.only"
+    /workspace/{workspace}/{folderOrFilePath}:
+        summary: "Folder & File management"
+        parameters:
+            - name: workspace
+              in: path
+              description: "name of workspace"
+              required: true
+              schema:
+                type: "string"
+            - name: folderOrFilePath
+              in: path
+              description: "Full folder or file path"
+              required: true
+              schema:
+                type: "string"
+        put:
+            summary: "Create a new folder or a new file or update an existing file; for folder command or to act on a folder, the request body must be empty; otherwise it assumes to be a file command and acts on a file"
+            tags:
+                -  "Folder & File"
+            requestBody:
+                content:
+                    text/*:
+                        schema:
+                            $ref: "#/components/schemas/file.content"
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/file.content"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+        post:
+            tags:
+                - "File"
+            summary: "Upload a file onto a workspace"
+            requestBody:
+                required: true
+                content:
+                    multipart/form-data:
+                        schema:
+                            type: "object"
+                            properties:
+                                file:
+                                    type: "string"
+                                    format: "binary"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+        delete:
+            summary: "Delete an existing folder or file"
+            tags:
+                -  "Folder & File"
+            responses:
+                default:
+                    $ref: "#/components/responses/response.result.only"
+        get:
+            summary: "Get content of a folder or file"
+            tags:
+                -  "Folder & File"
+            responses:
+                200:
+                    description: "Returned content of a folder or file"
+                    content:
+                        application/json:
+                            schema:
+                                oneOf:
+                                    - $ref: "#/components/schemas/file.content"
+                                    - $ref: "#/components/schemas/response.folder.content"
+                        "*":
+                            schema:
+                                $ref: "#/components/schemas/file.content"
+                default:
+                    $ref: "#/components/responses/response.result.only"
