@@ -1566,8 +1566,6 @@ components:
                     description: "The user's login name"
                     type: "string"
                     example: "john.smith"
-            required:
-                - name
         user.identifier:
             type: "object"
             properties:
@@ -1586,6 +1584,13 @@ components:
                     example: "1"
             required:
                 - identifier
+        team.name:
+            type: "object"
+            properties:
+                name:
+                    description: "An unique name to identify a team"
+                    type: "string"
+                    example: "systemAdministrators"
         organization.identifier:
             type: "object"
             properties:
@@ -1593,8 +1598,6 @@ components:
                     description: "An unique number to identify an organization"
                     type: "string"
                     example: "1"
-            required:
-                - identifier
         organization.name:
             type: "object"
             properties:
@@ -1602,8 +1605,6 @@ components:
                     description: "An unique name to identify an organization"
                     type: "string"
                     example: "john_smith_company"
-            required:
-                - name
         paymentInstrumentNumber.name:
             type: "object"
             properties:
@@ -1681,6 +1682,259 @@ components:
                     example: "1"
             required:
                 - identifier
+        accessRights.entities:
+            oneOf:
+                - type: "object"
+                  properties:
+                    user:
+                        $ref: "#/components/schemas/user.name"
+                - type: "object"
+                  properties:
+                    team:
+                        $ref: "#/components/schemas/team.name"
+                - type: "object"
+                  properties:
+                    organization:
+                        $ref: "#/components/schemas/organization.name"
+        accessRightsObject.name:
+            type: "object"
+            properties:
+                name:
+                    type: "string"
+                    description: "name of the object which the rights are processed; 'all' indicates retrieval of all records for query commands"
+                    example: "frog"
+        accessRightsObject.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    type: "string"
+                    description: "unique identifier of the object which the rights are processed"
+                    example: "<identifier>"
+        accessRightsObject.classification:
+            type: "object"
+            properties:
+                classification:
+                    type: "string"
+                    description: "user defined classification of the object which the rights are processed"
+                    example: "self-service"
+        accessRightsObject.actions:
+            type: "object"
+            description: "one or more actions"
+            properties:
+                accessRightsActions:
+                    type: "object"
+                    properties:
+                        <replace_with_action_name>:
+                            type: "boolean"
+                            description: "name of an action; values are ignored during retrieval however 'true' would mean an action to be granted and 'false' would mean an action to be revoked"
+        accessRightsAction.name:
+            type: "object"
+            properties:
+                name:
+                    type: "string"
+                    description: "name of the object's action which the rights are processed"
+                    example: "jump"
+        response.accessRightsObjects:
+            type: "object"
+            properties:
+                accessRightsObjects:
+                    type: "array"
+                    items:
+                        allOf:
+                            - $ref: "#/components/schemas/generic.recordStatus"
+                            - $ref: "#/components/schemas/generic.createTimestamp"
+                            - $ref: "#/components/schemas/generic.recordTimestamp"
+                            - $ref: "#/components/schemas/generic.rowId"
+                            - $ref: "#/components/schemas/accessRightsObject.name"
+                            - $ref: "#/components/schemas/accessRightsObject.identifier"
+                            - $ref: "#/components/schemas/accessRightsObject.classification"
+                            - type: "object"
+                              properties:
+                                organization:
+                                    allOf:
+                                        - $ref: "#/components/schemas/organization.identifier"
+                                        - required:
+                                            - identifier
+                            - required:
+                                - name
+                                - identifier
+        response.accessRightsActions:
+            type: "object"
+            properties:
+                accessRightsObjects:
+                    type: "array"
+                    items:
+                        allOf:
+                            - $ref: "#/components/schemas/accessRightsObject.name"
+                            - $ref: "#/components/schemas/accessRightsObject.identifier"
+                            - $ref: "#/components/schemas/accessRightsObject.actions"
+                            - required:
+                                - name
+                                - identifier
+                                - accessRightsActions
+        cursor.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "identifier used to uniquely identify a cursor created by the system"
+                    type: "string"
+                    minLength: 1
+                    example: "<cursor_identifier>"
+        cursor.creation:
+            type: "object"
+            properties:
+                creation:
+                    description: "should a cursor be created?"
+                    type: "string"
+                    enum:
+                        - always
+                        - auto
+                        - never
+        cursor.recordOffset:
+            type: "object"
+            properties:
+                recordOffset:
+                    description: "offset of the record to retrieve"
+                    type: "integer"
+                    format: "int32"
+                    minimum: 0
+                    example: 0
+        cursor.recordCount:
+            type: "object"
+            properties:
+                recordCount:
+                    description: "number of records to be retrieved"
+                    type: "integer"
+                    format: "int32"
+                    minimum: 1
+                    example: 1
+        cursor.totalRecords:
+            type: "object"
+            properties:
+                totalRecords:
+                    description: "total number of records a cursor holds"
+                    type: "integer"
+                    format: "int32"
+                    example: 10
+        cursor.recordIdentifier:
+            type: "object"
+            properties:
+                recordIdentifier:
+                    description: "record's identifier of a given cursor's context"
+                    type: "string"
+                    example: "1"
+        generic.recordStatus:
+            type: "object"
+            properties:
+                recordStatus:
+                    description: "The current status/state of a record"
+                    type: "string"
+                    enum:
+                        - active
+                        - inactive
+                        - suspense
+                        - pendingApproval
+                        - disable
+                        - locked
+                        - deleted
+                        - noPassword
+                    example: "active"
+        generic.createTimestamp:
+            type: "object"
+            properties:
+                createTimestamp:
+                    description: "date & time of create of a record"
+                    type: "string"
+                    format: "date-time"
+        generic.recordTimestamp:
+            type: "object"
+            properties:
+                recordTimestamp:
+                    description: "date & time of update of a record"
+                    type: "string"
+                    format: "date-time"
+        generic.rowId:
+            type: "object"
+            properties:
+                rowId:
+                    description: "record's unique identifier"
+                    type: "integer"
+                    format: "int32"
+                    example: 1
+        request.cursor.query:
+            type: "object"
+            properties:
+                cursor:
+                    allOf:
+                        - $ref: "#/components/schemas/cursor.creation"
+                        - $ref: "#/components/schemas/cursor.recordOffset"
+                        - $ref: "#/components/schemas/cursor.recordCount"
+                        - required:
+                            - creation
+                            - recordOffset
+                            - recordCount
+        request.accessRightsAction.for.new.rename:
+            type: "object"
+            properties:
+                accessRightsObject:
+                    allOf:
+                        - $ref: "#/components/schemas/accessRightsObject.name"
+                        - type: "object"
+                          properties:
+                            accessRightsAction:
+                                allOf:
+                                    - $ref: "#/components/schemas/accessRightsAction.name"
+                                    - required:
+                                        - name
+                        - required:
+                            - name
+                            - accessRightsAction
+            required:
+                - accessRightsObject
+        response.result.code:
+            type: "object"
+            properties:
+                code:
+                    type: "string"
+                    description: "success or error code"
+                    example: "ErrorCode"
+                    enum:
+                        - Success
+                        - Fail
+                        - InvalidSessionToken
+                        - InvalidRequestValues
+                        - ServerTimeout
+                        - SystemError
+                        - InvalidProvider
+                        - NoRecordFound
+                        - InvalidRecord
+                        - InvalidAccessRightOwner
+        response.result.reason:
+            type: "object"
+            properties:
+                reason:
+                    type: "string"
+                    description: "reason for error occur"
+                    example: "ErrorReason"
+        response.result:
+            type: "object"
+            properties:
+                result:
+                    allOf:
+                        - $ref: "#/components/schemas/response.result.code"
+                        - $ref: "#/components/schemas/response.result.reason"
+                        - required:
+                            - code
+        response.cursor:
+            type: "object"
+            properties:
+                cursor:
+                    allOf:
+                        - $ref: "#/components/schemas/cursor.identifier"
+                        - $ref: "#/components/schemas/cursor.totalRecords"
+                        - required:
+                            - identifier
+                            - totalRecords
     parameters:
         SessionToken:
             name: "x-synap-SessionToken"
@@ -1937,6 +2191,38 @@ components:
                                 type: "string"
                                 format: "uri"
                                 example: "https://payment.merchant.com/result/merchant_reference_number"
+        accessRights.grant.revoke:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            - $ref: "#/components/schemas/accessRights.entities"
+                            - allOf:
+                                - type: "object"
+                                  properties:
+                                    accessRightsObject:
+                                        allOf:
+                                            - $ref: "#/components/schemas/accessRightsObject.name"
+                                            - $ref: "#/components/schemas/accessRightsObject.actions"
+        fetch.with.cursor:
+            required: true
+            content:
+                application/json:
+                    schema:
+                        type: "object"
+                        properties:
+                            cursor:
+                                allOf:
+                                    - $ref: "#/components/schemas/cursor.identifier"
+                                    - $ref: "#/components/schemas/cursor.recordOffset"
+                                    - $ref: "#/components/schemas/cursor.recordCount"
+                                    - required:
+                                        - identifier
+                                        - recordOffset
+                                        - recordCount
+                        required:
+                            - cursor
     responses:
         ResultOnlyResponse:
             description: "Receive only result object on response"
@@ -2016,6 +2302,15 @@ components:
                                                 type: "string"
                         required:
                             - result
+        generic.result:
+            description: "Receive only result object on response"
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            - $ref: "#/components/schemas/response.result"
+                            - required:
+                                - result
     securitySchemes:
         synapSessionToken:
             type: "apiKey"
@@ -2348,8 +2643,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/CheckUserAccessRights:
-        summary: "Check user's access rights"
+        summary: "Check user's access rights; refer to /command/accessRights.user.check"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2375,8 +2671,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetAccessRights:
-        summary: "Get list of access rights for an entity"
+        summary: "Get list of access rights for an entity; refer to /command/accessRights.query"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2429,7 +2726,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetUserAccessRights_v1:
-        summary: "Get list of user's access rights"
+        summary: "Get list of user's access rights; refer to /command/accessRights.query"
         post:
             deprecated: true
             tags:
@@ -2459,7 +2756,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetTeamAccessRights:
-        summary: "Get list of team's access rights"
+        summary: "Get list of team's access rights; refer to /command/accessRights.query"
         post:
             deprecated: true
             tags:
@@ -2489,7 +2786,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetTeamAccessRights_v1:
-        summary: "Get list of team's access rights"
+        summary: "Get list of team's access rights; refer to /command/accessRights.query"
         post:
             deprecated: true
             tags:
@@ -2519,7 +2816,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetOrganizationAccessRights:
-        summary: "Get list of organization's access rights"
+        summary: "Get list of organization's access rights; refer to /command/accessRights.query"
         post:
             deprecated: true
             tags:
@@ -2549,7 +2846,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetOrganizationAccessRights_v1:
-        summary: "Get list of organization's access rights"
+        summary: "Get list of organization's access rights; refer to /command/accessRights.query"
         post:
             deprecated: true
             tags:
@@ -2579,8 +2876,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GrantAccessRights:
-        summary: "Grant access rights to an entity"
+        summary: "Grant access rights to an entity; refer to /command/accessRights.grant"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2589,7 +2887,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GrantUserAccessRights:
-        summary: "Grant user's access rights"
+        summary: "Grant user's access rights; refer to /command/accessRights.grant"
         post:
             deprecated: true
             tags:
@@ -2600,7 +2898,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GrantTeamAccessRights:
-        summary: "Grant team's access rights"
+        summary: "Grant team's access rights; refer to /command/accessRights.grant"
         post:
             deprecated: true
             tags:
@@ -2611,7 +2909,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GrantOrganizationAccessRights:
-        summary: "Grant organization's access rights"
+        summary: "Grant organization's access rights; refer to /command/accessRights.grant"
         post:
             deprecated: true
             tags:
@@ -2622,8 +2920,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/RevokeAccessRights:
-        summary: "Revoke access rights of an entity"
+        summary: "Revoke access rights of an entity; refer to /command/accessRights.revoke"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -2632,7 +2931,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/RevokeUserAccessRights:
-        summary: "Revoke user's access rights"
+        summary: "Revoke user's access rights; refer to /command/accessRights.revoke"
         post:
             deprecated: true
             tags:
@@ -2643,7 +2942,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/RevokeTeamAccessRights:
-        summary: "Revoke team's access rights"
+        summary: "Revoke team's access rights; refer to /command/accessRights.revoke"
         post:
             deprecated: true
             tags:
@@ -2654,7 +2953,7 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/RevokeOrganizationAccessRights:
-        summary: "Revoke organization's access rights"
+        summary: "Revoke organization's access rights; refer to /command/accessRights.revoke"
         post:
             deprecated: true
             tags:
@@ -2670,10 +2969,119 @@ paths:
             tags:
                 -  "Access Rights"
             requestBody:
-                $ref: "#/components/requestBodies/GrantAndRevokeAccessRights"
+                $ref: "#/components/requestBodies/accessRights.grant.revoke"
             responses:
                 default:
-                    $ref: "#/components/responses/ResultOnlyResponse"
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.user.check:
+        summary: "Check user's access rights"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            oneOf:
+                                - allOf:
+                                    - type: "object"
+                                      properties:
+                                        user:
+                                            $ref: "#/components/schemas/user.name"
+                                    - type: "object"
+                                      properties:
+                                        task:
+                                            type: "object"
+                                            properties:
+                                                name:
+                                                    type: "string"
+                                                    description: "name of a defined task"
+                                                    example: "a task"
+                                                actionName:
+                                                    type: "string"
+                                                    description: "action's name of a defined task"
+                                                    example: "an action"
+                                            required:
+                                                - name
+                                                - actionName
+                                    - required:
+                                        - task
+                                - allOf:
+                                    - type: "object"
+                                      properties:
+                                        user:
+                                            $ref: "#/components/schemas/user.name"
+                                    - type: "object"
+                                      properties:
+                                        accessRights:
+                                            type: "object"
+                                            properties:
+                                                expression:
+                                                    type: "string"
+                                                    description: "arbitrary rights expression"
+                                                    example: "%user(joe) and transact(reversal)"
+                                            required:
+                                                - expression
+                                    - required:
+                                        - accessRights
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.query:
+        summary: "Get list of access rights for an entity"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    allOf:
+                                        - $ref: "#/components/schemas/accessRights.entities"
+                                        - $ref: "#/components/schemas/accessRightsObject.name"
+            responses:
+                200:
+                    description: "Returned list of access rights"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        accessRightObjects:
+                                            type: "array"
+                                            items:
+                                                allOf:
+                                                    - $ref: "#/components/schemas/accessRightsObject.name"
+                                                    - $ref: "#/components/schemas/accessRightsObject.actions"
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.grant:
+        summary: "Grant access rights to an entity"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                $ref: "#/components/requestBodies/accessRights.grant.revoke"
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.revoke:
+        summary: "Revoke access rights of an entity"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                $ref: "#/components/requestBodies/accessRights.grant.revoke"
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
     /command/GetUser:
         summary: "Get user's details"
         post:
@@ -3736,8 +4144,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetAccessRightObject:
-        summary: "Get access rights's object"
+        summary: "Get access rights's object; refer to /command/accessRights.object.query"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -3775,8 +4184,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/FetchAccessRightObject:
-        summary: "Fetch more access right object's details with cursor"
+        summary: "Fetch more access right object's details with cursor; refer to /command/accessRights.object.fetch"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -3803,8 +4213,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/NewAccessRightObject:
-        summary: "Create a new access right object's record"
+        summary: "Create a new access right object's record; refer to /command/accessRights.object.new"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -3829,8 +4240,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/UpdateAccessRightObject:
-        summary: "Update an existing access right object's record"
+        summary: "Update an existing access right object's record; refer to /command/accessRights.object.update"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -3855,8 +4267,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/DeleteAccessRightObject:
-        summary: "Delete an existing access right object's record"
+        summary: "Delete an existing access right object's record; refer to /command/accessRights.object.delete"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -3879,8 +4292,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/GetAccessRightAction:
-        summary: "Get access rights's action"
+        summary: "Get access rights's action; refer to /command/accessRights.action.query"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -3918,8 +4332,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/FetchAccessRightAction:
-        summary: "Fetch more access right actions with cursor"
+        summary: "Fetch more access right actions with cursor; refer to /command/accessRights.action.fetch"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -3946,8 +4361,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/NewAccessRightAction:
-        summary: "Create a new access right action's record"
+        summary: "Create a new access right action's record; refer to /command/accessRights.action.new"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -3973,8 +4389,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/UpdateAccessRightAction:
-        summary: "Update an existing access right action's record"
+        summary: "Update an existing access right action's record; refer to /command/accessRights.action.rename"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -4000,8 +4417,9 @@ paths:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
     /command/DeleteAccessRightAction:
-        summary: "Delete an existing access right action's record"
+        summary: "Delete an existing access right action's record; refer to /command/accessRights.action.delete"
         post:
+            deprecated: true
             tags:
                 -  "Access Rights"
             requestBody:
@@ -4026,6 +4444,276 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/accessRights.object.query:
+        summary: "Get access rights's object"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/request.cursor.query"
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        type: "object"
+                                        properties:
+                                            accessRightsObject:
+                                                allOf:
+                                                    - $ref: "#/components/schemas/accessRightsObject.name"
+                                                    - required:
+                                                        - name
+                                        required:
+                                            - accessRightsObject
+                                - required:
+                                    - filters
+            responses:
+                200:
+                    description: "Returned list of access rights object records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - $ref: "#/components/schemas/response.cursor"
+                                    - $ref: "#/components/schemas/response.accessRightsObjects"
+                                    - required:
+                                        - result
+                                        - accessRightsObjects
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.object.fetch:
+        summary: "Fetch more access right object's details with cursor"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                $ref: "#/components/requestBodies/fetch.with.cursor"
+            responses:
+                200:
+                    description: "Returned list of access right object records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - $ref: "#/components/schemas/response.accessRightsObjects"
+                                    - required:
+                                        - result
+                                        - accessRightsObjects
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.object.new:
+        summary: "Create a new access right object's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                accessRightsObject:
+                                    allOf:
+                                        - $ref: "#/components/schemas/accessRightsObject.name"
+                                        - type: "object"
+                                          properties:
+                                            organization:
+                                                allOf:
+                                                    - $ref: "#/components/schemas/organization.name"
+                                                    - required:
+                                                        - name
+                                        - required:
+                                            - name
+                            required:
+                                - accessRightsObject
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.object.update:
+        summary: "Update an existing access right object's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    type: "object"
+                                    properties:
+                                        accessRightsObject:
+                                            allOf:
+                                                - $ref: "#/components/schemas/accessRightsObject.name"
+                                                - required:
+                                                    - name
+                                accessRightsObject:
+                                    allOf:
+                                        - $ref: "#/components/schemas/generic.recordStatus"
+                                        - required:
+                                            - recordStatus
+                            required:
+                                - filters
+                                - accessRightsObject
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.object.delete:
+        summary: "Delete an existing access right object's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    type: "object"
+                                    properties:
+                                        accessRightsObject:
+                                            allOf:
+                                                - $ref: "#/components/schemas/accessRightsObject.name"
+                                                - required:
+                                                    - name
+                                    required:
+                                        - accessRightsObject
+                            required:
+                                - filters
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.action.query:
+        summary: "Get access rights's action"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/request.cursor.query"
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        type: "object"
+                                        properties:
+                                            accessRightsObject:
+                                                allOf:
+                                                    - $ref: "#/components/schemas/accessRightsObject.name"
+                                                    - required:
+                                                        - name
+                                        required:
+                                            - accessRightsObject
+                                - required:
+                                    - filters
+            responses:
+                200:
+                    description: "Returned list of access rights action records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - $ref: "#/components/schemas/response.cursor"
+                                    - $ref: "#/components/schemas/response.accessRightsActions"
+                                    - required:
+                                        - result
+                                        - accessRightsObjects
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.action.fetch:
+        summary: "Fetch more access right actions with cursor"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                $ref: "#/components/requestBodies/fetch.with.cursor"
+            responses:
+                200:
+                    description: "Returned list of access right action records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - $ref: "#/components/schemas/response.accessRightsActions"
+                                    - required:
+                                        - result
+                                        - accessRightsObjects
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.action.new:
+        summary: "Create a new access right action's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/request.accessRightsAction.for.new.rename"
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.action.rename:
+        summary: "Rename an existing access right action's record"
+        description: "Rename an existing access right action name to a new name defined in 'accessRightsAction.name'"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    $ref: "#/components/schemas/request.accessRightsAction.for.new.rename"
+                                accessRightsAction:
+                                    allOf:
+                                        - $ref: "#/components/schemas/accessRightsAction.name"
+                                        - required:
+                                            - name
+                            required:
+                                - accessRightsObject
+                                - accessRightsAction
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/accessRights.action.delete:
+        summary: "Delete an existing access right action's record"
+        post:
+            tags:
+                -  "Access Rights"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    $ref: "#/components/schemas/request.accessRightsAction.for.new.rename"
+                            required:
+                                - filters
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
     /command/GetPasswordPolicy:
         summary: "Get password policy's details"
         post:
