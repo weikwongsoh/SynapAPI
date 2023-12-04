@@ -1687,15 +1687,24 @@ components:
                 - type: "object"
                   properties:
                     user:
-                        $ref: "#/components/schemas/user.name"
+                        allOf:
+                            - $ref: "#/components/schemas/user.name"
+                            - required:
+                                - name
                 - type: "object"
                   properties:
                     team:
-                        $ref: "#/components/schemas/team.name"
+                        allOf:
+                            - $ref: "#/components/schemas/team.name"
+                            - required:
+                                - name
                 - type: "object"
                   properties:
                     organization:
-                        $ref: "#/components/schemas/organization.name"
+                        allOf:
+                            - $ref: "#/components/schemas/organization.name"
+                            - required:
+                                - name
         accessRightsObject.name:
             type: "object"
             properties:
@@ -2205,6 +2214,11 @@ components:
                                         allOf:
                                             - $ref: "#/components/schemas/accessRightsObject.name"
                                             - $ref: "#/components/schemas/accessRightsObject.actions"
+                                            - required:
+                                                - name
+                                                - accessRightsActions
+                                  required:
+                                    - accessRightsObject
         fetch.with.cursor:
             required: true
             content:
@@ -3041,9 +3055,9 @@ paths:
                             type: "object"
                             properties:
                                 filters:
-                                    allOf:
-                                        - $ref: "#/components/schemas/accessRights.entities"
-                                        - $ref: "#/components/schemas/accessRightsObject.name"
+                                    $ref: "#/components/schemas/accessRights.entities"
+                            required:
+                                - filters
             responses:
                 200:
                     description: "Returned list of access rights"
@@ -3054,12 +3068,18 @@ paths:
                                     - $ref: "#/components/schemas/response.result"
                                     - type: "object"
                                       properties:
-                                        accessRightObjects:
+                                        accessRightsObjects:
                                             type: "array"
                                             items:
                                                 allOf:
                                                     - $ref: "#/components/schemas/accessRightsObject.name"
                                                     - $ref: "#/components/schemas/accessRightsObject.actions"
+                                                    - required:
+                                                        - name
+                                                        - accessRightsActions
+                                    - required:
+                                        - result
+                                        - accessRightsObjects
                 default:
                     $ref: "#/components/responses/generic.result"
     /command/accessRights.grant:
