@@ -3502,6 +3502,11 @@ components:
                     - $ref: "#/components/schemas/attribute.securityPolicy.maximumSessions"
                     - $ref: "#/components/schemas/attribute.securityPolicy.sessionExceededPolicy"
                     - $ref: "#/components/schemas/organization.identifier"
+                    - type: "object"
+                      properties:
+                        passwordPolicy:
+                            allOf:
+                                - $ref: "#/components/schemas/attribute.passwordPolicy.identifier"
         response.organization.records:
             type: "array"
             items:
@@ -8184,6 +8189,7 @@ paths:
                                             - $ref: "#/components/schemas/attribute.securityPolicy.maximumSessions"
                                             - $ref: "#/components/schemas/attribute.securityPolicy.sessionExceededPolicy"
                                 - $ref: "#/components/schemas/multiFactorAuthentication.name"
+                                - $ref: "#/components/schemas/passwordPolicy.name"
                                 - $ref: "#/components/schemas/organization.name"
                             required:
                                 - securityPolicy
@@ -8219,6 +8225,7 @@ paths:
                                             - $ref: "#/components/schemas/attribute.securityPolicy.maximumSessions"
                                             - $ref: "#/components/schemas/attribute.securityPolicy.sessionExceededPolicy"
                                 - $ref: "#/components/schemas/multiFactorAuthentication.name"
+                                - $ref: "#/components/schemas/passwordPolicy.name"
                                 - required:
                                     - filters
             responses:
@@ -10312,9 +10319,11 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
-    /command/SendPaymentReceipt:
+    /command/SendPaymentReceipt:  # deprecated
         summary: "Send a payment receipt"
         post:
+            summary: "refer to those supported send commands such as 'sendMail' and etc"
+            deprecated: true
             tags:
                 -  "Payment [TODO]"
             requestBody:
