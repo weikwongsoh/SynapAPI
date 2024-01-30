@@ -1562,6 +1562,7 @@ components:
                             - $ref: "#/components/schemas/attribute.customer.identifier"
                             - required:
                                 - identifier
+
         attribute.email.address:
             type: "object"
             properties:
@@ -1734,10 +1735,10 @@ components:
                     description: "date & time of last activity"
                     type: "string"
                     format: "date-time"
-        attribute.user.expiryInSeconds:
+        attribute.user.expirySeconds:
             type: "object"
             properties:
-                expiryInSeconds:
+                expirySeconds:
                     description: "expiry in seconds"
                     type: "integer"
                     format: "int32"
@@ -1909,20 +1910,20 @@ components:
                     description: "an unique name to identify an organization which name must not consists of spaces"
                     type: "string"
                     example: "john_smith_ltd"
-        attribute.organization.fullname:
+        attribute.organization.preferName:
             type: "object"
             properties:
-                fullname:
+                preferName:
                     description: "a legal name of organization"
                     type: "string"
                     example: "John Smith Ltd"
-        attribute.organization.externalIdentifier:
+        attribute.organization.externalIdentity:
             type: "object"
             properties:
-                externalIdentifier:
+                externalIdentity:
                     description: "an arbitrary value stored along with the organization record; the system does not interpret this value in anyway"
                     type: "string"
-                    example: "external identifier"
+                    example: "external identity"
         organization.name:
             type: "object"
             properties:
@@ -1937,12 +1938,12 @@ components:
                 organization:
                     allOf:
                         - $ref: "#/components/schemas/attribute.organization.identifier"
-        organization.fullname:
+        organization.preferName:
             type: "object"
             properties:
                 organization:
                     allOf:
-                        - $ref: "#/components/schemas/attribute.organization.fullname"
+                        - $ref: "#/components/schemas/attribute.organization.preferName"
         paymentInstrumentNumber.name:
             type: "object"
             properties:
@@ -2023,10 +2024,10 @@ components:
                     description: "finger print of a payment instrument"
                     type: "string"
                     example: "hP03HC0bta2WkHt4"
-        attribute.paymentInstrument.expiry:
+        attribute.paymentInstrument.expiryDateMMYY:
             type: "object"
             properties:
-                expiry:
+                expiryDateMMYY:
                     description: "expiry date (MMYY) of a payment instrument"
                     type: "string"
                     example: "1224"
@@ -2340,6 +2341,8 @@ components:
                     type: "string"
                     description: "unique name of the multi factor authentication's object"
                     example: "<name of multi factor authentication>"
+                    enum:
+                        - "2fa"
         attribute.multiFactorAuthentication.identifier:
             type: "object"
             properties:
@@ -2347,6 +2350,91 @@ components:
                     type: "string"
                     description: "unique identifier of the multi factor authentication's object"
                     example: "<multi factor authentication's identifier>"
+        attribute.multiFactorAuthentication.timeZero:
+            type: "object"
+            properties:
+                timeZero:
+                    type: "integer"
+                    format: "int32"
+                    description: "the Unix time to start counting TimeStep's (default is zero, the 'epoch' of when Unix time began)"
+                    example: 0
+        attribute.multiFactorAuthentication.timeStep:
+            type: "object"
+            properties:
+                timeStep:
+                    type: "integer"
+                    format: "int32"
+                    description: "represents the time steps in seconds (default 30); attempts to generate a new secret code within the same time step, will generate the same value"
+                    example: 30
+        attribute.multiFactorAuthentication.syncFactor:
+            type: "object"
+            properties:
+                syncFactor:
+                    type: "integer"
+                    format: "int32"
+                    description: "to be used with token generators and determines how far into the future the algorithm will look to make a match"
+                    example: 0
+        attribute.multiFactorAuthentication.delayFactor:
+            type: "object"
+            properties:
+                delayFactor:
+                    type: "integer"
+                    format: "int32"
+                    description: "determines how far back in time the the system goes to validate the secret code; the delay factor is expressed as the number of time steps to look back; the default attempts to provide a delay of around 60 seconds and depends on the value of TimeStep; for example, if TimeStep is 20 seconds, then the DelayFactor will be 2 (20 for the current window and 2 more TimeStep intervals into the past to complete 60 seconds)"
+                    example: 60
+        attribute.multiFactorAuthentication.throttleFactor:
+            type: "object"
+            properties:
+                throttleFactor:
+                    type: "integer"
+                    format: "int32"
+                    description: "a counter to guard against brute force attacks; this is similar to the failed login count for regular login's; an user entering this many incorrect secret code's in a row will have their record locked; a value of zero, turns throttling checking off"
+                    example: 0
+        attribute.multiFactorAuthentication.secretCodeLength:
+            type: "object"
+            properties:
+                secretCodeLength:
+                    type: "integer"
+                    format: "int32"
+                    description: "the number of bytes of secret code to be generated; the default is 6"
+                    example: 6
+        attribute.multiFactorAuthentication.offlineSecretCodeLength:
+            type: "object"
+            properties:
+                offlineSecretCodeLength:
+                    type: "integer"
+                    format: "int32"
+                    description: "the number of bytes of secret code to be generated for offline values. The default is 8"
+                    example: 8
+        attribute.multiFactorAuthentication.digestAlgorithm:
+            type: "object"
+            properties:
+                digestAlgorithm:
+                    type: "string"
+                    description: "the name of the digest algorithm to use; the default is 'SHA1'"
+                    example: "SHA1"
+        attribute.multiFactorAuthentication.tokenDeviceName:
+            type: "object"
+            properties:
+                tokenDeviceName:
+                    type: "string"
+                    description: "the symbolic name of the token device"
+                    example: "token_device"
+        attribute.multiFactorAuthentication.tokenDeviceSerial:
+            type: "object"
+            properties:
+                tokenDeviceSerial:
+                    type: "string"
+                    description: "the serial number of the token device"
+                    example: "token_device_serial"
+        attribute.multiFactorAuthentication.failedAttemptCount:
+            type: "object"
+            properties:
+                failedAttemptCount:
+                    type: "integer"
+                    format: "int32"
+                    description: "this counter maintains the number of consecutive failed validations and is reset to zero when an OTP is correctly validated; this is a cumulative value across all key streams"
+                    example: 0
         multiFactorAuthentication.name:
             type: "object"
             properties:
@@ -2661,10 +2749,10 @@ components:
                         - "email"
                         - "landline"
                         - "url"
-        attribute.contact.addressNumber:
+        attribute.contact.addressOrNumber:
             type: "object"
             properties:
-                addressNumber:
+                addressOrNumber:
                     description: "the plain text address/number of a contact; it will be empty if the actor is not the target user; this element holds the address/number which has been parsed by the system"
                     type: "string"
         attribute.contact.classification:
@@ -2680,17 +2768,11 @@ components:
                 identifier:
                     description: "a special string which can be used to uniquely identify the record at a later time; applications should never attempt to set the contact key directly; rather the system will provide a key for the record based on an internal algorithm"
                     type: "string"
-        attribute.contact.maskedAddressNumber:
+        attribute.contact.maskedData:
             type: "object"
             properties:
-                maskedAddressNumber:
-                    description: "the contact address/number masked for security purposes; an application must only display the masked address even if a plain text address is present in the response"
-                    type: "string"
-        attribute.contact.originalAddressNumber:
-            type: "object"
-            properties:
-                originalAddressNumber:
-                    description: "the plain text address for this contact; it will be empty if the actor is not the target user; this element holds the address string as entered by the user when the record was created or updated"
+                maskedData:
+                    description: "the masked data of contact for security purposes; an application must only display the masked data even if a plain text address or number is present in the response"
                     type: "string"
         attribute.contact.flags:
             type: "object"
@@ -2730,11 +2812,11 @@ components:
                         - $ref: "#/components/schemas/attribute.contact.identifier"
                         - required:
                             - identifier
-        attribute.location.ipAddress:
+        attribute.location.name:
             type: "object"
             properties:
-                ipAddress:
-                    description: "IP address of the device currently used"
+                name:
+                    description: "name of the user's device currently used such as ip address, mac address, terminal name, and etc"
                     type: "string"
                     example: "192.168.1.1"
         attribute.location.currentTimestamp:
@@ -2842,10 +2924,10 @@ components:
                     type: "integer"
                     format: "int32"
                     example: 1
-        attribute.device.totalFailedVerifications:
+        attribute.device.totalFailedVerificationAttempts:
             type: "object"
             properties:
-                totalFailedVerifications:
+                totalFailedVerificationAttempts:
                     description: "total nunber of failed verification attempted"
                     type: "integer"
                     format: "int32"
@@ -2869,8 +2951,9 @@ components:
             properties:
                 isoNumericCode:
                     description: "the ISO-4216 numeric currency code"
-                    type: "string"
-                    example: "840"
+                    type: "integer"
+                    format: "int32"
+                    example: 840
         attribute.currency.symbol:
             type: "object"
             properties:
@@ -3062,18 +3145,18 @@ components:
                         failed:
                             description: "failed transaction"
                             type: "boolean"
-        attribute.transaction.description:
+        attribute.transaction.descriptiveText:
             type: "object"
             properties:
-                description:
-                    description: "more descriptive text about the payment"
+                descriptiveText:
+                    description: "more descriptive text about the transaction"
                     type: "string"
                     example: "Help us protect children around the world"
-        attribute.transaction.purposeOfPayment:
+        attribute.transaction.purpose:
             type: "object"
             properties:
-                purposeOfPayment:
-                    description: "purpose of the payment transaction which could be product's description of this payment for"
+                purpose:
+                    description: "purpose of the transaction which could be product's description of this transaction for"
                     type: "string"
                     example: "Donate For Child"
         attribute.transaction.authorizationCode:
@@ -3281,10 +3364,10 @@ components:
                         - "pay"
                         - "donate"
                         - "book"
-        attribute.url.path:
+        attribute.url.address:
             type: "object"
             properties:
-                path:
+                address:
                     description: "full URL path with end point to initiate the payment process"
                     type: "string"
                     format: "uri"
@@ -3426,11 +3509,10 @@ components:
             allOf:
                 - $ref: "#/components/schemas/attribute.contact.type"
                 - $ref: "#/components/schemas/attribute.recordStatus"
-                - $ref: "#/components/schemas/attribute.contact.addressNumber"
+                - $ref: "#/components/schemas/attribute.contact.addressOrNumber"
                 - $ref: "#/components/schemas/attribute.contact.classification"
                 - $ref: "#/components/schemas/attribute.contact.identifier"
-                - $ref: "#/components/schemas/attribute.contact.maskedAddressNumber"
-                - $ref: "#/components/schemas/attribute.contact.originalAddressNumber"
+                - $ref: "#/components/schemas/attribute.contact.maskedData"
                 - $ref: "#/components/schemas/attribute.contact.flags"
         response.contact.records:
             anyOf:
@@ -3516,8 +3598,8 @@ components:
                     - $ref: "#/components/schemas/attribute.recordTimestamp"
                     - $ref: "#/components/schemas/attribute.organization.name"
                     - $ref: "#/components/schemas/attribute.organization.identifier"
-                    - $ref: "#/components/schemas/attribute.organization.externalIdentifier"
-                    - $ref: "#/components/schemas/attribute.organization.fullname"
+                    - $ref: "#/components/schemas/attribute.organization.externalIdentity"
+                    - $ref: "#/components/schemas/attribute.organization.preferName"
                     - type: "object"
                       properties:
                         restricted:
@@ -3534,7 +3616,7 @@ components:
                     - $ref: "#/components/schemas/attribute.user.identifier"
                     - $ref: "#/components/schemas/attribute.recordStatus"
                     - $ref: "#/components/schemas/attribute.user.lastActivityTimestamp"
-                    - $ref: "#/components/schemas/attribute.user.expiryInSeconds"
+                    - $ref: "#/components/schemas/attribute.user.expirySeconds"
                     - $ref: "#/components/schemas/attribute.user.activeSessions"
                     - $ref: "#/components/schemas/node.identifier"
         response.session.records:
@@ -3552,7 +3634,7 @@ components:
                       properties:
                         location:
                             allOf:
-                                - $ref: "#/components/schemas/attribute.location.ipAddress"
+                                - $ref: "#/components/schemas/attribute.location.name"
         response.currency.record:
             allOf:
                 - $ref: "#/components/schemas/attribute.currency.name"
@@ -3594,8 +3676,8 @@ components:
                     - $ref: "#/components/schemas/attribute.transaction.localDate"
                     - $ref: "#/components/schemas/attribute.transaction.localTime"
                     - $ref: "#/components/schemas/attribute.transaction.retrievalReferenceNumber"
-                    - $ref: "#/components/schemas/attribute.transaction.description"
-                    - $ref: "#/components/schemas/attribute.transaction.purposeOfPayment"
+                    - $ref: "#/components/schemas/attribute.transaction.descriptiveText"
+                    - $ref: "#/components/schemas/attribute.transaction.purpose"
                     - $ref: "#/components/schemas/attribute.transaction.authorizationCode"
                     - $ref: "#/components/schemas/currency.isoNumericCode"
                     - type: "object"
@@ -3615,7 +3697,7 @@ components:
                                 - $ref: "#/components/schemas/attribute.paymentInstrument.maskedNumber"
                                 - $ref: "#/components/schemas/attribute.paymentInstrument.cryptogram"
                                 - $ref: "#/components/schemas/attribute.paymentInstrument.fingerprint"
-                                - $ref: "#/components/schemas/attribute.paymentInstrument.expiry"
+                                - $ref: "#/components/schemas/attribute.paymentInstrument.expiryDateMMYY"
                                 - $ref: "#/components/schemas/country.isoNumericCode"
                                 - $ref: "#/components/schemas/currency.isoNumericCode"
                                 - type: "object"
@@ -3674,7 +3756,32 @@ components:
                                 - $ref: "#/components/schemas/attribute.currency.isoNumericCode"
                         url:
                             allOf:
-                                - $ref: "#/components/schemas/attribute.url.path"
+                                - $ref: "#/components/schemas/attribute.url.address"
+        response.multiFactorAuthentication.records:
+            type: "array"
+            items:
+                allOf:
+                    - $ref: "#/components/schemas/attribute.user.name"
+                    - type: "object"
+                      properties:
+                        multiFactorAuthentication:
+                            allOf:
+                                - $ref: "#/components/schemas/attribute.rowId"
+                                - $ref: "#/components/schemas/attribute.recordStatus"
+                                - $ref: "#/components/schemas/attribute.recordTimestamp"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.identifier"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.name"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.timeZero"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.timeStep"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.syncFactor"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.delayFactor"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.throttleFactor"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.secretCodeLength"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.offlineSecretCodeLength"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.digestAlgorithm"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.tokenDeviceName"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.tokenDeviceSerial"
+                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.failedAttemptCount"
     parameters:
         SessionToken:
             name: "x-synap-SessionToken"
@@ -4154,8 +4261,7 @@ paths:
                                                 - $ref: "#/components/schemas/passwordPolicy.minimumLength"
                                                 - $ref: "#/components/schemas/passwordPolicy.validationChecks"
                                                 - $ref: "#/components/schemas/organization.name"
-                                                - $ref: "#/components/schemas/organization.fullname"
-                                                - $ref: "#/components/schemas/merchant.identifier"
+                                                - $ref: "#/components/schemas/organization.preferName"
                                                 - $ref: "#/components/schemas/merchant.identifier"
                                     - required:
                                         - result
@@ -4451,7 +4557,7 @@ paths:
                                   properties:
                                     location:
                                         allOf:
-                                            - $ref: "#/components/schemas/attribute.location.ipAddress"
+                                            - $ref: "#/components/schemas/attribute.location.name"
                                             - $ref: "#/components/schemas/attribute.location.currentTimestamp"
                                             - required:
                                                 - ipAddress
@@ -4531,7 +4637,7 @@ paths:
                                             - passwordResetToken
                                 location:
                                     allOf:
-                                        - $ref: "#/components/schemas/attribute.location.ipAddress"
+                                        - $ref: "#/components/schemas/attribute.location.name"
                                         - required:
                                             - ipAddress
                             required:
@@ -5236,8 +5342,9 @@ paths:
                                     filters:
                                         allOf:
                                             - $ref: "#/components/schemas/user.name"
-                                            - required:
-                                                - user
+                                            - $ref: "#/components/schemas/organization.name"
+                                            - $ref: "#/components/schemas/team.name"
+                                            - $ref: "#/components/schemas/securityPolicy.name"
                                 - required:
                                     - filters
             responses:
@@ -5911,7 +6018,7 @@ paths:
     /command/GetUserContact:  # deprecated
         summary: "Get user's contact"
         post:
-            summary: "refer to /command/userContact.query"
+            summary: "refer to /command/user.contact.query"
             deprecated: true
             tags:
                 -  "User"
@@ -5962,7 +6069,7 @@ paths:
     /command/FetchUserContact:  # deprecated
         summary: "Fetch more user's contacts with cursor"
         post:
-            summary: "refer to /command/userContact.fetch"
+            summary: "refer to /command/user.contact.fetch"
             deprecated: true
             tags:
                 -  "User"
@@ -5995,7 +6102,7 @@ paths:
     /command/GetUserContactOfAnUser:  # deprecated
         summary: "Get an user's contact"
         post:
-            summary: "refer to /command/userContact.query.for.an.user"
+            summary: "refer to /command/user.contact.query.for.an.user"
             deprecated: true
             tags:
                 -  "User"
@@ -6052,7 +6159,7 @@ paths:
     /command/NewUserContact:  # deprecated
         summary: "Create a new contact's record"
         post:
-            summary: "refer to /command/userContact.new"
+            summary: "refer to /command/user.contact.new"
             deprecated: true
             tags:
                 -  "User"
@@ -6093,7 +6200,7 @@ paths:
     /command/UpdateUserContact:  # deprecated
         summary: "Update an existing contact's record"
         post:
-            summary: "refer to /command/userContact.update"
+            summary: "refer to /command/user.contact.update"
             deprecated: true
             tags:
                 -  "User"
@@ -6133,7 +6240,7 @@ paths:
     /command/DeleteUserContact:  # deprecated
         summary: "Delete an existing contact's record"
         post:
-            summary: "refer to /command/userContact.delete"
+            summary: "refer to /command/user.contact.delete"
             deprecated: true
             tags:
                 -  "User"
@@ -6169,7 +6276,7 @@ paths:
     /command/VerifyUserContact:  # deprecated
         summary: "Verify an existing contact's record"
         post:
-            summary: "refer to /command/userContact.verify"
+            summary: "refer to /command/user.contact.verify"
             deprecated: true
             tags:
                 -  "User"
@@ -6202,7 +6309,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
-    /command/userContact.query:
+    /command/user.contact.query:
         summary: "Get user's contact"
         post:
             tags:
@@ -6224,7 +6331,7 @@ paths:
                                                     - $ref: "#/components/schemas/attribute.contact.type"
                                                     - $ref: "#/components/schemas/attribute.contact.classification"
                                                     - $ref: "#/components/schemas/attribute.contact.identifier"
-                                                    - $ref: "#/components/schemas/attribute.contact.addressNumber"
+                                                    - $ref: "#/components/schemas/attribute.contact.addressOrNumber"
                                                     - $ref: "#/components/schemas/attribute.contact.flags"
                                         - required:
                                             - user
@@ -6254,7 +6361,7 @@ paths:
                                         - users
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/userContact.fetch:
+    /command/user.contact.fetch:
         summary: "Fetch more user's contacts with cursor"
         post:
             tags:
@@ -6284,7 +6391,7 @@ paths:
                                         - users
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/userContact.query.for.an.user:
+    /command/user.contact.query.for.an.user:
         summary: "Get an user's contact"
         post:
             tags:
@@ -6316,7 +6423,7 @@ paths:
                                     - result
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/userContact.new:
+    /command/user.contact.new:
         summary: "Create a new contact record for an existing user"
         post:
             tags:
@@ -6334,7 +6441,7 @@ paths:
                                         allOf:
                                             - $ref: "#/components/schemas/attribute.contact.type"
                                             - $ref: "#/components/schemas/attribute.contact.classification"
-                                            - $ref: "#/components/schemas/attribute.contact.addressNumber"
+                                            - $ref: "#/components/schemas/attribute.contact.addressOrNumber"
                                             - $ref: "#/components/schemas/attribute.contact.flags"
                                             - required:
                                                 - type
@@ -6345,7 +6452,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/userContact.update:
+    /command/user.contact.update:
         summary: "Update an existing user's contact record"
         post:
             tags:
@@ -6367,7 +6474,7 @@ paths:
                                                     - $ref: "#/components/schemas/attribute.contact.type"
                                                     - $ref: "#/components/schemas/attribute.contact.classification"
                                                     - $ref: "#/components/schemas/attribute.contact.identifier"
-                                                    - $ref: "#/components/schemas/attribute.contact.addressNumber"
+                                                    - $ref: "#/components/schemas/attribute.contact.addressOrNumber"
                                                     - $ref: "#/components/schemas/attribute.contact.flags"
                                         - required:
                                             - user
@@ -6375,7 +6482,7 @@ paths:
                                 contact:
                                     allOf:
                                         - $ref: "#/components/schemas/attribute.contact.classification"
-                                        - $ref: "#/components/schemas/attribute.contact.addressNumber"
+                                        - $ref: "#/components/schemas/attribute.contact.addressOrNumber"
                                         - $ref: "#/components/schemas/attribute.contact.flags"
                             required:
                                 - filters
@@ -6383,7 +6490,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/userContact.delete:
+    /command/user.contact.delete:
         summary: "Delete an existing user's contact record"
         post:
             tags:
@@ -6413,7 +6520,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/userContact.verify:
+    /command/user.contact.verify:
         summary: "Verify an existing user's contact record"
         post:
             tags:
@@ -8499,8 +8606,8 @@ paths:
                                     organization:
                                         allOf:
                                             - $ref: "#/components/schemas/attribute.organization.name"
-                                            - $ref: "#/components/schemas/attribute.organization.externalIdentifier"
-                                            - $ref: "#/components/schemas/attribute.organization.fullname"
+                                            - $ref: "#/components/schemas/attribute.organization.externalIdentity"
+                                            - $ref: "#/components/schemas/attribute.organization.preferName"
                                             - type: "object"
                                               properties:
                                                 restricted:
@@ -8539,8 +8646,8 @@ paths:
                                     organization:
                                         allOf:
                                             - $ref: "#/components/schemas/attribute.recordStatus"
-                                            - $ref: "#/components/schemas/attribute.organization.externalIdentifier"
-                                            - $ref: "#/components/schemas/attribute.organization.fullname"
+                                            - $ref: "#/components/schemas/attribute.organization.externalIdentity"
+                                            - $ref: "#/components/schemas/attribute.organization.preferName"
                                 - $ref: "#/components/schemas/securityPolicy.name"
                                 - $ref: "#/components/schemas/team.name"
                                 - required:
@@ -9172,7 +9279,7 @@ paths:
                                                     - $ref: "#/components/schemas/attribute.device.authenticationData"
                                                     - $ref: "#/components/schemas/attribute.device.lastVerificationTimestamp"
                                                     - $ref: "#/components/schemas/attribute.device.totalVerificationAttempts"
-                                                    - $ref: "#/components/schemas/attribute.device.totalFailedVerifications"
+                                                    - $ref: "#/components/schemas/attribute.device.totalFailedVerificationAttempts"
                                     - required:
                                         - result
                                         - devices
@@ -9204,6 +9311,78 @@ paths:
                                 - required:
                                     - filters
             responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/multiFactorAuthentication.activated.users.query:
+        summary: "Retrieve list of users who activate multi factor authentication"
+        post:
+            tags:
+                -  "Multi Factor Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/request.cursor.query"
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        allOf:
+                                            - $ref: "#/components/schemas/user.name"
+                                            - type: "object"
+                                              properties:
+                                                multiFactorAuthentication:
+                                                    allOf:
+                                                        - $ref: "#/components/schemas/attribute.multiFactorAuthentication.name"
+                                                        - required:
+                                                            - name
+                                            - required:
+                                                - user
+                                                - multiFactorAuthentication
+                                - required:
+                                    - filters
+            responses:
+                200:
+                    description: "Returned list of users and the related multi factor authentication record"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        users:
+                                            allOf:
+                                                - $ref: "#/components/schemas/response.multiFactorAuthentication.records"
+                                    - required:
+                                        - result
+                                        - users
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/multiFactorAuthentication.activated.users.fetch:
+        summary: "Fetch more multi factor authentication activated users with cursor"
+        post:
+            tags:
+                -  "Multi Factor Authentication"
+            requestBody:
+                $ref: "#/components/requestBodies/fetch.with.cursor"
+            responses:
+                200:
+                    description: "Returned list of organization records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        users:
+                                            allOf:
+                                                - $ref: "#/components/schemas/response.multiFactorAuthentication.records"
+                                    - required:
+                                        - result
+                                        - users
                 default:
                     $ref: "#/components/responses/generic.result"
     /command/GetCurrency:  # deprecated
@@ -10071,7 +10250,7 @@ paths:
                                                 - $ref: "#/components/schemas/attribute.paymentToken.identifier"
                                         url:
                                             allOf:
-                                                - $ref: "#/components/schemas/attribute.url.path"
+                                                - $ref: "#/components/schemas/attribute.url.address"
                                                 - required:
                                                     - path
                                     - required:
