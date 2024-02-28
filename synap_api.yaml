@@ -1862,12 +1862,119 @@ components:
                     description: "the merchant's name and location"
                     type: "string"
                     example: "PC21  Test Merchant      Newtwon SquPADE"
+        attribute.merchant.parent:
+            type: "object"
+            properties:
+                parent:
+                    description: "the merchant parent's parameters to be used for this merchant"
+                    type: "string"
+                    maxLength: 25
+        attribute.merchant.numberOfDevices:
+            type: "object"
+            properties:
+                numberOfDevices:
+                    description: "indicates the number of devices deployed to a merchant"
+                    type: "integer"
+                    maxLength: 0
+        attribute.merchant.allowedCaptureMethods:
+            type: "object"
+            properties:
+                allowedCaptureMethods:
+                    description: "a vector with each byte representing a capture method; a 'y' or 'n' determines if we allow the capture method for the merchant"
+                    type: "string"
+                    maxLength: 25
+                    example: "Y"
+        attribute.merchant.flexibleCurrency:
+            type: "object"
+            properties:
+                flexibleCurrency:
+                    description: "indicates if the merchant is allowed to initiate a transaction with currency different than the default; In case of cross border processing, this flag must be turned on"
+                    type: "boolean"
+                    example: false
+        attribute.merchant.crossBorder:
+            type: "object"
+            properties:
+                crossBorder:
+                    description: "indicates if the merchant is allowed to initiate transaction across country border"
+                    type: "boolean"
+                    example: false
+        attribute.merchant.restrictedLocation:
+            type: "object"
+            properties:
+                restrictedLocation:
+                    description: "indicates if location restriction is imposed on the merchant"
+                    type: "boolean"
+                    example: false
+        attribute.merchant.businessHourClose:
+            type: "object"
+            properties:
+                businessHourClose:
+                    description: "the time of day when the merchant's business is closed"
+                    type: "string"
+                    format: "time"
+                    example: "19:00:00"
+        attribute.merchant.allowedServices:
+            type: "object"
+            properties:
+                allowedServices:
+                    description: "the services does the merchant allow to perform"
+                    type: "string"
+                    maxLength: 50
+        attribute.merchant.restrictedLatitude:
+            type: "object"
+            properties:
+                restrictedLatitude:
+                    description: "latitude of restricted location"
+                    type: "number"
+                    example: 3.1575
+        attribute.merchant.restrictedLongitude:
+            type: "object"
+            properties:
+                restrictedLongitude:
+                    description: "longtitude of restricted location"
+                    type: "number"
+                    example: 101.711
+        attribute.merchant.restrictedRadius:
+            type: "object"
+            properties:
+                restrictedRadius:
+                    description: "readius of restricted location"
+                    type: "number"
+                    example: 5
+        attribute.merchant.effectiveTimestamp:
+            type: "object"
+            properties:
+                effectiveTimestamp:
+                    description: "timestamp of when a merchant becomes active"
+                    type: "string"
+                    format: "date-time"
+        attribute.merchant.expiryTimestamp:
+            type: "object"
+            properties:
+                expiryTimestamp:
+                    description: "timestamp of when a merchant becomes inactive"
+                    type: "string"
+                    format: "date-time"
         merchant.identifier:
             type: "object"
             properties:
                 merchant:
                     allOf:
                         - $ref: "#/components/schemas/attribute.merchant.identifier"
+        attribute.business.preferName:
+            type: "object"
+            properties:
+                preferName:
+                    description: "a name of business"
+                    type: "string"
+                    example: "John Smith Ltd"
+        attribute.business.otherName:
+            type: "object"
+            properties:
+                otherName:
+                    description: "an other name of business"
+                    type: "string"
+                    example: "John Smith"
         attribute.team.name:
             type: "object"
             properties:
@@ -2435,6 +2542,59 @@ components:
                     format: "int32"
                     description: "this counter maintains the number of consecutive failed validations and is reset to zero when an OTP is correctly validated; this is a cumulative value across all key streams"
                     example: 0
+        attribute.multiFactorAuthentication.keystream:
+            type: "object"
+            properties:
+                keystream:
+                    type: "string"
+                    description: |
+                        keystream determines the type of secret code generated; the following describes the valid values:-
+                        login          the default keystream and requests a verification code which can be used
+                                       for login purposes;
+                        offline        this generates one or more offline codes which can be used in place of a
+                                       login value
+                        address        this should be used when attempting to validate ownership of a device or email;
+                                       this keystream requires the address element be present to specify the target
+                                       address to which the verification code will be sent
+                        application    this can be used by an application to generate verification codes for their
+                                       private use
+                    enum:
+                        - "login"
+                        - "offline"
+                        - "address"
+                        - "application"
+        attribute.multiFactorAuthentication.keystreamAddress:
+            type: "object"
+            properties:
+                keystreamAddress:
+                    type: "string"
+                    description: |
+                        the address element can be set to cause the system to send the secret code directly
+                        to the device/email rather than return the code to the application;
+                        below are the valid values:-
+                        auto               this symbolic address causes the system to choose the primary address
+                                           available to the user; the system first searches for a mobile device
+                                           address followed by an email address; the user account is searched first
+                                           followed by their contact information (that is the kauth_user table is
+                                           examined first followed by examination of the kauth_contact table); the
+                                           first address found is considered the user’s primary address
+                        sms                this symbolic address causes the system to choose the primary mobile
+                                           device address
+                        email              this symbolic address causes the system to choose the primary email
+                                           address for the user
+                        <mobile number>    a valid mobile number can include the following characters: digits,
+                                           ‘+’, ‘(‘, ‘)’, ‘-‘ and spaces. For example: +1(416) 555-5555 is a valid
+                                           mobile number
+                        <email address>    a valid email address has the format: string ‘@’ string.string without
+                                           intervening spaces
+                    example: "<mobile number>"
+        attribute.multiFactorAuthentication.secretCode:
+            type: "object"
+            properties:
+                secretCode:
+                    type: "string"
+                    description: "secret code that sent to user's device privately"
+                    example: "<secret code>"
         multiFactorAuthentication.name:
             type: "object"
             properties:
@@ -2906,7 +3066,7 @@ components:
             type: "object"
             properties:
                 authenticationData:
-                    description: "the biometric authentication data, encrypted under the devices public and encoded as a base64 value; the application must store the authentication data and present its hash (using SHA256) in future attempts to authenticate the user on this specific device"
+                    description: "this value is returned by the server when biometric login is attempted and is encrypted using the public key of the device and base64 encoded; the device must save this value (encrypted) and on the next biometric login attempt must present this value hashed using SHA256 and encoded as a base64 value; even if the login failed, the device must check for and store the returned value"
                     type: "string"
                     example: "<Base64 encoded biometric authentication data>"
         attribute.device.lastVerificationTimestamp:
@@ -3187,6 +3347,12 @@ components:
                     description: "An unique text to identify an acquirer"
                     type: "string"
                     example: "acquirer_identifier"
+        acquirer.identifier:
+            type: "object"
+            properties:
+                acquirer:
+                    allOf:
+                        - $ref: "#/components/schemas/attribute.acquirer.identifier"
         attribute.issuer.identifier:
             type: "object"
             properties:
@@ -3386,6 +3552,179 @@ components:
                     description: "the end record timestamp on a query request"
                     type: "string"
                     format: "date"
+        attribute.fee.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique text to identify a fee"
+                    type: "string"
+                    example: "fee_identifier"
+        fee.identifier:
+            type: "object"
+            properties:
+                fee:
+                    allOf:
+                        - $ref: "#/components/schemas/attribute.fee.identifier"
+        attribute.limit.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique text to identify a limit"
+                    type: "string"
+                    example: "0001"
+        attribute.limit.useExtended:
+            type: "object"
+            properties:
+                useExtended:
+                    description: "indicate if extended limit shall be applied to the merchant"
+                    type: "boolean"
+                    example: false
+        attribute.limit.dailyMaximumAmount:
+            type: "object"
+            properties:
+                dailyMaximumAmount:
+                    description: "the daily maximum of accumulated transaction amount allowed for a merchant"
+                    type: "number"
+                    example: 0.0
+        attribute.limit.dailyMaximumCount:
+            type: "object"
+            properties:
+                dailyMaximumCount:
+                    description: "the daily maximum of accumulated number of transaction allowed for a merchant"
+                    type: "number"
+                    example: 0.0
+        attribute.limit.weeklyMaximumAmount:
+            type: "object"
+            properties:
+                weeklyMaximumAmount:
+                    description: "the weekly maximum of accumulated transaction amount allowed for a merchant"
+                    type: "number"
+                    example: 0.0
+        attribute.limit.weeklyMaximumCount:
+            type: "object"
+            properties:
+                weeklyMaximumCount:
+                    description: "the weekly maximum of accumulated number of transaction allowed for a merchant"
+                    type: "number"
+                    example: 0.0
+        attribute.limit.monthlyMaximumAmount:
+            type: "object"
+            properties:
+                monthlyMaximumAmount:
+                    description: "the monthly maximum of accumulated transaction amount allowed for a merchant"
+                    type: "number"
+                    example: 0.0
+        attribute.limit.monthlyMaximumCount:
+            type: "object"
+            properties:
+                monthlyMaximumCount:
+                    description: "the monthly maximum of accumulated number of transaction allowed for a merchant"
+                    type: "number"
+                    example: 0.0
+        attribute.limit.EMVChipMaximumAmount:
+            type: "object"
+            properties:
+                EMVChipMaximumAmount:
+                    description: "the maximum of accumulated EMV chip transaction amount allowed for a merchant"
+                    type: "number"
+                    example: 0.0
+        attribute.limit.magneticStripeMaximumAmount:
+            type: "object"
+            properties:
+                magneticStripeMaximumAmount:
+                    description: "the maximum of accumulated magnetic strip transaction amount allowed for a merchant"
+                    type: "number"
+                    example: 0.0
+        attribute.limit.manualEntryMaximumAmount:
+            type: "object"
+            properties:
+                manualEntryMaximumAmount:
+                    description: "the maximum of accumulated manual entry transaction amount allowed for a merchant"
+                    type: "number"
+                    example: 0.0
+        limit.identifier:
+            type: "object"
+            properties:
+                limit:
+                    allOf:
+                        - $ref: "#/components/schemas/attribute.limit.identifier"
+        attribute.total.identifier:
+            type: "object"
+            properties:
+                identifier:
+                    description: "An unique text to identify a total/accumulation"
+                    type: "string"
+                    example: "0001"
+        attribute.total.useExtended:
+            type: "object"
+            properties:
+                useExtended:
+                    description: "indicate if extended total/accumulation shall be applied to the merchant"
+                    type: "boolean"
+                    example: false
+        attribute.total.accumulationMethod:
+            type: "object"
+            properties:
+                accumulationMethod:
+                    description: "method used for total/accumulation"
+                    type: "string"
+        attribute.total.dailyLastTimestamp:
+            type: "object"
+            properties:
+                dailyLastTimestamp:
+                    description: "last timestamp of a daily accumulation is calculated"
+                    type: "string"
+                    format: "date-time"
+        attribute.total.dailyAccumulatedAmount:
+            type: "object"
+            properties:
+                dailyAccumulatedAmount:
+                    description: "a daily accumulated transaction amount"
+                    type: "number"
+        attribute.total.dailyAccumulatedCount:
+            type: "object"
+            properties:
+                dailyAccumulatedCount:
+                    description: "a daily accumulated number of transactions"
+                    type: "integer"
+        attribute.total.weeklyLastTimestamp:
+            type: "object"
+            properties:
+                weeklyLastTimestamp:
+                    description: "last timestamp of a weekly accumulation is calculated"
+                    type: "string"
+                    format: "date-time"
+        attribute.total.weeklyAccumulatedAmount:
+            type: "object"
+            properties:
+                weeklyAccumulatedAmount:
+                    description: "a weekly accumulated transaction amount"
+                    type: "number"
+        attribute.total.weeklyAccumulatedCount:
+            type: "object"
+            properties:
+                weeklyAccumulatedCount:
+                    description: "a weekly accumulated number of transactions"
+                    type: "integer"
+        attribute.total.monthlyLastTimestamp:
+            type: "object"
+            properties:
+                monthlyLastTimestamp:
+                    description: "last timestamp of a monthly accumulation is calculated"
+                    type: "string"
+                    format: "date-time"
+        attribute.total.monthlyAccumulatedAmount:
+            type: "object"
+            properties:
+                monthlyAccumulatedAmount:
+                    description: "a monthly accumulated transaction amount"
+                    type: "number"
+        attribute.total.monthlyAccumulatedCount:
+            type: "object"
+            properties:
+                monthlyAccumulatedCount:
+                    description: "a monthly accumulated number of transactions"
+                    type: "integer"
         request.cursor.query:
             type: "object"
             properties:
@@ -3782,6 +4121,63 @@ components:
                                 - $ref: "#/components/schemas/attribute.multiFactorAuthentication.tokenDeviceName"
                                 - $ref: "#/components/schemas/attribute.multiFactorAuthentication.tokenDeviceSerial"
                                 - $ref: "#/components/schemas/attribute.multiFactorAuthentication.failedAttemptCount"
+        response.merchant.records:
+            type: "array"
+            items:
+                allOf:
+                    - $ref: "#/components/schemas/attribute.rowId"
+                    - $ref: "#/components/schemas/attribute.recordStatus"
+                    - $ref: "#/components/schemas/attribute.recordTimestamp"
+                    - $ref: "#/components/schemas/attribute.merchant.identifier"
+                    - $ref: "#/components/schemas/attribute.merchant.parent"
+                    - $ref: "#/components/schemas/attribute.merchant.numberOfDevices"
+                    - $ref: "#/components/schemas/attribute.merchant.categoryCode"
+                    - $ref: "#/components/schemas/attribute.merchant.allowedCaptureMethods"
+                    - $ref: "#/components/schemas/attribute.merchant.flexibleCurrency"
+                    - $ref: "#/components/schemas/attribute.merchant.crossBorder"
+                    - $ref: "#/components/schemas/attribute.merchant.restrictedLocation"
+                    - $ref: "#/components/schemas/attribute.merchant.businessHourClose"
+                    - $ref: "#/components/schemas/attribute.merchant.allowedServices"
+                    - $ref: "#/components/schemas/attribute.merchant.restrictedLatitude"
+                    - $ref: "#/components/schemas/attribute.merchant.restrictedLongitude"
+                    - $ref: "#/components/schemas/attribute.merchant.restrictedRadius"
+                    - $ref: "#/components/schemas/attribute.merchant.effectiveTimestamp"
+                    - $ref: "#/components/schemas/attribute.merchant.expiryTimestamp"
+                    - $ref: "#/components/schemas/acquirer.identifier"
+                    - $ref: "#/components/schemas/currency.isoNumericCode"
+                    - $ref: "#/components/schemas/country.isoNumericCode"
+                    - $ref: "#/components/schemas/fee.identifier"
+                    - type: "object"
+                      properties:
+                        limit:
+                            allOf:
+                                - $ref: "#/components/schemas/attribute.limit.identifier"
+                                - $ref: "#/components/schemas/attribute.limit.useExtended"
+                                - $ref: "#/components/schemas/attribute.limit.dailyMaximumAmount"
+                                - $ref: "#/components/schemas/attribute.limit.dailyMaximumCount"
+                                - $ref: "#/components/schemas/attribute.limit.weeklyMaximumAmount"
+                                - $ref: "#/components/schemas/attribute.limit.weeklyMaximumCount"
+                                - $ref: "#/components/schemas/attribute.limit.monthlyMaximumAmount"
+                                - $ref: "#/components/schemas/attribute.limit.monthlyMaximumCount"
+                                - $ref: "#/components/schemas/attribute.limit.EMVChipMaximumAmount"
+                                - $ref: "#/components/schemas/attribute.limit.magneticStripeMaximumAmount"
+                                - $ref: "#/components/schemas/attribute.limit.manualEntryMaximumAmount"
+                    - type: "object"
+                      properties:
+                        total:
+                            allOf:
+                                - $ref: "#/components/schemas/attribute.total.identifier"
+                                - $ref: "#/components/schemas/attribute.total.useExtended"
+                                - $ref: "#/components/schemas/attribute.total.accumulationMethod"
+                                - $ref: "#/components/schemas/attribute.total.dailyLastTimestamp"
+                                - $ref: "#/components/schemas/attribute.total.dailyAccumulatedAmount"
+                                - $ref: "#/components/schemas/attribute.total.dailyAccumulatedCount"
+                                - $ref: "#/components/schemas/attribute.total.weeklyLastTimestamp"
+                                - $ref: "#/components/schemas/attribute.total.weeklyAccumulatedAmount"
+                                - $ref: "#/components/schemas/attribute.total.weeklyAccumulatedCount"
+                                - $ref: "#/components/schemas/attribute.total.monthlyLastTimestamp"
+                                - $ref: "#/components/schemas/attribute.total.monthlyAccumulatedAmount"
+                                - $ref: "#/components/schemas/attribute.total.monthlyAccumulatedCount"
     parameters:
         SessionToken:
             name: "x-synap-SessionToken"
@@ -4163,6 +4559,40 @@ components:
                             - $ref: "#/components/schemas/response.result"
                             - required:
                                 - result
+        login:
+            description: "Returned a session token and related data"
+            content:
+                application/json:
+                    schema:
+                        allOf:
+                            - $ref: "#/components/schemas/response.result"
+                            - type: "object"
+                              properties:
+                                sessionToken:
+                                    type: "string"
+                                    example: "<session_token>"
+                                user:
+                                    allOf:
+                                        - $ref: "#/components/schemas/securityPolicy.inactivityTimeout"
+                                        - $ref: "#/components/schemas/attribute.user.name"
+                                        - $ref: "#/components/schemas/attribute.user.preferName"
+                                        - $ref: "#/components/schemas/attribute.user.lastLoginTimestamp"
+                                        - $ref: "#/components/schemas/passwordPolicy.minimumLength"
+                                        - $ref: "#/components/schemas/passwordPolicy.validationChecks"
+                                        - $ref: "#/components/schemas/organization.name"
+                                        - $ref: "#/components/schemas/organization.preferName"
+                                        - $ref: "#/components/schemas/merchant.identifier"
+                                        - type: "object"
+                                          properties:
+                                            device:
+                                                allOf:
+                                                    - $ref: "#/components/schemas/attribute.device.authenticationData"
+                            - required:
+                                - result
+                                - sessionToken
+                                - user
+                                - passwordPolicy
+                                - organization
     securitySchemes:
         synapSessionToken:
             type: "apiKey"
@@ -4238,37 +4668,41 @@ paths:
                                         - $ref: "#/components/schemas/attribute.user.password"
                                         - required:
                                             - name
-                                            - password
+                                device:
+                                    allOf:
+                                        - $ref: "#/components/schemas/attribute.device.identifier"
+                                        - $ref: "#/components/schemas/attribute.device.authenticationData"
+                                        - required:
+                                            - identifier
+                                            - authenticationData
             responses:
                 200:
-                    description: "Returned a session token and related data"
-                    content:
-                        application/json:
-                            schema:
-                                allOf:
-                                    - $ref: "#/components/schemas/response.result"
-                                    - type: "object"
-                                      properties:
-                                        sessionToken:
-                                            type: "string"
-                                            example: "<session_token>"
-                                        user:
-                                            allOf:
-                                                - $ref: "#/components/schemas/securityPolicy.inactivityTimeout"
-                                                - $ref: "#/components/schemas/attribute.user.name"
-                                                - $ref: "#/components/schemas/attribute.user.preferName"
-                                                - $ref: "#/components/schemas/attribute.user.lastLoginTimestamp"
-                                                - $ref: "#/components/schemas/passwordPolicy.minimumLength"
-                                                - $ref: "#/components/schemas/passwordPolicy.validationChecks"
-                                                - $ref: "#/components/schemas/organization.name"
-                                                - $ref: "#/components/schemas/organization.preferName"
-                                                - $ref: "#/components/schemas/merchant.identifier"
-                                    - required:
-                                        - result
-                                        - sessionToken
-                                        - user
-                                        - passwordPolicy
-                                        - organization
+                    $ref: "#/components/responses/login"
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/login.continue.with.secretCode:
+        summary: "Continue login with secret code validation"
+        post:
+            tags:
+                -  "Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                multiFactorAuthentication:
+                                    allOf:
+                                        - $ref: "#/components/schemas/attribute.multiFactorAuthentication.secretCode"
+                                        - $ref: "#/components/schemas/attribute.multiFactorAuthentication.keystream"
+                                        - required:
+                                            - secretCode
+                            required:
+                                - multiFactorAuthentication
+            responses:
+                200:
+                    $ref: "#/components/responses/login"
                 default:
                     $ref: "#/components/responses/generic.result"
     /command/ContactShortList:  # deprecated
@@ -5864,7 +6298,162 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
-    /command/userMailingAddress.query:
+    /command/userMailingAddress.query:  # deprecated
+        summary: "Get user's mailing address"
+        post:
+            description: "Get user's mailing address; refer to /command/user.mailingAddress.query"
+            deprecated: true
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    allOf:
+                                        - $ref: "#/components/schemas/user.name"
+                                        - $ref: "#/components/schemas/mailingAddress.type"
+                                        - required:
+                                            - user
+                            required:
+                                - filters
+            responses:
+                200:
+                    description: "Returned list of user records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        mailingAddresses:
+                                            type: "array"
+                                            items:
+                                                allOf:
+                                                    - $ref: "#/components/schemas/attribute.recordStatus"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.type"
+                                                    - $ref: "#/components/schemas/country.isoNumericCode"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.line1"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.line2"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.line3"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.city"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.provinceState"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.postalCode"
+                                required:
+                                    - result
+                                    - mailingAddresses
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/userMailingAddress.new:  #deprecated
+        summary: "Create a new user's mailing address"
+        post:
+            description: "Create a new user's mailing address; refer to /command/user.mailingAddress.new"
+            deprecated: true
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/user.name"
+                                - type: "object"
+                                  properties:
+                                    mailingAddress:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.type"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.line1"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.line2"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.line3"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.city"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.provinceState"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.postalCode"
+                                            - required:
+                                                - type
+                                    country:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.country.isoNumericCode"
+                                            - required:
+                                                - isoNumericCode
+                                - required:
+                                    - user
+                                    - mailingAddress
+                                    - country
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/userMailingAddress.update:  #deprecated
+        summary: "Update an existing user's mailing address"
+        post:
+            description: "Update an existing user's mailing address; refer to /command/user.mailingAddress.update"
+            deprecated: true
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    allOf:
+                                        - $ref: "#/components/schemas/user.name"
+                                        - $ref: "#/components/schemas/mailingAddress.type"
+                                        - required:
+                                            - user
+                                            - mailingAddress
+                                mailingAddress:
+                                    allOf:
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.line1"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.line2"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.line3"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.city"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.provinceState"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.postalCode"
+                                country:
+                                    allOf:
+                                        - $ref: "#/components/schemas/attribute.country.isoNumericCode"
+                                        - required:
+                                            - isoNumericCode
+                            required:
+                                - filters
+                                - mailingAddress
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/userMailingAddress.delete:  #deprecated
+        summary: "Delete an existing user's mailing address"
+        post:
+            description: "Delete an existing user's mailing address; refer to /command/user.mailingAddress.delete"
+            deprecated: true
+            tags:
+                -  "User"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    allOf:
+                                        - $ref: "#/components/schemas/user.name"
+                                        - $ref: "#/components/schemas/mailingAddress.type"
+                                        - required:
+                                            - user
+                                            - mailingAddress
+                            required:
+                                - filters
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/user.mailingAddress.query:
         summary: "Get user's mailing address"
         post:
             description: "Get user's mailing address"
@@ -5913,7 +6502,7 @@ paths:
                                     - mailingAddresses
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/userMailingAddress.new:
+    /command/user.mailingAddress.new:
         summary: "Create a new user's mailing address"
         post:
             description: "Create a new user's mailing address"
@@ -5951,7 +6540,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/userMailingAddress.update:
+    /command/user.mailingAddress.update:
         summary: "Update an existing user's mailing address"
         post:
             description: "Update an existing user's mailing address"
@@ -5990,7 +6579,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/userMailingAddress.delete:
+    /command/user.mailingAddress.delete:
         summary: "Delete an existing user's mailing address"
         post:
             description: "Delete an existing user's mailing address"
@@ -9385,6 +9974,129 @@ paths:
                                         - users
                 default:
                     $ref: "#/components/responses/generic.result"
+    /command/multiFactorAuthentication.user.activate:
+        summary: "Activate multi factor authentication for an user"
+        post:
+            tags:
+                -  "Multi Factor Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/user.name"
+                                - type: "object"
+                                  properties:
+                                    multiFactorAuthentication:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.multiFactorAuthentication.name"
+                                            - required:
+                                                - name
+                                - required:
+                                    - user
+                                    - multiFactorAuthentication
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/multiFactorAuthentication.user.deactivate:
+        summary: "Deactivate multi factor authentication for an user"
+        post:
+            tags:
+                -  "Multi Factor Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/user.name"
+                                - required:
+                                    - user
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/multiFactorAuthentication.user.reset:
+        summary: "Reset User's multi factor authentication parameters"
+        post:
+            tags:
+                -  "Multi Factor Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/user.name"
+                                - required:
+                                    - user
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/multiFactorAuthentication.secretCode.generate:
+        summary: "Generate secret code of multi factor authentication"
+        post:
+            tags:
+                -  "Multi Factor Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/user.name"
+                                - type: "object"
+                                  properties:
+                                    multiFactorAuthentication:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.multiFactorAuthentication.keystream"
+                                            - $ref: "#/components/schemas/attribute.multiFactorAuthentication.keystreamAddress"
+                                - required:
+                                    - user
+            responses:
+                200:
+                    description: "Returned secret code"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        multiFactorAuthentication:
+                                            allOf:
+                                                - $ref: "#/components/schemas/attribute.multiFactorAuthentication.secretCode"
+                                    - required:
+                                        - result
+                                        - multiFactorAuthentication
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/multiFactorAuthentication.secretCode.validate:
+        summary: "Validate secret code of multi factor authentication"
+        post:
+            tags:
+                -  "Multi Factor Authentication"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/user.name"
+                                - type: "object"
+                                  properties:
+                                    multiFactorAuthentication:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.multiFactorAuthentication.keystream"
+                                            - $ref: "#/components/schemas/attribute.multiFactorAuthentication.secretCode"
+                                            - required:
+                                                - secretCode
+                                - required:
+                                    - user
+                                    - multiFactorAuthentication
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
     /command/GetCurrency:  # deprecated
         summary: "Get list of currencies"
         post:
@@ -10604,6 +11316,546 @@ paths:
                                     - payment
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/merchant.query:
+        summary: "Get list of merchant"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/request.cursor.query"
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        allOf:
+                                            - $ref: "#/components/schemas/merchant.identifier"
+                                            - $ref: "#/components/schemas/organization.name"
+                                            - required:
+                                                - merchant
+                                - required:
+                                    - filters
+            responses:
+                200:
+                    description: "Returned list of merchant records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - $ref: "#/components/schemas/response.cursor"
+                                    - type: "object"
+                                      properties:
+                                        merchants:
+                                            allOf:
+                                                - $ref: "#/components/schemas/response.merchant.records"
+                                    - required:
+                                        - result
+                                        - merchants
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.fetch:
+        summary: "Fetch more merchant with cursor"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                $ref: "#/components/requestBodies/fetch.with.cursor"
+            responses:
+                200:
+                    description: "Returned list of merchant records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        merchants:
+                                            allOf:
+                                                - $ref: "#/components/schemas/response.merchant.records"
+                                    - required:
+                                        - result
+                                        - merchants
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.new:
+        summary: "Create a new merchant's record"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - type: "object"
+                                  properties:
+                                    merchant:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.merchant.identifier"
+                                            - $ref: "#/components/schemas/attribute.merchant.parent"
+                                            - $ref: "#/components/schemas/attribute.merchant.categoryCode"
+                                            - $ref: "#/components/schemas/attribute.merchant.allowedCaptureMethods"
+                                            - $ref: "#/components/schemas/attribute.merchant.flexibleCurrency"
+                                            - $ref: "#/components/schemas/attribute.merchant.crossBorder"
+                                            - $ref: "#/components/schemas/attribute.merchant.restrictedLocation"
+                                            - $ref: "#/components/schemas/attribute.merchant.businessHourClose"
+                                            - $ref: "#/components/schemas/attribute.merchant.allowedServices"
+                                            - $ref: "#/components/schemas/attribute.merchant.restrictedLatitude"
+                                            - $ref: "#/components/schemas/attribute.merchant.restrictedLongitude"
+                                            - $ref: "#/components/schemas/attribute.merchant.restrictedRadius"
+                                            - $ref: "#/components/schemas/attribute.merchant.effectiveTimestamp"
+                                            - $ref: "#/components/schemas/attribute.merchant.expiryTimestamp"
+                                - type: "object"
+                                  properties:
+                                    limit:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.limit.identifier"
+                                            - $ref: "#/components/schemas/attribute.limit.useExtended"
+                                            - $ref: "#/components/schemas/attribute.limit.dailyMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.dailyMaximumCount"
+                                            - $ref: "#/components/schemas/attribute.limit.weeklyMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.weeklyMaximumCount"
+                                            - $ref: "#/components/schemas/attribute.limit.monthlyMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.monthlyMaximumCount"
+                                            - $ref: "#/components/schemas/attribute.limit.EMVChipMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.magneticStripeMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.manualEntryMaximumAmount"
+                                - type: "object"
+                                  properties:
+                                    total:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.total.identifier"
+                                            - $ref: "#/components/schemas/attribute.total.useExtended"
+                                            - $ref: "#/components/schemas/attribute.total.accumulationMethod"
+                                - type: "object"
+                                  properties:
+                                    fee:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.fee.identifier"
+                                - $ref: "#/components/schemas/acquirer.identifier"
+                                - $ref: "#/components/schemas/currency.isoNumericCode"
+                                - $ref: "#/components/schemas/country.isoNumericCode"
+                            required:
+                                - merchant
+                                - acquirer
+                                - currency
+                                - country
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.update:
+        summary: "Update a merchant's record"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        allOf:
+                                            - $ref: "#/components/schemas/merchant.identifier"
+                                            - required:
+                                                - merchant
+                                - type: "object"
+                                  properties:
+                                    merchant:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.merchant.parent"
+                                            - $ref: "#/components/schemas/attribute.merchant.categoryCode"
+                                            - $ref: "#/components/schemas/attribute.merchant.allowedCaptureMethods"
+                                            - $ref: "#/components/schemas/attribute.merchant.flexibleCurrency"
+                                            - $ref: "#/components/schemas/attribute.merchant.crossBorder"
+                                            - $ref: "#/components/schemas/attribute.merchant.restrictedLocation"
+                                            - $ref: "#/components/schemas/attribute.merchant.businessHourClose"
+                                            - $ref: "#/components/schemas/attribute.merchant.allowedServices"
+                                            - $ref: "#/components/schemas/attribute.merchant.restrictedLatitude"
+                                            - $ref: "#/components/schemas/attribute.merchant.restrictedLongitude"
+                                            - $ref: "#/components/schemas/attribute.merchant.restrictedRadius"
+                                            - $ref: "#/components/schemas/attribute.merchant.effectiveTimestamp"
+                                            - $ref: "#/components/schemas/attribute.merchant.expiryTimestamp"
+                                - type: "object"
+                                  properties:
+                                    fee:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.fee.identifier"
+                                - $ref: "#/components/schemas/acquirer.identifier"
+                                - $ref: "#/components/schemas/currency.isoNumericCode"
+                                - $ref: "#/components/schemas/country.isoNumericCode"
+                            required:
+                                - filters
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.delete:
+        summary: "Delete a merchant's record"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        allOf:
+                                            - $ref: "#/components/schemas/merchant.identifier"
+                                            - required:
+                                                - merchant
+                            required:
+                                - filters
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.limit.update:
+        summary: "Update a merchant's limit record"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        allOf:
+                                            - $ref: "#/components/schemas/merchant.identifier"
+                                            - required:
+                                                - merchant
+                                - type: "object"
+                                  properties:
+                                    limit:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.limit.identifier"
+                                            - $ref: "#/components/schemas/attribute.limit.useExtended"
+                                            - $ref: "#/components/schemas/attribute.limit.dailyMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.dailyMaximumCount"
+                                            - $ref: "#/components/schemas/attribute.limit.weeklyMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.weeklyMaximumCount"
+                                            - $ref: "#/components/schemas/attribute.limit.monthlyMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.monthlyMaximumCount"
+                                            - $ref: "#/components/schemas/attribute.limit.EMVChipMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.magneticStripeMaximumAmount"
+                                            - $ref: "#/components/schemas/attribute.limit.manualEntryMaximumAmount"
+                            required:
+                                - filters
+                                - limit
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.total.update:
+        summary: "Update a merchant's total record"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        allOf:
+                                            - $ref: "#/components/schemas/merchant.identifier"
+                                            - required:
+                                                - merchant
+                                - type: "object"
+                                  properties:
+                                    total:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.total.identifier"
+                                            - $ref: "#/components/schemas/attribute.total.useExtended"
+                                            - $ref: "#/components/schemas/attribute.total.accumulationMethod"
+                            required:
+                                - filters
+                                - total
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.business.query:
+        summary: "Get merchant's business profile"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/request.cursor.query"
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        allOf:
+                                            - $ref: "#/components/schemas/merchant.identifier"
+                                            - required:
+                                                - merchant
+                                - required:
+                                    - filters
+            responses:
+                200:
+                    description: "Returned list of merchant records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        business:
+                                            allOf:
+                                                - $ref: "#/components/schemas/attribute.business.preferName"
+                                                - $ref: "#/components/schemas/attribute.business.otherName"
+                                    - required:
+                                        - result
+                                        - business
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.business.new:
+        summary: "Create a new merchant's business record"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/merchant.identifier"
+                                - type: "object"
+                                  properties:
+                                    business:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.business.preferName"
+                                            - $ref: "#/components/schemas/attribute.business.otherName"
+                            required:
+                                - merchant
+                                - business
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.business.update:
+        summary: "Update a merchant's business record"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        allOf:
+                                            - $ref: "#/components/schemas/merchant.identifier"
+                                            - required:
+                                                - merchant
+                                - type: "object"
+                                  properties:
+                                    business:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.business.preferName"
+                                            - $ref: "#/components/schemas/attribute.business.otherName"
+                            required:
+                                - filters
+                                - business
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.business.delete:
+        summary: "Delete a merchant's business record"
+        post:
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - type: "object"
+                                  properties:
+                                    filters:
+                                        allOf:
+                                            - $ref: "#/components/schemas/merchant.identifier"
+                                            - required:
+                                                - merchant
+                            required:
+                                - filters
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.mailingAddress.query:
+        summary: "Get merchant's mailing address"
+        post:
+            description: "Get merchant's mailing address"
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    allOf:
+                                        - $ref: "#/components/schemas/merchant.identifier"
+                                        - required:
+                                            - merchant
+                            required:
+                                - filters
+            responses:
+                200:
+                    description: "Returned list of merchant records"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        mailingAddresses:
+                                            type: "array"
+                                            items:
+                                                allOf:
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.type"
+                                                    - $ref: "#/components/schemas/country.isoNumericCode"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.line1"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.line2"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.line3"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.city"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.provinceState"
+                                                    - $ref: "#/components/schemas/attribute.mailingAddress.postalCode"
+                                required:
+                                    - result
+                                    - mailingAddresses
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.mailingAddress.new:
+        summary: "Create a new merchant's mailing address"
+        post:
+            description: "Create a new merchant's mailing address"
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            allOf:
+                                - $ref: "#/components/schemas/merchant.identifier"
+                                - type: "object"
+                                  properties:
+                                    mailingAddress:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.type"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.line1"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.line2"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.line3"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.city"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.provinceState"
+                                            - $ref: "#/components/schemas/attribute.mailingAddress.postalCode"
+                                            - required:
+                                                - type
+                                    country:
+                                        allOf:
+                                            - $ref: "#/components/schemas/attribute.country.isoNumericCode"
+                                            - required:
+                                                - isoNumericCode
+                                - required:
+                                    - merchant
+                                    - mailingAddress
+                                    - country
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.mailingAddress.update:
+        summary: "Update an existing merchant's mailing address"
+        post:
+            description: "Update an existing merchant's mailing address"
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    allOf:
+                                        - $ref: "#/components/schemas/merchant.identifier"
+                                        - $ref: "#/components/schemas/mailingAddress.type"
+                                        - required:
+                                            - merchant
+                                            - mailingAddress
+                                mailingAddress:
+                                    allOf:
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.line1"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.line2"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.line3"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.city"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.provinceState"
+                                        - $ref: "#/components/schemas/attribute.mailingAddress.postalCode"
+                                country:
+                                    allOf:
+                                        - $ref: "#/components/schemas/attribute.country.isoNumericCode"
+                                        - required:
+                                            - isoNumericCode
+                            required:
+                                - filters
+                                - mailingAddress
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/merchant.mailingAddress.delete:
+        summary: "Delete an existing merchant's mailing address"
+        post:
+            description: "Delete an existing merchant's mailing address"
+            tags:
+                -  "Merchant"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                filters:
+                                    allOf:
+                                        - $ref: "#/components/schemas/merchant.identifier"
+                                        - $ref: "#/components/schemas/mailingAddress.type"
+                                        - required:
+                                            - merchant
+                                            - mailingAddress
+                            required:
+                                - filters
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
     /command/GetCustomer:
         summary: "Get list of customers"
         post:
