@@ -3744,17 +3744,6 @@ components:
                     type: "string"
                     description: "success or error code"
                     example: "ErrorCode"
-                    enum:
-                        - Success
-                        - Fail
-                        - InvalidSessionToken
-                        - InvalidRequestValues
-                        - ServerTimeout
-                        - SystemError
-                        - InvalidProvider
-                        - NoRecordFound
-                        - InvalidRecord
-                        - InvalidAccessRightOwner
         response.result.reason:
             type: "object"
             properties:
