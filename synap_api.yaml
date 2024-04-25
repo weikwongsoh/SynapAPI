@@ -4739,7 +4739,7 @@ paths:
                                     - result
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
-    /command/userContact.query.without.session:
+    /command/user.contact.query.without.session:
         summary: "Retrieve list of contact for an user"
         post:
             description: "Retrieve list of contact for an user without session token"
