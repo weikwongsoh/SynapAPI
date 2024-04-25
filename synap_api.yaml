@@ -13728,6 +13728,390 @@ paths:
                                     - file
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
+    /command/kswitch.institution.load:
+        summary: "Dynamic load an institution"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                institution:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                            required:
+                                - institution
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.institution.unload:
+        summary: "Dynamic unload an institution"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                institution:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                            required:
+                                - institution
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.institution.enable:
+        summary: "Dynamic enable an institution"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                institution:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                            required:
+                                - institution
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.institution.disable:
+        summary: "Dynamic disable an institution"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                institution:
+                                    type: "object"
+                                    properties:
+                                        identifier:
+                                            type: "string"
+                                    required:
+                                        - identifier
+                            required:
+                                - institution
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.route.load:
+        summary: "Dynamic load a route"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                route:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - route
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.route.unload:
+        summary: "Dynamic unload a route"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                route:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - route
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.route.enable:
+        summary: "Dynamic enable a route"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                route:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - route
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.route.disable:
+        summary: "Dynamic disable a route"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                route:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - route
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.link.load:
+        summary: "Dynamic load a link"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                link:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - link
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.link.unload:
+        summary: "Dynamic unload a link"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                link:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - link
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.link.enable:
+        summary: "Dynamic enable a link"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                link:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - link
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.link.disable:
+        summary: "Dynamic disable a link"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                link:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - link
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.transaction.load:
+        summary: "Dynamic load a transaction"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                transaction:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - transaction
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.transaction.unload:
+        summary: "Dynamic unload a transaction"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                transaction:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - transaction
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.transaction.enable:
+        summary: "Dynamic enable a transaction"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                transaction:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - route
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.transaction.disable:
+        summary: "Dynamic disable a transaction"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                transaction:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - transaction
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
     /command/sendMail:
         summary: "Send email"
         post:
