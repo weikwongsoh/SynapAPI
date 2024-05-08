@@ -5877,6 +5877,7 @@ paths:
                                 - $ref: "#/components/schemas/attribute.user.serverLoginScriptPath"
                                 - $ref: "#/components/schemas/attribute.user.homeDirectoryPath"
                                 - $ref: "#/components/schemas/attribute.user.notificationOptInMap"
+                                - $ref: "#/components/schemas/email.address"
                                 - $ref: "#/components/schemas/organization.name"
                                 - $ref: "#/components/schemas/securityPolicy.name"
                                 - $ref: "#/components/schemas/securityPolicy.inactivityTimeout"
