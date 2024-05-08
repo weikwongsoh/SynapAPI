@@ -7023,7 +7023,7 @@ paths:
                                             - $ref: "#/components/schemas/attribute.contact.flags"
                                             - required:
                                                 - type
-                                                - addressNumber
+                                                - addressOrNumber
                                 - required:
                                     - user
                                     - contact
