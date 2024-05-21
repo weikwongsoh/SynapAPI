@@ -13729,7 +13729,7 @@ paths:
                                     - file
                 default:
                     $ref: "#/components/responses/ResultOnlyResponse"
-    /command/kswitch.institution.load:
+    /command/kswitch.institution.add:
         summary: "Dynamic load an institution"
         post:
             tags:
@@ -13753,7 +13753,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/kswitch.institution.unload:
+    /command/kswitch.institution.remove:
         summary: "Dynamic unload an institution"
         post:
             tags:
@@ -13825,7 +13825,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/kswitch.route.load:
+    /command/kswitch.route.add:
         summary: "Dynamic load a route"
         post:
             tags:
@@ -13849,7 +13849,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/kswitch.route.unload:
+    /command/kswitch.route.remove:
         summary: "Dynamic unload a route"
         post:
             tags:
@@ -13865,6 +13865,8 @@ paths:
                                     type: "object"
                                     properties:
                                         name:
+                                            type: "string"
+                                        options:
                                             type: "string"
                                     required:
                                         - name
@@ -13921,7 +13923,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/kswitch.link.load:
+    /command/kswitch.link.add:
         summary: "Dynamic load a link"
         post:
             tags:
@@ -13945,7 +13947,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/kswitch.link.unload:
+    /command/kswitch.link.remove:
         summary: "Dynamic unload a link"
         post:
             tags:
@@ -14017,7 +14019,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/kswitch.transaction.load:
+    /command/kswitch.transaction.add:
         summary: "Dynamic load a transaction"
         post:
             tags:
@@ -14041,7 +14043,7 @@ paths:
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
-    /command/kswitch.transaction.unload:
+    /command/kswitch.transaction.remove:
         summary: "Dynamic unload a transaction"
         post:
             tags:
@@ -14110,6 +14112,317 @@ paths:
                                         - name
                             required:
                                 - transaction
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.transaction.list:
+        summary: "List transaction"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                transaction:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - transaction
+            responses:
+                default:
+                    description: "Receive list of transactions on success response"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        transactions:
+                                            type: "array"
+                                            items:
+                                                type: "object"
+                                    - required:
+                                        - result
+    /command/kswitch.institutions:
+        summary: "List institutions"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+            responses:
+                default:
+                    description: "Receive list of institutions on success response"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        institutions:
+                                            type: "array"
+                                            items:
+                                                type: "object"
+                                    - required:
+                                        - result
+    /command/kswitch.server.stat:
+        summary: "List servers"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+            responses:
+                default:
+                    description: "Receive list of server statistic on success response"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        server:
+                                            type: "array"
+                                            items:
+                                                type: "object"
+                                    - required:
+                                        - result
+    /command/kswitch.links:
+        summary: "List links/routes"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+            responses:
+                default:
+                    description: "Receive list of links on success response"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        routes:
+                                            type: "array"
+                                            items:
+                                                type: "object"
+                                        links:
+                                            type: "array"
+                                            items:
+                                                type: "object"
+                                    - required:
+                                        - result
+    /command/kswitch.process.list:
+        summary: "List of processes"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+            responses:
+                default:
+                    description: "Receive list of proceses on success response"
+                    content:
+                        application/json:
+                            schema:
+                                allOf:
+                                    - $ref: "#/components/schemas/response.result"
+                                    - type: "object"
+                                      properties:
+                                        processes:
+                                            type: "array"
+                                            items:
+                                                type: "object"
+                                    - required:
+                                        - result
+    /command/kswitch.process.stop:
+        summary: "Stop a process"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                process:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - process
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.process.start:
+        summary: "Start a process"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                process:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - process
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.process.restart:
+        summary: "Restart a process"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                process:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - process
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.process.disable:
+        summary: "Disable a process"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                process:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - process
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.process.enable:
+        summary: "Enable a process"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+                            properties:
+                                process:
+                                    type: "object"
+                                    properties:
+                                        name:
+                                            type: "string"
+                                    required:
+                                        - name
+                            required:
+                                - process
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.server.status:
+        summary: "Server's status"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.server.stop:
+        summary: "Stop server"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
+            responses:
+                default:
+                    $ref: "#/components/responses/generic.result"
+    /command/kswitch.server.start:
+        summary: "Start server"
+        post:
+            tags:
+                -  "KSwitch"
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: "object"
             responses:
                 default:
                     $ref: "#/components/responses/generic.result"
